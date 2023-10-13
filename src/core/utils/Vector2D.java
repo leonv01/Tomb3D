@@ -19,6 +19,22 @@ public class Vector2D {
         this.y = vec.y;
     }
 
+    public void add(Vector2D vec){
+        this.x += vec.x;
+        this.y += vec.y;
+    }
+
+    public void sub(Vector2D vec){
+        this.x -= vec.x;
+        this.y -= vec.y;
+    }
+
+    public double distance(){
+        return Math.sqrt(
+            x * x + y * y
+        );
+    }
+
     public void rotate(double angle){
         double tempX = x;
         double tempY = y;

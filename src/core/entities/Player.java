@@ -13,6 +13,12 @@ public class Player {
 
     private final float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
     private final float ROTATION_SPEED = Config.ROTATION_SPEED;
+    private final int WIDTH = Config.WIDTH;
+    private final int HEIGHT = Config.HEIGHT;
+
+    private final int CELL_SIZE_X = 1;
+    private final int CELL_SIZE_Y = 1;
+    private final int FOV =  1;// Config.FOV;
 
     public InputHandler inputHandler = new InputHandler();
 
@@ -34,22 +40,17 @@ public class Player {
         rotation = 0;
     }
 
-    private void checkHorizontal(){
-        int xIdx = (int)rayPosition.x;
-        int yIdx = (int)rayPosition.y;
+    /*
+     * Wall detection algorithm:
+     * DDA
+     */
+    public void castRays(Map map){
+        rayPosition.x = Math.cos(rotation);
+        rayPosition.y = Math.sin(rotation);
 
-        deltaRayPosition.y = yIdx - rayPosition.y;
-        if(rotation <= Math.PI){
-            rayPosition.x = -deltaRayPosition.y * 1 / Math.tan(rotation);
-            rayPosition.x = position.x - rayPosition.x;
-            rayPosition.y = position.y - deltaPosition.y; 
-        }
-        
-        System.out.println("Delta: " + deltaRayPosition);
-    }
-
-    public void castRays(){
-        checkHorizontal();
+        rayPosition.x = (int) position.x;
+        rayPosition.y = (int) position.y;
+        System.out.println(rayPosition);
     }
 
     public void update(Map map){
@@ -118,7 +119,9 @@ public class Player {
             deltaPosition.x = Math.cos(rotation);
             deltaPosition.y = Math.sin(rotation);
         }
-        System.out.println(position);
-        castRays();
+        //System.out.println(position);
+        //System.out.println(rotation);
+        System.out.println(deltaPosition);
+        castRays(map);
     }
 }
