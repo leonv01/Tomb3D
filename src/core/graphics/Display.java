@@ -6,18 +6,19 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
-
 import javax.swing.JFrame;
 
 import core.utils.Config;
 
 public class Display extends JFrame{
 
-    private BufferedImage image;
+    BufferedImage image;
+    private final int DIS_HEIGHT = Config.HEIGHT;
+    private final int DIS_WIDTH = Config.WIDTH;
 
     public Display(){
-        image = new BufferedImage(Config.WIDTH, Config.HEIGHT, BufferedImage.TYPE_INT_RGB);
-        setSize(Config.WIDTH, Config.HEIGHT);
+        image = new BufferedImage(DIS_WIDTH, DIS_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        setSize(DIS_WIDTH, DIS_HEIGHT);
         setResizable(false);
         setTitle("Tomb3D");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,7 +38,13 @@ public class Display extends JFrame{
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+        
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
+
+        g.setColor(Color.lightGray);
+        g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
+         
         bs.show();
     }
 }

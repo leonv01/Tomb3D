@@ -1,18 +1,20 @@
-## Getting Started
+## Tomb3D
+is a pure Java Swing game, using the ray casting technique to simulate a 3D worldspace by only using 2D coordinates. 
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Roadmap:
+- Enemies + Enemy targeting
+- Shooting mechanic
+- Looting/Point system
+- Level Editor
+- Import/Export custom maps
 
-## Folder Structure
+## Requirements:
+- Java Runtime Environment
 
-The workspace contains two folders by default, where:
+## License:
+Distributed under the MIT License. 
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## Sources:
+- ["Super Fast Ray Casting in Tiled Worlds using DDA" by javidx9](https://youtu.be/NbSee-XM7WA?si=9yfZXxtmH0g_dTnR)
+- ["Making a Basic 3D Engine in Java" by sheeptheelectric](https://www.instructables.com/Making-a-Basic-3D-Engine-in-Java/)
+- ["Make Your Own Raycaster Series" by 3DSage](https://youtu.be/gYRrGTC7GtA?si=Wf8iMP8HbzdcR-xt)

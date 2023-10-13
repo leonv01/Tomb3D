@@ -38,12 +38,14 @@ public class Player {
         int xIdx = (int)rayPosition.x;
         int yIdx = (int)rayPosition.y;
 
-        deltaPosition.y = yIdx - rayPosition.y;
+        deltaRayPosition.y = yIdx - rayPosition.y;
         if(rotation <= Math.PI){
-            deltaPosition.x = -deltaPosition.y * 1/Math.tan(rotation);
+            rayPosition.x = -deltaRayPosition.y * 1 / Math.tan(rotation);
+            rayPosition.x = position.x - rayPosition.x;
+            rayPosition.y = position.y - deltaPosition.y; 
         }
         
-        System.out.println("Delta: " + deltaPosition);
+        System.out.println("Delta: " + deltaRayPosition);
     }
 
     public void castRays(){
@@ -102,20 +104,21 @@ public class Player {
             }
         }
         if(inputHandler.left){
-            rotation += ROTATION_SPEED;
-            if(rotation >= 2 * Math.PI)
-                rotation = 0;
-            deltaPosition.x = Math.cos(rotation);
-            deltaPosition.y = Math.sin(rotation);
-        }
-        if(inputHandler.right){
             rotation -= ROTATION_SPEED;
             if(rotation <= 0)
                 rotation = 2 * Math.PI;
             deltaPosition.x = Math.cos(rotation);
             deltaPosition.y = Math.sin(rotation);
         }
+        if(inputHandler.right){
+            rotation += ROTATION_SPEED;
+            if(rotation >= 2 * Math.PI)
+                rotation = 0;
+
+            deltaPosition.x = Math.cos(rotation);
+            deltaPosition.y = Math.sin(rotation);
+        }
         System.out.println(position);
-        //castRays();
+        castRays();
     }
 }

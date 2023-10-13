@@ -14,6 +14,7 @@ public class Texture {
 
     public Texture(String path){
         this.path = path;
+        loadTexture();
     }
 
     private void loadTexture(){

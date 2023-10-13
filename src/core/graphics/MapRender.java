@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
-
 import javax.swing.JFrame;
 
 import core.entities.Player;
@@ -18,8 +17,8 @@ public class MapRender extends JFrame{
     Player player;
     BufferedImage image;
 
-    final int MAP_WIDTH = Config.WIDTH / 2;
-    final int MAP_HEIGHT = Config.HEIGHT / 2;
+    final int MAP_WIDTH = Config.WIDTH;
+    final int MAP_HEIGHT = Config.HEIGHT;
 
     final int TILE_X;
     final int TILE_Y;
@@ -70,7 +69,10 @@ public class MapRender extends JFrame{
         }
 
         g.setColor(Color.red);
-        g.drawRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
+        g.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
+
+        g.setColor(Color.BLACK);
+        g.drawLine((int)player.rayPosition.x, (int)player.rayPosition.y, (int)player.deltaRayPosition.x, (int)player.deltaRayPosition.y);
         bs.show();
     }
 }
