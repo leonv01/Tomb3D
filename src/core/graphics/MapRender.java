@@ -3,9 +3,7 @@ package core.graphics;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
@@ -53,8 +51,8 @@ public class MapRender extends JFrame{
 
         Color color;
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
-        for (int y = 0; y < map.map.length - 1; y++) {
-            for (int x = 0; x < map.map[y].length - 1; x++) {
+        for (int y = 0; y < map.map.length; y++) {
+            for (int x = 0; x < map.map[y].length; x++) {
                 if(map.map[y][x] == 0)
                     color = Color.WHITE;
                 else 
@@ -79,13 +77,13 @@ public class MapRender extends JFrame{
         g.setColor(Color.BLUE);
         g.drawLine(
             (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
-            (int) ((player.position.x + player.deltaPosition.x) * TILE_X), (int) ((player.position.y + player.deltaPosition.y) * TILE_Y));
+            (int) ((player.position.x + player.direction.x) * TILE_X), (int) ((player.position.y + player.direction.y) * TILE_Y));
 
         g.setColor(Color.RED);
         g.drawLine(
-            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y),
-            (int) player.rayPosition.x * TILE_X, (int) player.rayPosition.y * TILE_Y
-            );
+            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
+            (int) ((player.ray.x) * TILE_X), (int) ((player.ray.y) * TILE_Y));
+
         bs.show();
     }
 }

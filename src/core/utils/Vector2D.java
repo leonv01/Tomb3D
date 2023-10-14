@@ -29,10 +29,18 @@ public class Vector2D {
         this.y -= vec.y;
     }
 
-    public double distance(){
+    public double length(){
         return Math.sqrt(
             x * x + y * y
         );
+    }
+
+    public void normalize(){
+        double length = length();
+        if(length != 0){
+            x /= length;
+            y /= length;
+        }
     }
 
     public void rotate(double angle){

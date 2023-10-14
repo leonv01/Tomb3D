@@ -6,10 +6,10 @@ import core.utils.Config;
 import core.utils.Vector2D;
 
 public class Player {
-    public Vector2D position;
-    public Vector2D deltaPosition;
-    public Vector2D rayPosition;
-    public Vector2D deltaRayPosition;
+    public Vector2D position;   // player position
+    public Vector2D direction;  // player direction vector
+    public Vector2D plane;      // camera plane for fov
+    public Vector2D ray;
 
     private final float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
     private final float ROTATION_SPEED = Config.ROTATION_SPEED;
@@ -18,7 +18,7 @@ public class Player {
 
     private final int CELL_SIZE_X = 1;
     private final int CELL_SIZE_Y = 1;
-    private final int FOV =  1;// Config.FOV;
+    private final float FOV =  0.66f;// Config.FOV;
 
     public InputHandler inputHandler = new InputHandler();
 
@@ -26,17 +26,17 @@ public class Player {
 
     public Player(){
         position = new Vector2D();
-        deltaPosition = new Vector2D(1,0);
-        rayPosition = new Vector2D();
-        deltaRayPosition = new Vector2D();
+        direction = new Vector2D(1,0);
+        plane = new Vector2D(0,FOV);
         rotation = 0;
+        ray = new Vector2D();
     }
 
     public Player(Vector2D position){
         this.position = position;
-        this.deltaPosition = new Vector2D(1,0);
-        this.rayPosition = new Vector2D(position);
-        this.deltaRayPosition = new Vector2D();
+        this.direction = new Vector2D(1,0);
+        this.plane = new Vector2D(0,FOV);
+        this.ray = new Vector2D();
         rotation = 0;
     }
 
@@ -45,12 +45,40 @@ public class Player {
      * DDA
      */
     public void castRays(Map map){
-        rayPosition.x = Math.cos(rotation);
-        rayPosition.y = Math.sin(rotation);
+        int mapX = (int) position.x;
+        int mapY = (int) position.y;
+        
+        double rayX = position.x; // Der Startpunkt des Strahls ist gleich der Spielerposition
+        double rayY = position.y;
+        
+        // Berechne die Richtung des Strahls (normalisierte Richtungsvektoren)
+        double rayDirectionX = direction.x;
+        double rayDirectionY = direction.y;
+        
+        // Berechne die Entfernung zur nächsten vertikalen Kachelkante
+        double deltaX;
+        if (rayDirectionX >= 0) {
+            deltaX = (mapX + 1 - rayX) / rayDirectionX;
+        } else {
+            deltaX = (rayX - mapX) / (-rayDirectionX);
+        }
+        double xIntersection = rayX + deltaX * rayDirectionX;
+        
+        // Berechne die Entfernung zur nächsten horizontalen Kachelkante
+        double deltaY;
+        if (rayDirectionY >= 0) {
+            deltaY = (mapY + 1 - rayY) / rayDirectionY;
+        } else {
+            deltaY = (rayY - mapY) / (-rayDirectionY);
+        }
+        double yIntersection = rayY + deltaY * rayDirectionY;
 
-        rayPosition.x = (int) position.x;
-        rayPosition.y = (int) position.y;
-        System.out.println(rayPosition);
+        // TODO fix pos
+
+        ray.x = xIntersection;
+        ray.y = yIntersection;
+
+        System.out.println(ray);
     }
 
     public void update(Map map){
@@ -60,13 +88,11 @@ public class Player {
         int mapY;
 
         if(inputHandler.forward){
-            tempX = position.x + deltaPosition.x * MOVEMENT_SPEED;
-            tempY = position.y + deltaPosition.y * MOVEMENT_SPEED;
+            tempX = position.x + direction.x * MOVEMENT_SPEED;
+            tempY = position.y + direction.y * MOVEMENT_SPEED;
 
             mapX = (int) (tempX);
             mapY = (int) (tempY);
-
-
             /*
             * Check if tile is free if player would move there
             * Horizontal
@@ -83,8 +109,8 @@ public class Player {
             }
         }
         if(inputHandler.back){
-            tempX = position.x - deltaPosition.x * MOVEMENT_SPEED;
-            tempY = position.y - deltaPosition.y * MOVEMENT_SPEED;
+            tempX = position.x - direction.x * MOVEMENT_SPEED;
+            tempY = position.y - direction.y * MOVEMENT_SPEED;
 
             mapX = (int) tempX;
             mapY = (int) tempY;
@@ -108,20 +134,26 @@ public class Player {
             rotation -= ROTATION_SPEED;
             if(rotation <= 0)
                 rotation = 2 * Math.PI;
-            deltaPosition.x = Math.cos(rotation);
-            deltaPosition.y = Math.sin(rotation);
+            updateDirection(direction);
+            updateDirection(plane);
         }
         if(inputHandler.right){
             rotation += ROTATION_SPEED;
             if(rotation >= 2 * Math.PI)
                 rotation = 0;
 
-            deltaPosition.x = Math.cos(rotation);
-            deltaPosition.y = Math.sin(rotation);
+            updateDirection(direction);
+            updateDirection(plane);
         }
         //System.out.println(position);
         //System.out.println(rotation);
-        System.out.println(deltaPosition);
         castRays(map);
     }
+
+    public void updateDirection(Vector2D vec) {
+        vec.x = Math.cos(rotation);
+        vec.y = Math.sin(rotation);
+        vec.normalize();
+    }
+    
 }
