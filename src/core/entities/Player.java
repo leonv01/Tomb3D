@@ -10,6 +10,7 @@ public class Player {
     public Vector2D direction;  // player direction vector
     public Vector2D plane;      // camera plane for fov
     public Vector2D ray;
+    public Vector2D rayDirection;
 
     private final float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
     private final float ROTATION_SPEED = Config.ROTATION_SPEED;
@@ -27,7 +28,7 @@ public class Player {
     public Player(){
         position = new Vector2D();
         direction = new Vector2D(1,0);
-        plane = new Vector2D(0,FOV);
+        plane = new Vector2D(0,-FOV);
         rotation = 0;
         ray = new Vector2D();
     }
@@ -35,7 +36,7 @@ public class Player {
     public Player(Vector2D position){
         this.position = position;
         this.direction = new Vector2D(1,0);
-        this.plane = new Vector2D(0,FOV);
+        this.plane = new Vector2D(0,-FOV);
         this.ray = new Vector2D();
         rotation = 0;
     }
@@ -54,22 +55,31 @@ public class Player {
 
         ray.x = 0;
         ray.y = 0;
+
+        double distanceV, distanceH;
         //System.out.println(deltaY + " " + deltaX);
 
         /*
          * check if player looks right
          */
         if(direction.x >= 0){
-            double c = deltaX * 1 / Math.cos(rotation);
-            double p = c * Math.sin(rotation);
+            double c = (1.0 - deltaX) * 1 / Math.cos(rotation);
+            double p = (1.0 - deltaX) * Math.tan(rotation);
 
-            ray = new Vector2D(deltaX, p);
+            distanceV = c;
+
+            ray = new Vector2D( 1 -deltaX , p);
             ray.add(position);
-            //System.out.println("rechts");
         }
         else{
             //System.out.println("links");
+            double c = (1.0 - deltaX) * 1 / Math.cos(-rotation);
+            double p = (1.0 - deltaX) * Math.tan(-rotation);
 
+            distanceV = c;
+
+            ray = new Vector2D((1 - deltaX) - 1, p);
+            ray.add(position);
         }
         /*
          * check if player looks down
@@ -80,6 +90,8 @@ public class Player {
             System.out.println(position.y + " " +  (1 - deltaY));
             double p = c * 1 / Math.tan(rotation);
 
+            distanceH = c;
+
             ray = new Vector2D(p, -deltaY + 1);
             ray.add(position);
 
@@ -89,13 +101,18 @@ public class Player {
             double c = deltaY * 1 / Math.sin(rotation);
             double p = c * 1 / Math.tan(rotation);
 
+            distanceH = c;
+
             ray = new Vector2D(p, -deltaY);
             ray.add(position);
 
-            System.out.println(c + " " + p);
+            //System.out.println(c + " " + p);
             //System.out.println("hoch");
-
         }
+        
+        System.out.println(Math.abs(distanceH) + " " + Math.abs(distanceV));
+        
+        //System.out.println(ray);
     }
 
     public void update(Map map){
