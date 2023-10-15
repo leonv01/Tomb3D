@@ -48,37 +48,54 @@ public class Player {
         int mapX = (int) position.x;
         int mapY = (int) position.y;
         
-        double rayX = position.x; // Der Startpunkt des Strahls ist gleich der Spielerposition
-        double rayY = position.y;
-        
-        // Berechne die Richtung des Strahls (normalisierte Richtungsvektoren)
-        double rayDirectionX = direction.x;
-        double rayDirectionY = direction.y;
-        
-        // Berechne die Entfernung zur nächsten vertikalen Kachelkante
-        double deltaX;
-        if (rayDirectionX >= 0) {
-            deltaX = (mapX + 1 - rayX) / rayDirectionX;
-        } else {
-            deltaX = (rayX - mapX) / (-rayDirectionX);
+        double deltaY = position.y - mapY;
+        double deltaX = position.x - mapX;
+
+
+        ray.x = 0;
+        ray.y = 0;
+        //System.out.println(deltaY + " " + deltaX);
+
+        /*
+         * check if player looks right
+         */
+        if(direction.x >= 0){
+            double c = deltaX * 1 / Math.cos(rotation);
+            double p = c * Math.sin(rotation);
+
+            ray = new Vector2D(deltaX, p);
+            ray.add(position);
+            //System.out.println("rechts");
         }
-        double xIntersection = rayX + deltaX * rayDirectionX;
-        
-        // Berechne die Entfernung zur nächsten horizontalen Kachelkante
-        double deltaY;
-        if (rayDirectionY >= 0) {
-            deltaY = (mapY + 1 - rayY) / rayDirectionY;
-        } else {
-            deltaY = (rayY - mapY) / (-rayDirectionY);
+        else{
+            //System.out.println("links");
+
         }
-        double yIntersection = rayY + deltaY * rayDirectionY;
+        /*
+         * check if player looks down
+         */
+        if(direction.y >= 0){
+            //System.out.println("runter");
+            double c = (1.0 - deltaY) * 1 / Math.sin(rotation);
+            System.out.println(position.y + " " +  (1 - deltaY));
+            double p = c * 1 / Math.tan(rotation);
 
-        // TODO fix pos
+            ray = new Vector2D(p, -deltaY + 1);
+            ray.add(position);
 
-        ray.x = xIntersection;
-        ray.y = yIntersection;
+           // System.out.println(c + " " + p);
+        }
+        else{
+            double c = deltaY * 1 / Math.sin(rotation);
+            double p = c * 1 / Math.tan(rotation);
 
-        System.out.println(ray);
+            ray = new Vector2D(p, -deltaY);
+            ray.add(position);
+
+            System.out.println(c + " " + p);
+            //System.out.println("hoch");
+
+        }
     }
 
     public void update(Map map){
