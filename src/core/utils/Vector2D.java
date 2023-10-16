@@ -29,6 +29,12 @@ public class Vector2D {
         this.y -= vec.y;
     }
 
+    public double distance(Vector2D vec){
+        Vector2D vector2d = new Vector2D(this);
+        vector2d.sub(vec);
+        return vector2d.length();
+    }
+
     public double length(){
         return Math.sqrt(
             x * x + y * y

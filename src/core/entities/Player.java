@@ -41,6 +41,8 @@ public class Player {
         rotation = 0;
     }
 
+
+
     /*
      * Wall detection algorithm:
      * DDA
@@ -52,9 +54,7 @@ public class Player {
         double deltaY = position.y - mapY;
         double deltaX = position.x - mapX;
 
-
-        ray.x = 0;
-        ray.y = 0;
+        Vector2D horizontal, vertical;
 
         double distanceV, distanceH;
         //System.out.println(deltaY + " " + deltaX);
@@ -63,54 +63,38 @@ public class Player {
          * check if player looks right
          */
         if(direction.x >= 0){
-            double c = (1.0 - deltaX) * 1 / Math.cos(rotation);
-            double p = (1.0 - deltaX) * Math.tan(rotation);
-
-            distanceV = c;
-
-            ray = new Vector2D( 1 -deltaX , p);
-            ray.add(position);
+            double tempRayX = 1 - deltaX;
+            double tempRayY =  tempRayX * Math.tan(rotation);
+            vertical = new Vector2D(tempRayX, tempRayY);
         }
         else{
-            //System.out.println("links");
-            double c = (1.0 - deltaX) * 1 / Math.cos(-rotation);
-            double p = (1.0 - deltaX) * Math.tan(-rotation);
-
-            distanceV = c;
-
-            ray = new Vector2D((1 - deltaX) - 1, p);
-            ray.add(position);
+            double tempRayX = -deltaX;
+            double tempRayY = deltaX* Math.tan(-rotation);
+            vertical = new Vector2D(tempRayX, tempRayY);
         }
+        distanceV = vertical.length();
         /*
          * check if player looks down
          */
         if(direction.y >= 0){
-            //System.out.println("runter");
-            double c = (1.0 - deltaY) * 1 / Math.sin(rotation);
-            System.out.println(position.y + " " +  (1 - deltaY));
-            double p = c * 1 / Math.tan(rotation);
+            double tmp = -deltaY + 1.0;
+            double tempRayX = tmp / Math.tan(-rotation);
 
-            distanceH = c;
-
-            ray = new Vector2D(p, -deltaY + 1);
-            ray.add(position);
-
-           // System.out.println(c + " " + p);
+            horizontal = new Vector2D(-tempRayX, tmp);
         }
         else{
-            double c = deltaY * 1 / Math.sin(rotation);
-            double p = c * 1 / Math.tan(rotation);
-
-            distanceH = c;
-
-            ray = new Vector2D(p, -deltaY);
-            ray.add(position);
-
-            //System.out.println(c + " " + p);
-            //System.out.println("hoch");
+            double tempRayX = -deltaY / Math.tan(-rotation);
+            horizontal = new Vector2D(-tempRayX, -deltaY);
         }
-        
-        System.out.println(Math.abs(distanceH) + " " + Math.abs(distanceV));
+        distanceH = horizontal.length();
+
+        if(distanceH > distanceV)
+            ray = new Vector2D(vertical);
+        else
+            ray = new Vector2D(horizontal);
+        ray.add(position);
+
+        //System.out.println(Math.abs(distanceH) + " " + Math.abs(distanceV));
         
         //System.out.println(ray);
     }
