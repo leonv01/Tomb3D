@@ -42,6 +42,17 @@ public class MapRender extends JFrame{
         addKeyListener(player.inputHandler);
     }
 
+    private Color mapColorIndex(int i){
+        switch(i){
+            case 0:
+                return Color.white;
+            case 1:
+                return Color.black;
+            default:
+                return Color.red;
+        }
+    }
+
     public void render(){
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
@@ -53,10 +64,8 @@ public class MapRender extends JFrame{
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
         for (int y = 0; y < map.map.length; y++) {
             for (int x = 0; x < map.map[y].length; x++) {
-                if(map.map[y][x] == 0)
-                    color = Color.WHITE;
-                else 
-                    color = Color.BLACK;
+
+                color = mapColorIndex(map.map[y][x]);
                 g.setColor(color);
                 g.fillPolygon(
                     new int[]{
