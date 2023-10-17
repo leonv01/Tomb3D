@@ -12,7 +12,7 @@ public class Player {
     public Vector2D ray;
     public Vector2D rayDirection;
 
-    private final float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
+    private float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
     private final float ROTATION_SPEED = Config.ROTATION_SPEED;
     private final int WIDTH = Config.WIDTH;
     private final int HEIGHT = Config.HEIGHT;
@@ -41,24 +41,12 @@ public class Player {
         rotation = 0;
     }
 
-
-
-    /*
-     * Wall detection algorithm:
-     * DDA
-     */
-    public void castRays(Map map){
+    private Vector2D getVerticalVector(double rad){
         int mapX = (int) position.x;
-        int mapY = (int) position.y;
         
-        double deltaY = position.y - mapY;
         double deltaX = position.x - mapX;
 
-        Vector2D horizontal, vertical;
-
-        double distanceV, distanceH;
-        //System.out.println(deltaY + " " + deltaX);
-
+        Vector2D vertical;
         /*
          * check if player looks right
          */
@@ -72,7 +60,16 @@ public class Player {
             double tempRayY = deltaX* Math.tan(-rotation);
             vertical = new Vector2D(tempRayX, tempRayY);
         }
-        distanceV = vertical.length();
+        return vertical;
+    }
+
+
+    private Vector2D getHorziontalVector(double rad){
+        int mapY = (int) position.y;
+        
+        double deltaY = position.y - mapY;
+
+        Vector2D horizontal;
         /*
          * check if player looks down
          */
@@ -86,17 +83,24 @@ public class Player {
             double tempRayX = -deltaY / Math.tan(-rotation);
             horizontal = new Vector2D(-tempRayX, -deltaY);
         }
-        distanceH = horizontal.length();
+        return horizontal;
+    }
+    /*
+     * Wall detection algorithm:
+     * DDA
+     */
+    public void castRays(Map map){
+        Vector2D horizontal = getHorziontalVector(rotation);
+        Vector2D vertical = getVerticalVector(rotation);
+
+        double distanceH = horizontal.length();
+        double distanceV = vertical.length();
 
         if(distanceH > distanceV)
             ray = new Vector2D(vertical);
         else
             ray = new Vector2D(horizontal);
         ray.add(position);
-
-        //System.out.println(Math.abs(distanceH) + " " + Math.abs(distanceV));
-        
-        //System.out.println(ray);
     }
 
     public void update(Map map){
@@ -105,6 +109,12 @@ public class Player {
         int mapX;
         int mapY;
 
+        if(inputHandler.run){
+            MOVEMENT_SPEED = Config.RUN_SPEED;
+        }
+        else{
+            MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
+        }
         if(inputHandler.forward){
             tempX = position.x + direction.x * MOVEMENT_SPEED;
             tempY = position.y + direction.y * MOVEMENT_SPEED;
@@ -163,8 +173,6 @@ public class Player {
             updateDirection(direction);
             updateDirection(plane);
         }
-        //System.out.println(position);
-        //System.out.println(rotation);
         castRays(map);
     }
 

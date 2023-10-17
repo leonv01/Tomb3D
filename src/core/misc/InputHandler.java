@@ -11,6 +11,7 @@ public class InputHandler implements KeyListener {
     public boolean right;
     public boolean shoot;
     public boolean map;
+    public boolean run;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -41,6 +42,9 @@ public class InputHandler implements KeyListener {
         // Keyboard Input for map
         if(e.getKeyCode() == KeyEvent.VK_M){
             map = true;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+            run = true;
         }
     }
 
@@ -76,6 +80,9 @@ public class InputHandler implements KeyListener {
        }
        if(e.getKeyCode() == KeyEvent.VK_M){
             map = false;
+       }
+       if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+            run = false;
        }
     }
 }
