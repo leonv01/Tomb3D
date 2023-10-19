@@ -4,6 +4,7 @@ import core.entities.Player;
 import core.graphics.Display;
 import core.graphics.MapRender;
 import core.utils.Vector2D;
+import core.entities.Enemy;
 
 public class Game implements Runnable{
 
@@ -13,6 +14,7 @@ public class Game implements Runnable{
     private Player player;
     private Map map;
     private MapRender mapRender;
+    private Enemy enemy;
 
     public Game(){
         thread = new Thread(this);
@@ -22,7 +24,8 @@ public class Game implements Runnable{
         player = new Player(
             new Vector2D(map.map.length / 2, map.map.length / 2)
         );
-        mapRender = new MapRender(map, player);
+        enemy = new Enemy(new Vector2D(1.5, 1.5));
+        mapRender = new MapRender(map, player, enemy);
 
         display.setKeyListener(player.inputHandler);
         start();
@@ -58,6 +61,7 @@ public class Game implements Runnable{
             while (delta >= 1)//Make sure update is only happening 60 times a second
             {
                 player.update(map);
+                enemy.update(map, player);
                 delta--;
             }
             display.render();//displays to the screen unrestricted time

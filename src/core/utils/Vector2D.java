@@ -29,6 +29,13 @@ public class Vector2D {
         this.y -= vec.y;
     }
 
+    public double mul(Vector2D vec){
+        return (
+            this.x * vec.x +
+            this.y * vec.y
+        );
+    }
+
     public double distance(Vector2D vec){
         Vector2D vector2d = new Vector2D(this);
         vector2d.sub(vec);

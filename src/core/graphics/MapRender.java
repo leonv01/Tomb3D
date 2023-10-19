@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
+import core.entities.Enemy;
 import core.entities.Player;
 import core.misc.Map;
 import core.utils.Config;
@@ -16,6 +17,7 @@ import core.utils.Config;
 public class MapRender extends JFrame{
     Map map;
     Player player;
+    Enemy enemy;
     BufferedImage image;
 
     final int MAP_WIDTH = Config.WIDTH;
@@ -41,6 +43,26 @@ public class MapRender extends JFrame{
         setVisible(true);
         addKeyListener(player.inputHandler);
     }
+
+    public MapRender(Map map, Player player, Enemy enemy){
+        this.map = map;
+        this.player = player;
+        this.enemy = enemy;
+        image = new BufferedImage(MAP_WIDTH, MAP_HEIGHT, BufferedImage.TYPE_INT_RGB);
+
+        TILE_X = MAP_WIDTH / map.map[0].length;
+        TILE_Y = MAP_HEIGHT / map.map.length;
+
+        setSize(MAP_WIDTH, MAP_HEIGHT);
+        setResizable(false);
+        setTitle("Map Renderer");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBackground(Color.BLACK);
+        setLocationRelativeTo(null);
+        setVisible(true);
+        addKeyListener(player.inputHandler);
+    }
+
 
     private Color mapColorIndex(int i){
         switch(i){
@@ -81,7 +103,19 @@ public class MapRender extends JFrame{
         g.setColor(Color.red);
         g.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
 
+        if(enemy != null){
+            g.setColor(Color.orange);
+            g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
+            g.setStroke(new BasicStroke(5));
+            g.setColor(Color.BLUE);
+            g.drawLine(
+                (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y), 
+                (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
+
+        }
+
         g.setStroke(new BasicStroke(5));
+
         // view direction
         g.setColor(Color.BLUE);
         g.drawLine(
