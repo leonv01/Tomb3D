@@ -41,66 +41,59 @@ public class Player {
         rotation = 0;
     }
 
-    private Vector2D getVerticalVector(double rad){
-        int mapX = (int) position.x;
-        
-        double deltaX = position.x - mapX;
-
-        Vector2D vertical;
-        /*
-         * check if player looks right
-         */
-        if(direction.x >= 0){
-            double tempRayX = 1 - deltaX;
-            double tempRayY =  tempRayX * Math.tan(rotation);
-            vertical = new Vector2D(tempRayX, tempRayY);
-        }
-        else{
-            double tempRayX = -deltaX;
-            double tempRayY = deltaX* Math.tan(-rotation);
-            vertical = new Vector2D(tempRayX, tempRayY);
-        }
-        return vertical;
-    }
-
-
-    private Vector2D getHorziontalVector(double rad){
-        int mapY = (int) position.y;
-        
-        double deltaY = position.y - mapY;
-
-        Vector2D horizontal;
-        /*
-         * check if player looks down
-         */
-        if(direction.y >= 0){
-            double tmp = -deltaY + 1.0;
-            double tempRayX = tmp / Math.tan(-rotation);
-
-            horizontal = new Vector2D(-tempRayX, tmp);
-        }
-        else{
-            double tempRayX = -deltaY / Math.tan(-rotation);
-            horizontal = new Vector2D(-tempRayX, -deltaY);
-        }
-        return horizontal;
-    }
-    /*
-     * Wall detection algorithm:
-     * DDA
-     */
     public void castRays(Map map){
-        Vector2D horizontal = getHorziontalVector(rotation);
-        Vector2D vertical = getVerticalVector(rotation);
+        int dof = 0;
+        int dofEnd = Config.CELL_COUNT_X;
+        
+        double yRayDelta = position.y - (int)(position.y);
 
-        double distanceH = horizontal.length();
-        double distanceV = vertical.length();
+        double rayX = 0, rayY = 0;
+        double yRayOff = 0, xRayOff = 0;
 
-        if(distanceH > distanceV)
-            ray = new Vector2D(vertical);
-        else
-            ray = new Vector2D(horizontal);
-        ray.add(position);
+        double lookingUp = 1.0;
+        
+        // looking down
+        if(rotation < Math.PI){
+            rayX = -yRayDelta / Math.tan(rotation);
+            rayX = position.x - rayX;
+            rayY = position.y - yRayDelta;
+
+            yRayOff = 1.0;
+            xRayOff = yRayOff / -Math.tan(rotation);
+
+            lookingUp = -1.0;
+        } else if(rotation > Math.PI){
+            double tmp = -yRayDelta + 1.0;
+            
+            rayX = tmp / Math.tan(rotation);
+            rayX = position.x - rayX;
+            rayY = position.y + tmp;
+
+            yRayOff = -1.0;
+            xRayOff = yRayOff / -Math.tan(rotation);
+
+            lookingUp = 0;
+        }
+        if(rotation == Math.PI || rotation == 0 || rotation == 2 * Math.PI){
+            rayX = position.x;
+            rayY = position.y;
+            dof = dofEnd;
+        }
+
+        while(dof < dofEnd){
+            int indexX = (int)(rayX);
+            int indexY = (int)(rayY + lookingUp);
+
+            System.out.println(indexX + " " + indexY);
+            if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0)
+                dof = dofEnd;
+            else{
+                rayX -= xRayOff;
+                rayY -= yRayOff;
+                dof++;
+            }
+        }
+        ray = new Vector2D(rayX, rayY);
     }
 
     public void update(Map map){
@@ -158,14 +151,14 @@ public class Player {
                 position.y = tempY;
             }
         }
-        if(inputHandler.left){
+        if(inputHandler.right){
             rotation -= ROTATION_SPEED;
             if(rotation <= 0)
                 rotation = 2 * Math.PI;
             updateDirection(direction);
             updateDirection(plane);
         }
-        if(inputHandler.right){
+        if(inputHandler.left){
             rotation += ROTATION_SPEED;
             if(rotation >= 2 * Math.PI)
                 rotation = 0;
@@ -177,8 +170,8 @@ public class Player {
     }
 
     public void updateDirection(Vector2D vec) {
-        vec.x = Math.cos(rotation);
-        vec.y = Math.sin(rotation);
+        vec.x = Math.cos(-rotation);
+        vec.y = Math.sin(-rotation);
         vec.normalize();
     }
     

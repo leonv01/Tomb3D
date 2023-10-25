@@ -61,7 +61,7 @@ public class Game implements Runnable{
             while (delta >= 1)//Make sure update is only happening 60 times a second
             {
                 player.update(map);
-                enemy.update(map, player);
+                //enemy.update(map, player);
                 delta--;
             }
             display.render();//displays to the screen unrestricted time
