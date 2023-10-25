@@ -58,10 +58,9 @@ public class Vector2D {
 
     public void rotate(double angle){
         double tempX = x;
-        double tempY = y;
 
-        x = tempX * Math.cos(angle) - tempY * Math.sin(angle);
-        y = tempX * Math.sin(angle) + tempY * Math.cos(angle);
+        x = tempX * Math.cos(angle);
+        y = tempX * Math.sin(angle);
     }
 
     @Override
