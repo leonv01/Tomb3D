@@ -132,6 +132,11 @@ public class MapRender extends JFrame{
             (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
             (int) ((player.verticalVector.x) * TILE_X), (int) ((player.verticalVector.y) * TILE_Y));
 
+    
+        g.setColor(Color.pink);
+        g.drawLine(
+            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
+            (int) ((player.ray.x) * TILE_X), (int) ((player.ray.y) * TILE_Y));
         bs.show();
     }
 }
