@@ -57,51 +57,62 @@ public class Player {
         }
     }
 
+    /*
+     * calculates for the angle of the ray the corresponding vector for the horizontal grid check
+     * algorithm used: DDA
+     * the function returns a 2D Vector for which the length can be determined
+     */
     private Vector2D getHorizontalVector(Map map, double angle){
-        int dof = 0;
-        int dofEnd = Config.CELL_COUNT_X;
+        int dof = 0;    // defines the maximum iterations/extensions for the ray
+        int dofEnd = Config.CELL_COUNT_X;   // defines the limit of the depth of field -> maximum count of horizontal cells
         
-        double yRayDelta = position.y - (int)(position.y);
+        double yRayDelta = position.y - (int)(position.y);  // determines the relative position of the player within the current cell
 
-        double rayX = 0, rayY = 0;
+        double rayX = 0, rayY = 0;  
         double yRayOff = 0, xRayOff = 0;
 
-        int lookingUp = 1;
+        int lookingUp = 1;  // grid correction for the direction the player looking at
         
-        // looking down
+        // player lookin down
         if(Math.sin(angle) > 0){
-            rayX = -yRayDelta / Math.tan(angle);
+            rayX = -yRayDelta / Math.tan(angle);    // the ray for the current cell ground is calculated based on the relative cell position
             rayX = position.x - rayX;
             rayY = position.y - yRayDelta;
 
-            yRayOff = 1.0;
-            xRayOff = yRayOff / -Math.tan(angle);
+            yRayOff = 1.0;  // y-offset = 1.0 because the player is looking down, so y needs to be positive
+            xRayOff = yRayOff / -Math.tan(angle);   // calculate x offset for the next iterations aslong as no wall has been hit
 
             lookingUp = -1;
-        } else if(Math.sin(angle) < 0){
-            double tmp = -yRayDelta + 1.0;
+        } 
+        // player looking up        
+        else if(Math.sin(angle) < 0){
+            double tmp = -yRayDelta + 1.0;  // get relative cell position by subtracting the delta by the cell-size
             
-            rayX = tmp / Math.tan(angle);
+            rayX = tmp / Math.tan(angle);    // the ray for the current cell ground is calculated based on the relative cell position
             rayX = position.x - rayX;
             rayY = position.y + tmp;
 
-            yRayOff = -1;
-            xRayOff = yRayOff / -Math.tan(angle);
+            yRayOff = -1.0;   // y-offset = -1.0 because the player is looking up, so y need to be negative
+            xRayOff = yRayOff / -Math.tan(angle);   //calculate x offset for the next iteraions aslong as no wall has been hit
 
             lookingUp = 0;
         }
-        if(Math.sin(angle) == 0 /* angle == Math.PI || angle == 0 || angle == 2 * Math.PI */){
+        // if player looks directly horizontal, no horizontal lines are visible -> rays are set to players position
+        if(Math.sin(angle) == 0){
             rayX = position.x;
             rayY = position.y;
-            dof = dofEnd;
+            dof = dofEnd;   // iteration ends directly, because no horizontal wall will be hit
         }
 
+        // iterations goes aslong as no wall has been detected or the indexes are within the array-bounds
         while(dof < dofEnd){
-            int indexX = (int)(rayX);
-            int indexY = (int)(rayY) + lookingUp;
+            int indexX = (int)(rayX);   // get current x-index in the map by flooring the x-position of the ray
+            int indexY = (int)(rayY) + lookingUp;   // get current y-index in the map by flooring the y-position and adding the grid-correction, depending on the look-direction
 
+            // if indexes are in bounds and value in the map are not empty -> loop exit
             if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0)
                 dof = dofEnd;
+            // else offsets are added on ray position until dof is >= than dofEnd
             else{
                 rayX -= xRayOff;
                 rayY -= yRayOff;
