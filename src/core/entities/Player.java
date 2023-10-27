@@ -46,13 +46,26 @@ public class Player {
             horizontalVector = getHorizontalVector(map, rotation);
             verticalVector = getVerticalVector(map, rotation);
 
-            vLength = verticalVector.length();
-            hLength = horizontalVector.length();
+            Vector2D vTemp = verticalVector.diff(position);
+            Vector2D hTemp = horizontalVector.diff(position);
 
-            if(vLength < hLength)
-                ray = verticalVector;
-            else 
-                ray = horizontalVector;
+            vLength = vTemp.length();
+            hLength = hTemp.length();
+
+        
+            System.out.println(vLength + " " + hLength);
+
+            double newX, newY;
+            if((vLength < hLength)){
+                newX = verticalVector.x;
+                newY = verticalVector.y;
+            }
+            else{
+                newX = horizontalVector.x;
+                newY = horizontalVector.y;
+            }
+
+            ray = new Vector2D(newX, newY);
            
         }
     }
