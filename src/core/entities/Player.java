@@ -12,7 +12,7 @@ public class Player {
     public Vector2D direction;  // player direction vector
     public Vector2D horizontalVector;
     public Vector2D verticalVector;
-    public Vector2D ray;
+    public Vector2D[] ray;
 
     private float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
     private final float ROTATION_SPEED = Config.ROTATION_SPEED;
@@ -20,6 +20,8 @@ public class Player {
     public InputHandler inputHandler = new InputHandler();
 
     double rotation;
+    
+    int fov = Config.FOV;
 
     public Player(){
         this.position = new Vector2D();
@@ -27,7 +29,10 @@ public class Player {
         this.rotation = 0;
         this.horizontalVector = new Vector2D();
         this.verticalVector = new Vector2D();
-        this.ray = new Vector2D();
+        this.ray = new Vector2D[2* fov];
+        for (int i = 0; i < ray.length; i++) {
+            ray[i] = new Vector2D();
+        }
     }
 
     public Player(Vector2D position){
@@ -35,25 +40,34 @@ public class Player {
         this.direction = new Vector2D(1,0);
         this.horizontalVector = new Vector2D();
         this.verticalVector = new Vector2D();
-        this.ray = new Vector2D();
+                this.ray = new Vector2D[2* fov];
+        for (int i = 0; i < ray.length; i++) {
+            ray[i] = new Vector2D();
+        }
         this.rotation = 0;
     }
 
     public void castRays(Map map){
         double vLength, hLength;
 
-        for (int i = 0; i < 1; i++) {
-            horizontalVector = getHorizontalVector(map, rotation);
-            verticalVector = getVerticalVector(map, rotation);
+        double lookRadiant = rotation - Math.toRadians(fov);
+        if(lookRadiant < 0) lookRadiant += 2 * Math.PI;
+        if(lookRadiant > 2 * Math.PI) lookRadiant -= 2 * Math.PI;
+
+        for (int i = 0; i < 2 * fov; i++) {
+
+            double tempAngle = lookRadiant + Math.toRadians(i);
+            if(tempAngle < 0) tempAngle += 2 * Math.PI;
+            if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
+
+            horizontalVector = getHorizontalVector(map, tempAngle);
+            verticalVector = getVerticalVector(map, tempAngle);
 
             Vector2D vTemp = verticalVector.diff(position);
             Vector2D hTemp = horizontalVector.diff(position);
 
             vLength = vTemp.length();
             hLength = hTemp.length();
-
-        
-            System.out.println(vLength + " " + hLength);
 
             double newX, newY;
             if((vLength < hLength)){
@@ -65,7 +79,7 @@ public class Player {
                 newY = horizontalVector.y;
             }
 
-            ray = new Vector2D(newX, newY);
+            ray[i] = new Vector2D(newX, newY);
            
         }
     }

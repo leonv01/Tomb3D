@@ -19,5 +19,5 @@ public class Config {
     public static int CELL_COUNT_X = 1;
     public static int CELL_COUNT_Y = 1;
 
-    public final static int FOV = 60;
+    public final static int FOV = 30;
 }

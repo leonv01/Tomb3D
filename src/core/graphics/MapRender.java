@@ -13,6 +13,7 @@ import core.entities.Enemy;
 import core.entities.Player;
 import core.misc.Map;
 import core.utils.Config;
+import core.utils.Vector2D;
 
 public class MapRender extends JFrame{
     Map map;
@@ -134,9 +135,13 @@ public class MapRender extends JFrame{
 
     
         g.setColor(Color.LIGHT_GRAY);
-        g.drawLine(
+
+        for (Vector2D vector2d : player.ray) {
+            g.drawLine(
             (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
-            (int) ((player.ray.x) * TILE_X), (int) ((player.ray.y) * TILE_Y));
+            (int) ((vector2d.x) * TILE_X), (int) ((vector2d.y) * TILE_Y));    
+        }
+        
         bs.show();
 
     }
