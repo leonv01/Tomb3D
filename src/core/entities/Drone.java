@@ -4,24 +4,24 @@ import core.misc.Map;
 import core.utils.Config;
 import core.utils.Vector2D;
 
-public class Enemy {
+public class Drone {
     public Vector2D position;
     public Vector2D direction;
     public double rotation;
 
-    public Enemy() {
+    public Drone() {
         position = new Vector2D();
         direction = new Vector2D();
         rotation = 0;
     }
 
-    public Enemy(Vector2D position, Vector2D direction, double rotation) {
+    public Drone(Vector2D position, Vector2D direction, double rotation) {
         this.direction = direction;
         this.rotation = rotation;
         this.position = position;
     }
 
-    public Enemy(Vector2D position) {
+    public Drone(Vector2D position) {
         this.position = position;
         this.rotation = 0;
         this.direction = new Vector2D(1, 0);
@@ -32,12 +32,6 @@ public class Enemy {
                 position.mul(player.position) /
                         (position.length() * player.position.length()));
         System.out.println(Math.toDegrees(rotation));
-    }
-
-    private void rotateEnemy() {
-        direction.x = Math.cos(rotation);
-        direction.y = Math.sin(rotation);
-        direction.normalize();
     }
 
     public void update(Map map, Player player) {
@@ -52,8 +46,8 @@ public class Enemy {
         direction.x = Math.cos(rotation);
         direction.y = Math.sin(rotation);
 
-        double tempX = position.x + direction.x * Config.MOVEMENT_SPEED;
-        double tempY = position.y + direction.y * Config.MOVEMENT_SPEED;
+        double tempX = position.x + direction.x * Config.DRONE_SPEED;
+        double tempY = position.y + direction.y * Config.DRONE_SPEED;
 
         int mapX = (int) tempX;
         int mapY = (int) tempY;

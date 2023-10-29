@@ -4,12 +4,13 @@ package core.graphics;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-import core.entities.Enemy;
+import core.entities.Drone;
 import core.entities.Player;
 import core.misc.Map;
 import core.utils.Config;
@@ -17,8 +18,6 @@ import core.utils.Vector2D;
 
 public class MapRender extends JFrame{
     Map map;
-    Player player;
-    Enemy enemy;
     BufferedImage image;
 
     final int MAP_WIDTH = Config.WIDTH;
@@ -27,9 +26,8 @@ public class MapRender extends JFrame{
     final int TILE_X;
     final int TILE_Y;
 
-    public MapRender(Map map, Player player){
+    public MapRender(Map map){
         this.map = map;
-        this.player = player;
         image = new BufferedImage(MAP_WIDTH, MAP_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
         TILE_X = MAP_WIDTH / map.map[0].length;
@@ -42,41 +40,21 @@ public class MapRender extends JFrame{
         setBackground(Color.BLACK);
         setLocationRelativeTo(null);
         setVisible(true);
-        addKeyListener(player.inputHandler);
     }
 
-    public MapRender(Map map, Player player, Enemy enemy){
-        this.map = map;
-        this.player = player;
-        this.enemy = enemy;
-        image = new BufferedImage(MAP_WIDTH, MAP_HEIGHT, BufferedImage.TYPE_INT_RGB);
-
-        TILE_X = MAP_WIDTH / map.map[0].length;
-        TILE_Y = MAP_HEIGHT / map.map.length;
-
-        setSize(MAP_WIDTH, MAP_HEIGHT);
-        setResizable(false);
-        setTitle("Map Renderer");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBackground(Color.BLACK);
-        setLocationRelativeTo(null);
-        setVisible(true);
-        addKeyListener(player.inputHandler);
+    public void setKeyListener(KeyListener k){
+        addKeyListener(k);
     }
-
 
     private Color mapColorIndex(int i){
-        switch(i){
-            case 0:
-                return Color.white;
-            case 1:
-                return Color.black;
-            default:
-                return Color.red;
-        }
+        return switch (i) {
+            case 0 -> Color.white;
+            case 1 -> Color.black;
+            default -> Color.red;
+        };
     }
 
-    public void render(){
+    public void render(Player player, Drone enemy){
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
             createBufferStrategy(3);
@@ -103,18 +81,6 @@ public class MapRender extends JFrame{
 
         g.setColor(Color.red);
         g.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
-
-        if(enemy != null){
-            g.setColor(Color.orange);
-            g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
-            g.setStroke(new BasicStroke(5));
-            g.setColor(Color.BLUE);
-            g.drawLine(
-                (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y), 
-                (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
-
-        }
-
         g.setStroke(new BasicStroke(5));
 
         // view direction
@@ -136,12 +102,21 @@ public class MapRender extends JFrame{
     
         g.setColor(Color.LIGHT_GRAY);
 
-        for (Vector2D vector2d : player.ray) {
+        for (Vector2D vector2d : player.rays) {
             g.drawLine(
             (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
             (int) ((vector2d.x) * TILE_X), (int) ((vector2d.y) * TILE_Y));    
         }
-        
+
+        if(enemy != null){
+            g.setColor(Color.orange);
+            g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
+            g.setColor(Color.BLUE);
+            g.drawLine(
+                    (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
+                    (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
+
+        }
         bs.show();
 
     }

@@ -4,17 +4,17 @@ import core.entities.Player;
 import core.graphics.Display;
 import core.graphics.MapRender;
 import core.utils.Vector2D;
-import core.entities.Enemy;
+import core.entities.Drone;
 
 public class Game implements Runnable{
 
     private boolean running;
-    private Thread thread;
-    private Display display;
-    private Player player;
-    private Map map;
-    private MapRender mapRender;
-    private Enemy enemy;
+    private final Thread thread;
+    private final Display display;
+    private final Player player;
+    private final Map map;
+    private final MapRender mapRender;
+    private Drone enemy;
 
     public Game(){
         thread = new Thread(this);
@@ -22,11 +22,12 @@ public class Game implements Runnable{
         map = new Map();
         
         player = new Player(
-            new Vector2D(map.map.length / 2, map.map.length / 2)
+            new Vector2D((double) map.map.length / 2, (double) map.map.length / 2)
         );
-        enemy = new Enemy(new Vector2D(1.5, 1.5));
-        mapRender = new MapRender(map, player, enemy);
+        enemy = new Drone(new Vector2D(1.5, 1.5));
+        mapRender = new MapRender(map);
 
+        mapRender.setKeyListener(player.inputHandler);
         display.setKeyListener(player.inputHandler);
         start();
     }
@@ -45,7 +46,7 @@ public class Game implements Runnable{
         try{
             thread.join();
         }catch (InterruptedException e){
-            e.printStackTrace();
+            System.out.println("threads couldn't join");
         }
     }
 
@@ -64,8 +65,8 @@ public class Game implements Runnable{
                 //enemy.update(map, player);
                 delta--;
             }
-            display.render();//displays to the screen unrestricted time
-            mapRender.render();
+            display.render(player);//displays to the screen unrestricted time
+            mapRender.render(player, enemy);
         }
     }
 }

@@ -1,7 +1,5 @@
 package core.entities;
 
-import java.util.Vector;
-
 import core.misc.InputHandler;
 import core.misc.Map;
 import core.utils.Config;
@@ -12,10 +10,8 @@ public class Player {
     public Vector2D direction;  // player direction vector
     public Vector2D horizontalVector;
     public Vector2D verticalVector;
-    public Vector2D[] ray;
-
-    private float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
-    private final float ROTATION_SPEED = Config.ROTATION_SPEED;
+    public Vector2D[] rays;
+    public double[] raysLength;
 
     public InputHandler inputHandler = new InputHandler();
 
@@ -29,9 +25,11 @@ public class Player {
         this.rotation = 0;
         this.horizontalVector = new Vector2D();
         this.verticalVector = new Vector2D();
-        this.ray = new Vector2D[2* fov];
-        for (int i = 0; i < ray.length; i++) {
-            ray[i] = new Vector2D();
+        this.rays = new Vector2D[2 * fov];
+        this.raysLength = new double[2 * fov];
+        for (int i = 0; i < rays.length; i++) {
+            rays[i] = new Vector2D();
+            raysLength[i] = 0;
         }
     }
 
@@ -40,9 +38,11 @@ public class Player {
         this.direction = new Vector2D(1,0);
         this.horizontalVector = new Vector2D();
         this.verticalVector = new Vector2D();
-                this.ray = new Vector2D[2* fov];
-        for (int i = 0; i < ray.length; i++) {
-            ray[i] = new Vector2D();
+        this.rays = new Vector2D[2 * fov];
+        this.raysLength = new double[2 * fov];
+        for (int i = 0; i < rays.length; i++) {
+            rays[i] = new Vector2D();
+            raysLength[i] = 0;
         }
         this.rotation = 0;
     }
@@ -69,18 +69,19 @@ public class Player {
             vLength = vTemp.length();
             hLength = hTemp.length();
 
-            double newX, newY;
+            double newX, newY, length;
             if((vLength < hLength)){
                 newX = verticalVector.x;
                 newY = verticalVector.y;
+                length = vLength;
             }
             else{
                 newX = horizontalVector.x;
                 newY = horizontalVector.y;
+                length = hLength;
             }
-
-            ray[i] = new Vector2D(newX, newY);
-           
+            rays[i] = new Vector2D(newX, newY);
+            raysLength[i] = length;
         }
     }
 
@@ -100,14 +101,14 @@ public class Player {
 
         int lookingUp = 1;  // grid correction for the direction the player looking at
         
-        // player lookin down
+        // player looking down
         if(Math.sin(angle) > 0){
             rayX = -yRayDelta / Math.tan(angle);    // the ray for the current cell ground is calculated based on the relative cell position
             rayX = position.x - rayX;
             rayY = position.y - yRayDelta;
 
             yRayOff = 1.0;  // y-offset = 1.0 because the player is looking down, so y needs to be positive
-            xRayOff = yRayOff / -Math.tan(angle);   // calculate x offset for the next iterations aslong as no wall has been hit
+            xRayOff = yRayOff / -Math.tan(angle);   // calculate x offset for the next iterations as long as no wall has been hit
 
             lookingUp = -1;
         } 
@@ -120,7 +121,7 @@ public class Player {
             rayY = position.y + tmp;
 
             yRayOff = -1.0;   // y-offset = -1.0 because the player is looking up, so y need to be negative
-            xRayOff = yRayOff / -Math.tan(angle);   //calculate x offset for the next iteraions aslong as no wall has been hit
+            xRayOff = yRayOff / -Math.tan(angle);   //calculate x offset for the next iterations as long as no wall has been hit
 
             lookingUp = 0;
         }
@@ -131,7 +132,7 @@ public class Player {
             dof = dofEnd;   // iteration ends directly, because no horizontal wall will be hit
         }
 
-        // iterations goes aslong as no wall has been detected or the indexes are within the array-bounds
+        // iterations goes as long as no wall has been detected or the indexes are within the array-bounds
         while(dof < dofEnd){
             int indexX = (int)(rayX);   // get current x-index in the map by flooring the x-position of the ray
             int indexY = (int)(rayY) + lookingUp;   // get current y-index in the map by flooring the y-position and adding the grid-correction, depending on the look-direction
@@ -149,6 +150,11 @@ public class Player {
         return new Vector2D(rayX, rayY);
     }
 
+    /*
+     * calculates for the angle of the ray the corresponding vector for the vertical grid check
+     * algorithm used: DDA
+     * the function returns a 2D Vector for which the length can be determined
+     */
     private Vector2D getVerticalVector(Map map, double angle){
         int dof = 0;
         int dofEnd = Config.CELL_COUNT_Y;
@@ -159,8 +165,8 @@ public class Player {
         double yRayOff = 0, xRayOff = 0;
 
         int lookingLeft = 1;
-
-        if(angle < (3 * Math.PI / 2) && angle > Math.PI / 2)   {
+        /* angle < (3 * Math.PI / 2) && angle > Math.PI / 2 */
+        if(Math.cos(angle) < 0)   {
             rayX = xRayDelta;
             rayX = position.x - rayX;
             rayY = xRayDelta * Math.tan(angle);
@@ -171,7 +177,8 @@ public class Player {
             
             lookingLeft = -1;
         }
-        if (angle > (3 * Math.PI / 2) || angle < Math.PI / 2) {
+        // angle > (3 * Math.PI / 2) || angle < Math.PI / 2
+        if (Math.cos(angle) > 0) {
             xRayDelta = 1.0 - xRayDelta;
 
             rayX = xRayDelta;
@@ -184,7 +191,8 @@ public class Player {
 
             lookingLeft = 0;
         }
-        if(angle == Math.PI / 2 || angle == (3 * Math.PI / 2)){
+        //angle == Math.PI / 2 || angle == (3 * Math.PI / 2)
+        if(Math.cos(angle) == 0){
             rayX = position.x;
             rayY = position.y;
 
@@ -213,6 +221,7 @@ public class Player {
         int mapX;
         int mapY;
 
+        float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
         if(inputHandler.run){
             MOVEMENT_SPEED = Config.RUN_SPEED;
         }
@@ -262,6 +271,7 @@ public class Player {
                 position.y = tempY;
             }
         }
+        float ROTATION_SPEED = Config.ROTATION_SPEED;
         if(inputHandler.right){
             rotation -= ROTATION_SPEED;
             if(rotation <= 0)
