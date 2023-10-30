@@ -46,6 +46,8 @@ public class InputHandler implements KeyListener {
         if(e.getKeyCode() == KeyEvent.VK_SHIFT){
             run = true;
         }
+        if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+            System.exit(69);
     }
 
     @Override

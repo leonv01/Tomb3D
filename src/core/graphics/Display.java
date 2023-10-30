@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 import core.entities.Player;
 import core.utils.Config;
-import core.utils.Vector2D;
+import core.utils.Ray;
 
 public class Display extends JFrame{
 
@@ -46,22 +46,23 @@ public class Display extends JFrame{
         g.setColor(Color.lightGray);
         g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
 
-        g.setColor(Color.BLUE);
-        double[] rayLength = player.raysLength;
-        for (int i = 0; i < rayLength.length; i++) {
+        Ray[] rays = player.rays;
+        for (int i = 0; i < rays.length; i++) {
 
-            double wallHeight = (double)DIS_HEIGHT / rayLength[i];
+            double wallHeight = (double)DIS_HEIGHT / rays[i].getLength();
 
             if(wallHeight > DIS_HEIGHT) wallHeight = DIS_HEIGHT;
 
             double lineOffset = (DIS_HEIGHT / 2.0);
 
-            int xOffset = DIS_WIDTH / rayLength.length;
+            int xOffset = DIS_WIDTH / rays.length;
 
-            int temp = (rayLength.length - 1) - i;
+            int temp = (rays.length - 1) - i;
+
+            g.setColor(rays[i].getColor());
 
             g.setStroke(new BasicStroke(xOffset));
-            g.drawLine(temp * xOffset, (int)(lineOffset + wallHeight), temp * xOffset, (int)(lineOffset - wallHeight));
+            g.drawLine(((temp) * xOffset) +xOffset , (int)(lineOffset + wallHeight), ((temp) * xOffset) + xOffset , (int)(lineOffset - wallHeight));
         }
          
         bs.show();

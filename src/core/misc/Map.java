@@ -2,6 +2,8 @@ package core.misc;
 
 import core.utils.Config;
 
+import java.awt.*;
+
 public class Map {
     public int[][] map;
 
@@ -41,5 +43,19 @@ public class Map {
                 x >= 0 && x < map[0].length &&
                         y >= 0 && y < map.length
         );
+    }
+
+    public Color getColor(int x, int y){
+        switch(map[y][x]){
+            case 1 ->{
+                return Color.BLUE;
+            }
+            case 2 ->{
+                return Color.RED;
+            }
+            default -> {
+                return Color.GRAY;
+            }
+        }
     }
 }

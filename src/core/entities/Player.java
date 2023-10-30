@@ -3,15 +3,17 @@ package core.entities;
 import core.misc.InputHandler;
 import core.misc.Map;
 import core.utils.Config;
+import core.utils.Ray;
 import core.utils.Vector2D;
+
+import java.awt.*;
 
 public class Player {
     public Vector2D position;   // player position
     public Vector2D direction;  // player direction vector
-    public Vector2D horizontalVector;
-    public Vector2D verticalVector;
-    public Vector2D[] rays;
-    public double[] raysLength;
+    public Ray horizontal;
+    public Ray vertical;
+    public Ray[] rays;
 
     public InputHandler inputHandler = new InputHandler();
 
@@ -23,26 +25,22 @@ public class Player {
         this.position = new Vector2D();
         this.direction = new Vector2D(1,0);
         this.rotation = 0;
-        this.horizontalVector = new Vector2D();
-        this.verticalVector = new Vector2D();
-        this.rays = new Vector2D[2 * fov];
-        this.raysLength = new double[2 * fov];
+        this.horizontal = new Ray();
+        this.vertical = new Ray();
+        this.rays = new Ray[4 * fov];
         for (int i = 0; i < rays.length; i++) {
-            rays[i] = new Vector2D();
-            raysLength[i] = 0;
+            rays[i] = new Ray();
         }
     }
 
     public Player(Vector2D position){
         this.position = position;
         this.direction = new Vector2D(1,0);
-        this.horizontalVector = new Vector2D();
-        this.verticalVector = new Vector2D();
-        this.rays = new Vector2D[2 * fov];
-        this.raysLength = new double[2 * fov];
+        this.horizontal = new Ray();
+        this.vertical = new Ray();
+        this.rays = new Ray[4 * fov];
         for (int i = 0; i < rays.length; i++) {
-            rays[i] = new Vector2D();
-            raysLength[i] = 0;
+            rays[i] = new Ray();
         }
         this.rotation = 0;
     }
@@ -50,38 +48,38 @@ public class Player {
     public void castRays(Map map){
         double vLength, hLength;
 
-        double lookRadiant = rotation - Math.toRadians(fov);
+        double lookRadiant = rotation - (Math.toRadians(fov) / 2);
         if(lookRadiant < 0) lookRadiant += 2 * Math.PI;
         if(lookRadiant > 2 * Math.PI) lookRadiant -= 2 * Math.PI;
 
-        for (int i = 0; i < 2 * fov; i++) {
+        for (int i = 0; i < 4 * fov; i++) {
 
-            double tempAngle = lookRadiant + Math.toRadians(i);
+            double tempAngle = lookRadiant + Math.toRadians((i / 2.0));
             if(tempAngle < 0) tempAngle += 2 * Math.PI;
             if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
 
-            horizontalVector = getHorizontalVector(map, tempAngle);
-            verticalVector = getVerticalVector(map, tempAngle);
+            horizontal = getHorizontalVector(map, tempAngle);
+            vertical = getVerticalVector(map, tempAngle);
 
-            Vector2D vTemp = verticalVector.diff(position);
-            Vector2D hTemp = horizontalVector.diff(position);
-
-            vLength = vTemp.length();
-            hLength = hTemp.length();
+            horizontal.calculateDifference(position);
+            vertical.calculateDifference(position);
 
             double newX, newY, length;
-            if((vLength < hLength)){
-                newX = verticalVector.x;
-                newY = verticalVector.y;
-                length = vLength;
+            Color wallColor;
+            boolean hor;
+            if((vertical.getLength() < horizontal.getLength())){
+                newX = vertical.getX();
+                newY = vertical.getY();
+                length = vertical.getLength();
+                wallColor = vertical.getColor();
             }
             else{
-                newX = horizontalVector.x;
-                newY = horizontalVector.y;
-                length = hLength;
+                newX = horizontal.getX();
+                newY = horizontal.getY();
+                length = horizontal.getLength();
+                wallColor = horizontal.getColor().darker();
             }
-            rays[i] = new Vector2D(newX, newY);
-            raysLength[i] = length;
+            rays[i] = new Ray(new Vector2D(newX, newY), length, wallColor);
         }
     }
 
@@ -90,7 +88,7 @@ public class Player {
      * algorithm used: DDA
      * the function returns a 2D Vector for which the length can be determined
      */
-    private Vector2D getHorizontalVector(Map map, double angle){
+    private Ray getHorizontalVector(Map map, double angle){
         int dof = 0;    // defines the maximum iterations/extensions for the ray
         int dofEnd = Config.CELL_COUNT_X;   // defines the limit of the depth of field -> maximum count of horizontal cells
         
@@ -132,14 +130,17 @@ public class Player {
             dof = dofEnd;   // iteration ends directly, because no horizontal wall will be hit
         }
 
+        Color color = Color.GRAY;
         // iterations goes as long as no wall has been detected or the indexes are within the array-bounds
         while(dof < dofEnd){
             int indexX = (int)(rayX);   // get current x-index in the map by flooring the x-position of the ray
             int indexY = (int)(rayY) + lookingUp;   // get current y-index in the map by flooring the y-position and adding the grid-correction, depending on the look-direction
 
             // if indexes are in bounds and value in the map are not empty -> loop exit
-            if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0)
+            if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0) {
                 dof = dofEnd;
+                color = map.getColor(indexX, indexY);
+            }
             // else offsets are added on ray position until dof is >= than dofEnd
             else{
                 rayX -= xRayOff;
@@ -147,7 +148,7 @@ public class Player {
                 dof++;
             }
         }
-        return new Vector2D(rayX, rayY);
+        return new Ray(new Vector2D(rayX, rayY), 0, color);
     }
 
     /*
@@ -155,7 +156,7 @@ public class Player {
      * algorithm used: DDA
      * the function returns a 2D Vector for which the length can be determined
      */
-    private Vector2D getVerticalVector(Map map, double angle){
+    private Ray getVerticalVector(Map map, double angle){
         int dof = 0;
         int dofEnd = Config.CELL_COUNT_Y;
         
@@ -199,12 +200,16 @@ public class Player {
             dof = dofEnd;
         }
 
+        Color color = Color.GRAY;
+
         while(dof < dofEnd){
             int indexY = (int)(rayY);
             int indexX = (int)(rayX) + lookingLeft;
 
-            if(map.inBounds(indexX, indexY)	&& map.getValue(indexX, indexY) != 0)
+            if(map.inBounds(indexX, indexY)	&& map.getValue(indexX, indexY) != 0) {
                 dof = dofEnd;
+                color = map.getColor(indexX, indexY);
+            }
             else{
                 rayX -= xRayOff;
                 rayY -= yRayOff;
@@ -212,7 +217,7 @@ public class Player {
             }
         }
 
-        return new Vector2D(rayX, rayY);
+        return new Ray(new Vector2D(rayX, rayY), 0, color);
     }
 
     public void update(Map map){
@@ -286,6 +291,13 @@ public class Player {
             updateDirection(direction);
         }
         castRays(map);
+    }
+
+    public double getX(){
+        return position.x;
+    }
+    public double getY(){
+        return position.y;
     }
 
     public void updateDirection(Vector2D vec) {

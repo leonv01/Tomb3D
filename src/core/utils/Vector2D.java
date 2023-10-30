@@ -24,9 +24,10 @@ public class Vector2D {
         this.y += vec.y;
     }
 
-    public void sub(Vector2D vec){
-        this.x -= vec.x;
-        this.y -= vec.y;
+    public Vector2D sub(Vector2D vec){
+        return new Vector2D(
+        this.x - vec.x,
+        this.y - vec.y);
     }
 
     public Vector2D diff(Vector2D vec){

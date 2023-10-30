@@ -14,6 +14,7 @@ import core.entities.Drone;
 import core.entities.Player;
 import core.misc.Map;
 import core.utils.Config;
+import core.utils.Ray;
 import core.utils.Vector2D;
 
 public class MapRender extends JFrame{
@@ -89,23 +90,13 @@ public class MapRender extends JFrame{
             (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
             (int) ((player.position.x + player.direction.x) * TILE_X), (int) ((player.position.y + player.direction.y) * TILE_Y));
 
-        g.setColor(Color.darkGray);
-        g.drawLine(
-            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
-            (int) ((player.horizontalVector.x) * TILE_X), (int) ((player.horizontalVector.y) * TILE_Y));
 
-        g.setColor(Color.green);
-        g.drawLine(
-            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
-            (int) ((player.verticalVector.x) * TILE_X), (int) ((player.verticalVector.y) * TILE_Y));
 
-    
-        g.setColor(Color.LIGHT_GRAY);
-
-        for (Vector2D vector2d : player.rays) {
+        for (Ray ray : player.rays) {
+            g.setColor(ray.getColor());
             g.drawLine(
-            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y), 
-            (int) ((vector2d.x) * TILE_X), (int) ((vector2d.y) * TILE_Y));    
+            (int) (player.getX() * TILE_X), (int) (player.getY() * TILE_Y),
+            (int) ((ray.getX()) * TILE_X), (int) ((ray.getY()) * TILE_Y));
         }
 
         if(enemy != null){
