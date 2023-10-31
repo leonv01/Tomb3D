@@ -67,7 +67,7 @@ public class MapRender extends JFrame{
         for (int y = 0; y < map.map.length; y++) {
             for (int x = 0; x < map.map[y].length; x++) {
 
-                color = mapColorIndex(map.map[y][x]);
+                color = map.getColor(x,y);
                 g.setColor(color);
                 g.fillPolygon(
                     new int[]{

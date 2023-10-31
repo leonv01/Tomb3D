@@ -79,6 +79,10 @@ public class Player {
                 length = horizontal.getLength();
                 wallColor = horizontal.getColor().darker();
             }
+            double temp = rotation - tempAngle;
+            if(temp < 0) temp += 2 * Math.PI;
+            if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
+            length *= Math.cos(temp);
             rays[i] = new Ray(new Vector2D(newX, newY), length, wallColor);
         }
     }
