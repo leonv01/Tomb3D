@@ -29,11 +29,17 @@ public class Game implements Runnable{
 
         mapRender.setKeyListener(player.inputHandler);
         display.setKeyListener(player.inputHandler);
+
+        RenderingThread renderingThread = new RenderingThread(display, player);
+        Thread renderThread = new Thread(renderingThread);
+        renderThread.start();
+
         start();
     }
 
     public static void main(String[] args) {
         new Game();
+
     }
 
     public synchronized void start(){
@@ -62,10 +68,10 @@ public class Game implements Runnable{
             while (delta >= 1)//Make sure update is only happening 60 times a second
             {
                 player.update(map);
-                //enemy.update(map, player);
+                enemy.update(map, player);
                 delta--;
             }
-            display.render(player);//displays to the screen unrestricted time
+            //display.render(player);//displays to the screen unrestricted time
             mapRender.render(player, enemy);
         }
     }

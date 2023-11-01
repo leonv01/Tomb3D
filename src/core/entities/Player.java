@@ -27,7 +27,7 @@ public class Player {
         this.rotation = 0;
         this.horizontal = new Ray();
         this.vertical = new Ray();
-        this.rays = new Ray[4 * fov];
+        this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) {
             rays[i] = new Ray();
         }
@@ -38,7 +38,7 @@ public class Player {
         this.direction = new Vector2D(1,0);
         this.horizontal = new Ray();
         this.vertical = new Ray();
-        this.rays = new Ray[4 * fov];
+        this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) {
             rays[i] = new Ray();
         }
@@ -48,42 +48,44 @@ public class Player {
     public void castRays(Map map){
         double vLength, hLength;
 
-        double lookRadiant = rotation - (Math.toRadians(fov) / 2);
+        double lookRadiant = rotation - (Math.toRadians(fov) / Config.rayResolution);
         if(lookRadiant < 0) lookRadiant += 2 * Math.PI;
         if(lookRadiant > 2 * Math.PI) lookRadiant -= 2 * Math.PI;
 
-        for (int i = 0; i < 4 * fov; i++) {
+        for (int i = 0; i < rays.length; i++) {
 
-            double tempAngle = lookRadiant + Math.toRadians((i / 2.0));
+            double tempAngle = lookRadiant + Math.toRadians((i / (double)Config.rayResolution));
             if(tempAngle < 0) tempAngle += 2 * Math.PI;
             if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
 
-            horizontal = getHorizontalVector(map, tempAngle);
+            this.horizontal = getHorizontalVector(map, tempAngle);
             vertical = getVerticalVector(map, tempAngle);
 
-            horizontal.calculateDifference(position);
+            this.horizontal.calculateDifference(position);
             vertical.calculateDifference(position);
 
             double newX, newY, length;
             Color wallColor;
-            boolean hor;
-            if((vertical.getLength() < horizontal.getLength())){
+            boolean horizontal;
+            if((vertical.getLength() < this.horizontal.getLength())){
                 newX = vertical.getX();
                 newY = vertical.getY();
                 length = vertical.getLength();
                 wallColor = vertical.getColor();
+                horizontal = false;
             }
             else{
-                newX = horizontal.getX();
-                newY = horizontal.getY();
-                length = horizontal.getLength();
-                wallColor = horizontal.getColor().darker();
+                newX = this.horizontal.getX();
+                newY = this.horizontal.getY();
+                length = this.horizontal.getLength();
+                wallColor = this.horizontal.getColor().darker();
+                horizontal = true;
             }
             double temp = rotation - tempAngle;
             if(temp < 0) temp += 2 * Math.PI;
             if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
             length *= Math.cos(temp);
-            rays[i] = new Ray(new Vector2D(newX, newY), length, wallColor);
+            rays[i] = new Ray(new Vector2D(newX, newY), length, wallColor, horizontal);
         }
     }
 
@@ -152,7 +154,7 @@ public class Player {
                 dof++;
             }
         }
-        return new Ray(new Vector2D(rayX, rayY), 0, color);
+        return new Ray(new Vector2D(rayX, rayY), 0, color, false);
     }
 
     /*
@@ -221,7 +223,7 @@ public class Player {
             }
         }
 
-        return new Ray(new Vector2D(rayX, rayY), 0, color);
+        return new Ray(new Vector2D(rayX, rayY), 0, color, true);
     }
 
     public void update(Map map){
