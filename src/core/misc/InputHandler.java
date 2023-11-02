@@ -3,6 +3,9 @@ package core.misc;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+/**
+ * The InputHandler class represents the input handler in the game.
+ */
 public class InputHandler implements KeyListener {
 
     public boolean forward;
@@ -43,9 +46,11 @@ public class InputHandler implements KeyListener {
         if(e.getKeyCode() == KeyEvent.VK_M){
             map = true;
         }
+        // Keyboard Input for running
         if(e.getKeyCode() == KeyEvent.VK_SHIFT){
             run = true;
         }
+        // Keyboard Input for escaping the game
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
             System.exit(69);
     }
@@ -80,9 +85,11 @@ public class InputHandler implements KeyListener {
        ){
         right = false;
        }
+       // Keyboard Input for opening the map
        if(e.getKeyCode() == KeyEvent.VK_M){
             map = false;
        }
+       // Keyboard Input for running
        if(e.getKeyCode() == KeyEvent.VK_SHIFT){
             run = false;
        }

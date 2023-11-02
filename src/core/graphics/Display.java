@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -12,69 +11,113 @@ import core.entities.Player;
 import core.utils.Config;
 import core.utils.Ray;
 
+/**
+ * The Display class represents the graphical display for rendering the game world.
+ */
 public class Display extends JFrame{
 
+    // Displayed image.
     BufferedImage image;
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
     Texture texture;
 
-    ArrayList<Texture> textureAtlas;
+    // ArrayList<Texture> textureAtlas;
 
+    /**
+     * Constructs a Display object and initializes the display window.
+     */
     public Display(){
+        // Initializing image renderer with Config values and RGB type.
         image = new BufferedImage(DIS_WIDTH, DIS_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        // Set window size with in Config defined values.
         setSize(DIS_WIDTH, DIS_HEIGHT);
+        // Disable window resize.
         setResizable(false);
+        // Set window title
         setTitle("Tomb3D");
+        // Set default close operation.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         setBackground(Color.BLACK);
         setLocationRelativeTo(null);
         setVisible(true);
 
+        // Load debug texture.
         texture = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\wood.png", 64);
     };
 
+    /**
+     * Add KeyListener to this window, so user input can be detected when this window is in foreground.
+     *
+     * @param k KeyListener to detect user input.
+     */
     public void setKeyListener(KeyListener k){
         addKeyListener(k);
     }
 
+    /**
+     * Render the pseudo 3D walls from the players perspective.
+     *
+     * @param player Player object to access properties.
+     */
     public void render(Player player) {
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
             createBufferStrategy(3);
             return;
         }
+
+        // Get Graphics2D component for more functionality.
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
+        /*
+        Sky color:
+        Fill a rectangle from top to half of the window height with the color gray.
+         */
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
 
+        /*
+        Floor color:
+        Fill a rectangle from the half of the window height to the end of the window height with the color light gray.
+         */
         g.setColor(Color.lightGray);
         g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
 
+        // Get the array of calculated rays.
         Ray[] rays = player.rays;
+
+        // Calculate the width for each ray on the image.
         int xOffset = DIS_WIDTH / rays.length;
 
+        // Rendering for each ray.
         for (int i = 0; i < rays.length; i++) {
+
+            // Determining the wall height by dividing the maximum wall height possible (the window height) with the individual ray length.
             double wallHeight = (double) DIS_HEIGHT / rays[i].getLength();
 
+            // If the wall height for the ray exceeds the maximum wall height, it is reset to the maximum wall height possible (the window height).
             if (wallHeight > DIS_HEIGHT) wallHeight = DIS_HEIGHT;
 
+            // Value to reset the walls to the center of the y-axis. Without this offset the walls would start in the middle of the window and exceed the window height.
             double lineOffset = (DIS_HEIGHT / 2.0);
+
+            // Value to let the rays render from right to left.
             int temp = (rays.length - 1) - i;
 
             // Calculate the texture coordinates based on the hit point
             double textureX = rays[i].getX() % 1.0; // Normalize the hit point's X-coordinate
 
             // Map the normalized X-coordinate to the texture width
-            int texelX = (int) (textureX * texture.tex_size);
+            int texelX = (int) (textureX * texture.size);
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
-                int texelY = (int) ((j / wallHeight) * texture.tex_size);
+                int texelY = (int) ((j / wallHeight) * texture.size);
 
                 // Get the color of the texel from the texture
-                int texelColor = texture.rgbArray[texelY * texture.tex_size + texelX];
+                int texelColor = texture.rgbArray[(texture.size - 1 - texelY) * texture.size + texelX];
 
                 // Set the color of the wall segment
                 Color color = new Color(texelColor);
@@ -97,69 +140,4 @@ public class Display extends JFrame{
         }
         bs.show();
     }
-
-
-/*
-    public void render(Player player){
-        BufferStrategy bs = getBufferStrategy();
-        if(bs == null){
-            createBufferStrategy(3);
-            return;
-        }
-        Graphics2D g = (Graphics2D) bs.getDrawGraphics();
-        
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
-
-        g.setColor(Color.lightGray);
-        g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
-
-        Ray[] rays = player.rays;
-
-        for (int i = 0; i < rays.length; i++) {
-
-            double wallHeight = (double) DIS_HEIGHT / rays[i].getLength();
-
-            if (wallHeight > DIS_HEIGHT) wallHeight = DIS_HEIGHT;
-
-            double lineOffset = (DIS_HEIGHT / 2.0);
-
-            int xOffset = DIS_WIDTH / (rays.length );
-
-            int temp = (rays.length - 1) - i;
-
-            int textYoff = (int) wallHeight / texture.tex_size;
-
-            g.setColor(rays[i].getColor());
-
-            g.setStroke(new BasicStroke(xOffset));
-
-            int x = ((temp) * xOffset) + xOffset;
-            int y = (int) (lineOffset - wallHeight / 2);
-            int lineHeight = (int) (wallHeight);
-
-
-
-           // g.fillRect(x, y, xOffset, lineHeight);
-            int s = 0;
-            int yOff = (int)(lineOffset - wallHeight / 2);
-            for (int j = 0; j < wallHeight; j+= textYoff) {
-                g.fillRect(x, yOff, xOffset, textYoff);
-                yOff += textYoff;
-            }
-        }
-/*
-            int t = 0;
-            for (int j = 0; j < wallHeight; j++) {
-
-                int y1 = (int)(lineOffset + wallHeight / 2 - j);
-                int y2 = (int)(lineOffset + wallHeight / 2 - j + 1);
-                g.drawLine(((temp) * xOffset) +xOffset , y1, ((temp) * xOffset) + xOffset , y2);
-            }
-            //g.drawLine(((temp) * xOffset) +xOffset , (int)(lineOffset + wallHeight), ((temp) * xOffset) + xOffset , (int)(lineOffset - wallHeight));
-        }
-
-        bs.show();
-    }
-  */
 }
