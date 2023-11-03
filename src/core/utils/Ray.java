@@ -10,6 +10,7 @@ public class Ray {
     private double length;
     private final Color color;
     private boolean horitontal;
+    private int wallID;
 
     /**
      * Constructs a new Ray with default values.
@@ -19,6 +20,7 @@ public class Ray {
         this.length = 0;
         this.color = Color.WHITE;
         this.horitontal = false;
+        this.wallID = 0;
     }
 
     /**
@@ -29,11 +31,12 @@ public class Ray {
      * @param color The color of the ray.
      * @param horizontal Indicates whether the ray is horizontal (true) or vertical (false).
      */
-    public Ray(Vector2D position, double length, Color color, boolean horizontal) {
+    public Ray(Vector2D position, double length, Color color, boolean horizontal, int wallID) {
         this.position = position;
         this.length = length;
         this.color = color;
         this.horitontal = horizontal;
+        this.wallID = wallID;
     }
 
     /**
@@ -67,6 +70,8 @@ public class Ray {
      * @return The Y-coordinate of the ray's position.
      */
     public double getY(){ return position.y; }
+
+    public int getWallID(){ return wallID; }
 
     /**
      * Get the length of the ray.

@@ -3,8 +3,8 @@ package core.utils;
 import java.awt.Color;
 
 public class Config {
-    public final static int WIDTH = 1000;
-    public final static int HEIGHT = 1000;
+    public final static int WIDTH = 1500;
+    public final static int HEIGHT = 1500;
     public final static float DRONE_SPEED = 0.04f;
     public final static float MOVEMENT_SPEED = .05f;
     public final static float RUN_SPEED = .1f;
@@ -20,6 +20,6 @@ public class Config {
     public static int CELL_COUNT_X = 1;
     public static int CELL_COUNT_Y = 1;
 
-    public final static int FOV = 50;
-    public final static int rayResolution = 4;
+    public final static int FOV = 40;
+    public final static int rayResolution = 3;
 }

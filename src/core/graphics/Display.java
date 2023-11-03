@@ -20,9 +20,7 @@ public class Display extends JFrame{
     BufferedImage image;
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
-    Texture texture;
-
-    // ArrayList<Texture> textureAtlas;
+    Texture textureAtlas;
 
     /**
      * Constructs a Display object and initializes the display window.
@@ -44,7 +42,7 @@ public class Display extends JFrame{
         setVisible(true);
 
         // Load debug texture.
-        texture = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\bluestone.png", 64);
+        textureAtlas = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\texture_atlas.png", 64, 3);
     };
 
     /**
@@ -75,21 +73,21 @@ public class Display extends JFrame{
         Sky color:
         Fill a rectangle from top to half of the window height with the color gray.
          */
-        g.setColor(Color.GRAY);
+        g.setColor(Config.colorSky);
         g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
 
         /*
         Floor color:
         Fill a rectangle from the half of the window height to the end of the window height with the color light gray.
          */
-        g.setColor(Color.lightGray);
+        g.setColor(Config.colorGround);
         g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
 
         // Get the array of calculated rays.
         Ray[] rays = player.rays;
 
         // Calculate the width for each ray on the image.
-        int xOffset = DIS_WIDTH / rays.length;
+        int wallWidth = DIS_WIDTH / rays.length + 1;
 
         // Rendering for each ray.
         for (int i = 0; i < rays.length; i++) {
@@ -111,23 +109,27 @@ public class Display extends JFrame{
             double textureXVertical = rays[i].getY() % 1.0;
 
             // Map the normalized X-coordinate to the texture width
-            int texelXHorizontal = (int) (textureXHorizontal * texture.size);
-            int texelXVertical = (int) (textureXVertical * texture.size);
+            int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.size);
+            int texelXVertical = (int) (textureXVertical * textureAtlas.size);
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
-                int texelYHorizontal = (int) ((j / wallHeight) * texture.size);
-                int texelYVertical = (int) ((j / wallHeight) * texture.size);
+                int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.size);
+                int texelYVertical = (int) ((j / wallHeight) * textureAtlas.size);
 
                 // Get the color of the texel from the texture
                 int texelColor;
+                int textureAtlasOffset = rays[i].getWallID() - 1;
                 Color color;
+
                 if(rays[i].getHorizontal()) {
-                    texelColor = texture.rgbArray[(texture.size - 1 - texelYHorizontal) * texture.size + texelXHorizontal];
+                    // Get the RGB value of the texture at the texture atlas offset for horizontal walls.
+                    texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                     color = new Color(texelColor);
                 }
                 else{
-                    texelColor = texture.rgbArray[(texture.size - 1 - texelYVertical) * texture.size + texelXVertical];
+                    // Get the RGB value of the texture at the texture atlas offset for vertical walls.
+                    texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical);
                     color = new Color(texelColor).darker().darker();
                 }
 
@@ -138,8 +140,8 @@ public class Display extends JFrame{
                 int y1 = (int) (lineOffset + wallHeight / 2 - j);
                 int y2 = (int) (lineOffset + wallHeight / 2 - j + 1);
 
-                int x = ((temp) * xOffset) + xOffset;
-                int width = xOffset;
+                int x = ((temp) * wallWidth);
+                int width = wallWidth;
                 int height = 1; // Adjust this to set the wall segment thickness
 
                 // Use fillRect to draw the wall segment with texture
