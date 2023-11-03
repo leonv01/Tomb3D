@@ -44,7 +44,7 @@ public class Display extends JFrame{
         setVisible(true);
 
         // Load debug texture.
-        texture = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\wood.png", 64);
+        texture = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\bluestone.png", 64);
     };
 
     /**
@@ -107,23 +107,31 @@ public class Display extends JFrame{
             int temp = (rays.length - 1) - i;
 
             // Calculate the texture coordinates based on the hit point
-            double textureX = rays[i].getX() % 1.0; // Normalize the hit point's X-coordinate
+            double textureXHorizontal = rays[i].getX() % 1.0; // Normalize the hit point's X-coordinate
+            double textureXVertical = rays[i].getY() % 1.0;
 
             // Map the normalized X-coordinate to the texture width
-            int texelX = (int) (textureX * texture.size);
+            int texelXHorizontal = (int) (textureXHorizontal * texture.size);
+            int texelXVertical = (int) (textureXVertical * texture.size);
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
-                int texelY = (int) ((j / wallHeight) * texture.size);
+                int texelYHorizontal = (int) ((j / wallHeight) * texture.size);
+                int texelYVertical = (int) ((j / wallHeight) * texture.size);
 
                 // Get the color of the texel from the texture
-                int texelColor = texture.rgbArray[(texture.size - 1 - texelY) * texture.size + texelX];
+                int texelColor;
+                Color color;
+                if(rays[i].getHorizontal()) {
+                    texelColor = texture.rgbArray[(texture.size - 1 - texelYHorizontal) * texture.size + texelXHorizontal];
+                    color = new Color(texelColor);
+                }
+                else{
+                    texelColor = texture.rgbArray[(texture.size - 1 - texelYVertical) * texture.size + texelXVertical];
+                    color = new Color(texelColor).darker().darker();
+                }
 
                 // Set the color of the wall segment
-                Color color = new Color(texelColor);
-                if(!rays[i].getHorizontal()){
-                    color.darker();
-                }
                 g.setColor(color);
 
 
