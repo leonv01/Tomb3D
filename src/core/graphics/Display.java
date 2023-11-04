@@ -42,7 +42,7 @@ public class Display extends JFrame{
         setVisible(true);
 
         // Load debug texture.
-        textureAtlas = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\texture_atlas.png", 64, 3);
+        textureAtlas = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\texture_atlas_shadow.png", 64, 3);
     };
 
     /**
@@ -129,8 +129,8 @@ public class Display extends JFrame{
                 }
                 else{
                     // Get the RGB value of the texture at the texture atlas offset for vertical walls.
-                    texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical);
-                    color = new Color(texelColor).darker().darker();
+                    texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
+                    color = new Color(texelColor);//.darker().darker();
                 }
 
                 // Set the color of the wall segment

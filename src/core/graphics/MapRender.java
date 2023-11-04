@@ -98,19 +98,20 @@ public class MapRender extends JFrame{
         g.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
         g.setStroke(new BasicStroke(5));
 
-        // Render the directional vector where player is looking at.
-        g.setColor(Color.BLUE);
-        g.drawLine(
-            (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y),
-            (int) ((player.position.x + player.direction.x) * TILE_X), (int) ((player.position.y + player.direction.y) * TILE_Y));
-
         // Render the rays of the player.
         for (Ray ray : player.rays) {
-            g.setColor(ray.getColor());
+            g.setColor(Color.ORANGE.darker());
             g.drawLine(
             (int) (player.getX() * TILE_X), (int) (player.getY() * TILE_Y),
             (int) ((ray.getX()) * TILE_X), (int) ((ray.getY()) * TILE_Y));
         }
+
+        // Render the directional vector where player is looking at.
+        g.setColor(Color.BLUE);
+        g.drawLine(
+                (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y),
+                (int) ((player.position.x + player.direction.x) * TILE_X), (int) ((player.position.y + player.direction.y) * TILE_Y));
+
 
         // If an enemy exists, it should be rendered as a square with a width of 5 and its directional vector.
         if(enemy != null){

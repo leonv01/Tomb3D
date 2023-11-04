@@ -8,9 +8,8 @@ import java.awt.*;
 public class Ray {
     private final Vector2D position;
     private double length;
-    private final Color color;
     private boolean horitontal;
-    private int wallID;
+    private final int wallID;
 
     /**
      * Constructs a new Ray with default values.
@@ -18,7 +17,6 @@ public class Ray {
     public Ray(){
         this.position = new Vector2D();
         this.length = 0;
-        this.color = Color.WHITE;
         this.horitontal = false;
         this.wallID = 0;
     }
@@ -28,13 +26,11 @@ public class Ray {
      *
      * @param position The position of the ray.
      * @param length The length of the ray.
-     * @param color The color of the ray.
      * @param horizontal Indicates whether the ray is horizontal (true) or vertical (false).
      */
-    public Ray(Vector2D position, double length, Color color, boolean horizontal, int wallID) {
+    public Ray(Vector2D position, double length, boolean horizontal, int wallID) {
         this.position = position;
         this.length = length;
-        this.color = color;
         this.horitontal = horizontal;
         this.wallID = wallID;
     }
@@ -79,11 +75,4 @@ public class Ray {
      * @return The length of the ray.
      */
     public double getLength(){ return length; }
-
-    /**
-     * Get the color of the ray.
-     *
-     * @return The color of the ray.
-     */
-    public Color getColor(){ return color; }
 }

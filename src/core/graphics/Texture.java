@@ -57,6 +57,6 @@ public class Texture {
      */
     public int getRGB(int y, int x){
          y = Math.abs(y);
-        return rgbArray[y * (size) + x];
+        return rgbArray[y * (size * 2) + x];
     }
 }

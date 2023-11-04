@@ -6,8 +6,6 @@ import core.utils.Config;
 import core.utils.Ray;
 import core.utils.Vector2D;
 
-import java.awt.*;
-
 /**
  * The Player class represents the player entity in the game.
  */
@@ -100,7 +98,6 @@ public class Player {
             this.vertical.calculateDifference(position);
 
             double newX, newY, length;
-            Color wallColor;
             boolean horizontal;
             int wallID;
             /*
@@ -111,7 +108,6 @@ public class Player {
                 newX = vertical.getX();
                 newY = vertical.getY();
                 length = vertical.getLength();
-                wallColor = vertical.getColor();
                 wallID = vertical.getWallID();
                 horizontal = false;
             }
@@ -120,7 +116,6 @@ public class Player {
                 newX = this.horizontal.getX();
                 newY = this.horizontal.getY();
                 length = this.horizontal.getLength();
-                wallColor = this.horizontal.getColor().darker();
                 wallID = this.horizontal.getWallID();
                 horizontal = true;
             }
@@ -132,7 +127,7 @@ public class Player {
             length *= Math.cos(temp);
 
             // A new ray is stored in the array with the values of the shortest ray, the length, color and the indicator if it was a horizontal wall or not.
-            rays[i] = new Ray(new Vector2D(newX, newY), length, wallColor, horizontal, wallID);
+            rays[i] = new Ray(new Vector2D(newX, newY), length, horizontal, wallID);
         }
     }
 
@@ -204,7 +199,6 @@ public class Player {
             dof = dofEnd;
         }
 
-        Color color = Color.GRAY;
         int wallID = 0;
 
         // The ray will iterate as long as no wall has been hit or the ray goes out of bounds.
@@ -218,7 +212,6 @@ public class Player {
             if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0) {
                 wallID = map.getValue(indexX, indexY);
                 dof = dofEnd;
-                color = map.getColor(indexX, indexY);
             }
             // Else the ray will iterate with the x and y offsets.
             else{
@@ -227,7 +220,7 @@ public class Player {
                 dof++;
             }
         }
-        return new Ray(new Vector2D(rayX, rayY), 0, color, false, wallID);
+        return new Ray(new Vector2D(rayX, rayY), 0, false, wallID);
     }
 
     /**
@@ -298,8 +291,6 @@ public class Player {
             dof = dofEnd;
         }
 
-        Color color = Color.GRAY;
-
         int wallID = 0;
         // The ray will iterate as long as no wall has been hit or the ray goes out of bounds.
         while(dof < dofEnd){
@@ -312,7 +303,6 @@ public class Player {
             if(map.inBounds(indexX, indexY)	&& map.getValue(indexX, indexY) != 0) {
                 wallID = map.getValue(indexX, indexY);
                 dof = dofEnd;
-                color = map.getColor(indexX, indexY);
             }
             // Else the ray will iterate with the x and y offsets.
             else{
@@ -322,7 +312,7 @@ public class Player {
             }
         }
 
-        return new Ray(new Vector2D(rayX, rayY), 0, color, true, wallID);
+        return new Ray(new Vector2D(rayX, rayY), 0, true, wallID);
     }
 
     /**
