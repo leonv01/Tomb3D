@@ -406,6 +406,16 @@ public class Player {
             updateDirection(direction);
         }
 
+        if(inputHandler.use){
+
+
+            int directionX = (int) (direction.x + position.x);
+            int directionY = (int) (direction.y + position.y);
+
+            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
+                map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+        }
+
         // Start the ray casting.
         castRays(map);
     }

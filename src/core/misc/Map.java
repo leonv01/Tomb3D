@@ -10,6 +10,19 @@ import java.awt.*;
 public class Map {
     public int[][] map;
 
+    public enum WALLS{
+        EMPTY,
+        WOOD,
+        STONE,
+        DOOR,
+        STONEBRICKS;
+
+        private static final WALLS[] list = WALLS.values();
+        public static WALLS getWall(int idx){
+            return list[idx];
+        }
+    };
+
     /**
      * Constructor for the Map class. Initializes the map and sets configuration values.
      */
@@ -22,12 +35,12 @@ public class Map {
         map = new int[][]{
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1},
-                {1, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
+                {1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 2, 3, 4, 0, 1},
+                {1, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 0, 1},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1},
+                {1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
@@ -59,6 +72,16 @@ public class Map {
     }
 
     /**
+     * Get the current wall ID by the map index.
+     *
+     * @param x The x-index of the cell.
+     * @param y The y-index of the cell.
+     * @return The enum item/wall ID of the x and y index.
+     */
+    public WALLS getWall(int x, int y){
+        return WALLS.getWall(getValue(x,y));
+    }
+    /**
      * Check if the specified indexes are within the bounds of the map.
      *
      * @param x The x-index to check.
@@ -73,6 +96,24 @@ public class Map {
     }
 
     /**
+     * Sets the value at the x and y indexes.
+     *
+     * @param x The x-index of the cell.
+     * @param y The y-index of the cell.
+     * @param value The value to be set in the map array.
+     */
+    public void setValue(int x, int y, int value){ map[y][x] = value; }
+
+    /**
+     * Sets the value at the x and y indexes.
+     *
+     * @param x The x-index of the cell.
+     * @param y The y-index of the cell.
+     * @param walls The value to be set in the map array.
+     */
+    public void setValue(int x, int y, WALLS walls){ map[y][x] = walls.ordinal(); }
+
+    /**
      * Get the color associated with a specific cell in the map for rendering.
      *
      * @param x The x-index of the cell.
@@ -85,10 +126,13 @@ public class Map {
                 return Color.DARK_GRAY;
             }
             case 2 ->{
-                return Color.RED;
+                return Color.RED.darker();
             }
             case 3 ->{
-                return Color.ORANGE;
+                return Color.ORANGE.darker();
+            }
+            case 4 ->{
+                return Color.GREEN.darker();
             }
             default -> {
                 return Color.GRAY;

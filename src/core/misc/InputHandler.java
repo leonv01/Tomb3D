@@ -15,7 +15,7 @@ public class InputHandler implements KeyListener {
     public boolean shoot;
     public boolean map;
     public boolean run;
-
+    public boolean use;
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -53,6 +53,9 @@ public class InputHandler implements KeyListener {
         // Keyboard Input for escaping the game
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
             System.exit(69);
+        // Keyboard Input for using item/door
+        if(e.getKeyCode() == KeyEvent.VK_E)
+            use = true;
     }
 
     @Override
@@ -92,6 +95,10 @@ public class InputHandler implements KeyListener {
        // Keyboard Input for running
        if(e.getKeyCode() == KeyEvent.VK_SHIFT){
             run = false;
+       }
+       // Keyboard Input for using item/door
+       if(e.getKeyCode() == KeyEvent.VK_E){
+           use = false;
        }
     }
 }
