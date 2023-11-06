@@ -42,7 +42,7 @@ public class Display extends JFrame{
         setVisible(true);
 
         // Load debug texture.
-        textureAtlas = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\texture_atlas_shadow_2.png", 64, 4);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
     };
 
     /**

@@ -11,6 +11,9 @@ is a pure Java Swing game, using the ray casting technique to simulate a 3D worl
 ## Requirements:
 - Java Runtime Environment
 
+## Hardware Acceleration:
+For a better experience and a smoother rendering and framerate add "-Dsun.java2d.opengl=true" to your JVM options to allow hardware acceleration.
+
 ## License:
 Distributed under the MIT License. 
 
