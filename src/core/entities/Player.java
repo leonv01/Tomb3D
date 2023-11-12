@@ -1,5 +1,6 @@
 package core.entities;
 
+import core.misc.Game;
 import core.misc.InputHandler;
 import core.misc.Map;
 import core.utils.Config;
@@ -407,13 +408,15 @@ public class Player {
         }
 
         if(inputHandler.use){
-
-
             int directionX = (int) (direction.x + position.x);
             int directionY = (int) (direction.y + position.y);
 
             if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+        }
+
+        if(inputHandler.shoot){
+            Game.soundManager.playAudio("src/audio/sound.wav");
         }
 
         // Start the ray casting.

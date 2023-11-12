@@ -51,11 +51,16 @@ public class InputHandler implements KeyListener {
             run = true;
         }
         // Keyboard Input for escaping the game
-        if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             System.exit(69);
+        }
         // Keyboard Input for using item/door
-        if(e.getKeyCode() == KeyEvent.VK_E)
+        if(e.getKeyCode() == KeyEvent.VK_E) {
             use = true;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_SPACE){
+            shoot = true;
+        }
     }
 
     @Override
@@ -99,6 +104,9 @@ public class InputHandler implements KeyListener {
        // Keyboard Input for using item/door
        if(e.getKeyCode() == KeyEvent.VK_E){
            use = false;
+       }
+       if(e.getKeyCode() == KeyEvent.VK_SPACE){
+           shoot = false;
        }
     }
 }
