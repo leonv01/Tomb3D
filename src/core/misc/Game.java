@@ -3,6 +3,7 @@ package core.misc;
 import core.entities.Player;
 import core.graphics.Display;
 import core.graphics.MapRender;
+import core.utils.SoundManager;
 import core.utils.Vector2D;
 import core.entities.Drone;
 
@@ -33,6 +34,8 @@ public class Game implements Runnable{
 
     private final InputHandler inputHandler;
 
+    public static SoundManager soundManager;
+
     /**
      * Constructor for the Game class. Initializes game components and starts the game loop.
      */
@@ -57,6 +60,8 @@ public class Game implements Runnable{
         RenderingThread renderingThread = new RenderingThread(display, player);
         Thread renderThread = new Thread(renderingThread);
         renderThread.start();
+
+        soundManager = SoundManager.getInstance();
 
         start();
     }
