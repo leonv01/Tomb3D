@@ -21,3 +21,4 @@ Distributed under the MIT License.
 - ["Super Fast Ray Casting in Tiled Worlds using DDA" by javidx9](https://youtu.be/NbSee-XM7WA?si=9yfZXxtmH0g_dTnR)
 - ["Making a Basic 3D Engine in Java" by sheeptheelectric](https://www.instructables.com/Making-a-Basic-3D-Engine-in-Java/)
 - ["Make Your Own Raycaster Series" by 3DSage](https://youtu.be/gYRrGTC7GtA?si=Wf8iMP8HbzdcR-xt)
+- ["Implementing a Ray Caster Part 2: Sprite Rendering" by Liam Wynn](https://wynnliam.github.io/raycaster/news/tutorial/2019/04/03/raycaster-part-02.html)
