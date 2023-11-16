@@ -25,7 +25,7 @@ public class Player {
     private InputHandler inputHandler;
 
     // Rotation value of the player.
-    double rotation;
+    public double rotation;
 
     // FOV value.
     int fov = Config.FOV;

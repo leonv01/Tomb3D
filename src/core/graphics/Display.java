@@ -4,12 +4,15 @@ import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import core.entities.Obstacle;
 import core.entities.Player;
 import core.utils.Config;
 import core.utils.Ray;
+import core.utils.Vector2D;
 
 /**
  * The Display class represents the graphical display for rendering the game world.
@@ -21,6 +24,7 @@ public class Display extends JFrame{
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
     Texture textureAtlas;
+    ArrayList<Obstacle> obstacles;
 
     /**
      * Constructs a Display object and initializes the display window.
@@ -41,6 +45,10 @@ public class Display extends JFrame{
         setLocationRelativeTo(null);
         setVisible(true);
 
+        obstacles = new ArrayList<>(2);
+        obstacles.add(new Obstacle("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\bluestone.png", new Vector2D(5.5,5.5)));
+        obstacles.add(new Obstacle("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\stone.png", new Vector2D(15,10.5)));
+
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
     };
@@ -52,6 +60,26 @@ public class Display extends JFrame{
      */
     public void setKeyListener(KeyListener k){
         addKeyListener(k);
+    }
+
+    public void renderSprites(Player player, Graphics2D g){
+        Obstacle obstacle = obstacles.get(1);
+        obstacle.z = 1;
+        Vector2D diff = player.position.sub(obstacle.getPosition());
+        double cs = Math.cos(player.rotation);
+        double sn = Math.sin(player.rotation);
+
+        double a = diff.y * cs + diff.x * sn;
+        double b = diff.x * cs - diff.y * sn;
+
+        a = (a * Config.WIDTH / b) + (Config.WIDTH / 2.0);
+        b = (obstacle.z * Config.HEIGHT / b) + (Config.HEIGHT / 2.0);
+
+        System.out.println(a + " " + b);
+
+        g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+        //g.setColor(Color.ORANGE);
+        //g.fillRect((int)a,(int) b,20,20);
     }
 
     /**
@@ -68,6 +96,7 @@ public class Display extends JFrame{
 
         // Get Graphics2D component for more functionality.
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
+
 
         /*
         Sky color:
@@ -148,6 +177,7 @@ public class Display extends JFrame{
                 g.fillRect(x, y1, width, height);
             }
         }
+        renderSprites(player, g);
         bs.show();
     }
 }
