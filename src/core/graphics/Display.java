@@ -63,21 +63,22 @@ public class Display extends JFrame{
     }
 
     public void renderSprites(Player player, Graphics2D g){
-        Obstacle obstacle = obstacles.get(1);
-        obstacle.z = 1;
-        Vector2D diff = player.position.sub(obstacle.getPosition());
-        double cs = Math.cos(player.rotation);
-        double sn = Math.sin(player.rotation);
+        for (Obstacle obstacle:obstacles) {
+            obstacle.z = 1;
+            Vector2D diff = player.position.sub(obstacle.getPosition());
+            double cs = Math.cos(player.rotation);
+            double sn = Math.sin(player.rotation);
 
-        double a = diff.y * cs + diff.x * sn;
-        double b = diff.x * cs - diff.y * sn;
+            double a = diff.y * cs + diff.x * sn;
+            double b = diff.x * cs - diff.y * sn;
 
-        a = (a * Config.WIDTH / b) + (Config.WIDTH / 2.0);
-        b = (obstacle.z * Config.HEIGHT / b) + (Config.HEIGHT / 2.0);
+            a = (a * Config.WIDTH / b) + (Config.WIDTH / 2.0);
+            b = (obstacle.z * Config.HEIGHT / b) + (Config.HEIGHT / 2.0);
 
-        System.out.println(a + " " + b);
+            System.out.println(a + " " + b);
 
-        g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+            g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+        }
         //g.setColor(Color.ORANGE);
         //g.fillRect((int)a,(int) b,20,20);
     }
