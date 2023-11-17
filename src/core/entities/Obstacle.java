@@ -16,6 +16,7 @@ public class Obstacle {
     public Obstacle(String path, Vector2D position){
         try {
             image = ImageIO.read(new File(path));
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -46,8 +46,8 @@ public class Display extends JFrame{
         setVisible(true);
 
         obstacles = new ArrayList<>(2);
-        obstacles.add(new Obstacle("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\bluestone.png", new Vector2D(5.5,5.5)));
-        obstacles.add(new Obstacle("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\stone.png", new Vector2D(15,10.5)));
+        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(5.5,5.5)));
+        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5)));
 
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
@@ -62,9 +62,20 @@ public class Display extends JFrame{
         addKeyListener(k);
     }
 
+    public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
+
+        Vector2D diff = obstacle.getPosition().sub(player.position);
+
+        double angle = Math.atan2(diff.y, diff.x) - Math.atan2(player.direction.y, player.direction.x);
+
+        angle = Math.atan2(Math.sin(angle), Math.cos(angle));
+
+        double thresholdAngle = Math.PI / 2;
+        return Math.abs(angle) > Math.PI - thresholdAngle;
+    }
     public void renderSprites(Player player, Graphics2D g){
         for (Obstacle obstacle:obstacles) {
-            obstacle.z = 1;
+            obstacle.z = -0.25;
             Vector2D diff = player.position.sub(obstacle.getPosition());
             double cs = Math.cos(player.rotation);
             double sn = Math.sin(player.rotation);
@@ -75,44 +86,18 @@ public class Display extends JFrame{
             a = (a * Config.WIDTH / b) + (Config.WIDTH / 2.0);
             b = (obstacle.z * Config.HEIGHT / b) + (Config.HEIGHT / 2.0);
 
-            System.out.println(a + " " + b);
-
-            g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+            if(!isSpriteBehindPlayer(player, obstacle)) {
+                // System.out.println(a + " " + b);
+                BufferedImage oldImage = obstacle.getImage();
+                BufferedImage newImage;
+                g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+            }
         }
         //g.setColor(Color.ORANGE);
         //g.fillRect((int)a,(int) b,20,20);
     }
 
-    /**
-     * Render the pseudo 3D walls from the players perspective.
-     *
-     * @param player Player object to access properties.
-     */
-    public void render(Player player) {
-        BufferStrategy bs = getBufferStrategy();
-        if(bs == null){
-            createBufferStrategy(3);
-            return;
-        }
-
-        // Get Graphics2D component for more functionality.
-        Graphics2D g = (Graphics2D) bs.getDrawGraphics();
-
-
-        /*
-        Sky color:
-        Fill a rectangle from top to half of the window height with the color gray.
-         */
-        g.setColor(Config.colorSky);
-        g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
-
-        /*
-        Floor color:
-        Fill a rectangle from the half of the window height to the end of the window height with the color light gray.
-         */
-        g.setColor(Config.colorGround);
-        g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
-
+    public void renderWalls(Player player, Graphics2D g){
         // Get the array of calculated rays.
         Ray[] rays = player.rays;
 
@@ -178,6 +163,40 @@ public class Display extends JFrame{
                 g.fillRect(x, y1, width, height);
             }
         }
+    }
+
+    /**
+     * Render the pseudo 3D walls from the players perspective.
+     *
+     * @param player Player object to access properties.
+     */
+    public void render(Player player) {
+        BufferStrategy bs = getBufferStrategy();
+        if(bs == null){
+            createBufferStrategy(3);
+            return;
+        }
+
+        // Get Graphics2D component for more functionality.
+        Graphics2D g = (Graphics2D) bs.getDrawGraphics();
+
+
+        /*
+        Sky color:
+        Fill a rectangle from top to half of the window height with the color gray.
+         */
+        g.setColor(Config.colorSky);
+        g.fillRect(0, 0, DIS_WIDTH, DIS_HEIGHT / 2);
+
+        /*
+        Floor color:
+        Fill a rectangle from the half of the window height to the end of the window height with the color light gray.
+         */
+        g.setColor(Config.colorGround);
+        g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
+
+        renderWalls(player, g);
+
         renderSprites(player, g);
         bs.show();
     }
