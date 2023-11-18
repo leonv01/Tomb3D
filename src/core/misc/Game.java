@@ -29,7 +29,7 @@ public class Game implements Runnable{
     // MapRender object to render 2D view.
     private final MapRender mapRender;
 
-    private Drone enemy;
+    private Drone[] enemy;
 
     private final InputHandler inputHandler;
 
@@ -46,12 +46,21 @@ public class Game implements Runnable{
         player = new Player(
             new Vector2D((double) map.map.length / 2, (double) map.map.length / 2)
         );
-        enemy = new Drone(new Vector2D(1.5, 1.5));
+        enemy = new Drone[]{
+                new Drone(new Vector2D(1.5, 1.5)),
+                new Drone(new Vector2D(5.5, 4.5)),
+                new Drone(new Vector2D(7.5, 1.5)),
+                new Drone(new Vector2D(9.5, 2.5))
+        };
+
         mapRender = new MapRender(map);
 
         mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
         player.setKeyListener(inputHandler);
+
+        display.addDrones(enemy);
+        display.addPlayer(player);
 
         // Create a new thread for display rendering.
         RenderingThread renderingThread = new RenderingThread(display, player);
@@ -114,12 +123,18 @@ public class Game implements Runnable{
                 player.update(map);
 
                 // Enemy gets updated.
-                //enemy.update(map, player);
+                for (Drone d : enemy) {
+                    d.update(map, player);
+                }
+
 
                 delta--;
 
                 // The MapRender function is called to update.
-                mapRender.render(player, enemy);
+                for (Drone d : enemy) {
+                    mapRender.render(player, d);
+                }
+
             }
             //display.render(player);
 

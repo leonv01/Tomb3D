@@ -30,6 +30,8 @@ public class Player {
     // FOV value.
     int fov = Config.FOV;
 
+    int health;
+
     /**
      * Default constructor for the Player class. Initializes player properties.
      */
@@ -43,6 +45,8 @@ public class Player {
         // Creates array of rays based on the FOV and the ray resolution.
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
+
+        this.health = 100;
     }
 
     /**
@@ -61,6 +65,8 @@ public class Player {
         // Creates array of rays based on the FOV and the ray resolution.
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
+
+        this.health = 100;
     }
 
     /**
@@ -407,17 +413,37 @@ public class Player {
         }
 
         if(inputHandler.use){
-
-
             int directionX = (int) (direction.x + position.x);
             int directionY = (int) (direction.y + position.y);
 
+
             if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+
+            /*
+            TODO: Implement wall building mechanic + remove designated walls
+            else if(
+                    map.getWall(directionX, directionY).equals(Map.WALLS.EMPTY)
+                    && (directionX != (int) position.x || directionY != (int) position.y)
+            ) {
+                map.setValue(directionX, directionY, Map.WALLS.WOOD);
+            }
+
+             */
+
+
         }
 
         // Start the ray casting.
         castRays(map);
+    }
+
+    public void takeDamage(int i) {
+        health -= i;
+        if(health <= 0)
+            System.out.println("DEAD");
+
+        System.out.println(health);
     }
 
     /**
@@ -457,4 +483,6 @@ public class Player {
     public void setKeyListener(InputHandler i){
         this.inputHandler = i;
     }
+
+
 }

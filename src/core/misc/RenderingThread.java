@@ -24,7 +24,7 @@ public class RenderingThread implements Runnable {
     @Override
     public void run() {
         while(true){
-            display.render(player);
+            display.render();
         }
     }
 }

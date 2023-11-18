@@ -1,5 +1,6 @@
 package core.graphics;
 
+import java.awt.*;
 import java.io.*;
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 public class Texture {
     final String path;
     int[] rgbArray;
+    Color[] colorArray;
     int size;
     private int textureCount;
     /**
@@ -27,8 +29,11 @@ public class Texture {
         this.size = size;
 
         this.rgbArray = new int[size * size * textureCount * 2];
-
+        this.colorArray = new Color[rgbArray.length];
         loadTexture();
+        for (int i = 0; i < colorArray.length; i++) {
+            colorArray[i] = new Color(rgbArray[i]);
+        }
     }
 
     /**
@@ -58,5 +63,11 @@ public class Texture {
     public int getRGB(int y, int x){
          y = Math.abs(y);
         return rgbArray[y * (size * 2) + x];
+    }
+
+    public Color getColor(int y, int x){
+
+        y = Math.abs(y);
+        return colorArray[y * (size * 2) + x];
     }
 }

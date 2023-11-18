@@ -29,6 +29,9 @@ public class Obstacle {
     public BufferedImage getImage(){
         return image;
     }
+    public void setPosition(Vector2D position){
+        this.position = position;
+    }
 
     public Vector2D getPosition() {
         return position;

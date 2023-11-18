@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import core.entities.Drone;
 import core.entities.Obstacle;
 import core.entities.Player;
 import core.utils.Config;
@@ -25,6 +26,8 @@ public class Display extends JFrame{
     private final int DIS_WIDTH = Config.WIDTH;
     Texture textureAtlas;
     ArrayList<Obstacle> obstacles;
+    Drone[] drone = null;
+    Player player = null;
 
     /**
      * Constructs a Display object and initializes the display window.
@@ -46,11 +49,11 @@ public class Display extends JFrame{
         setVisible(true);
 
         obstacles = new ArrayList<>(2);
-        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(5.5,5.5)));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5)));
+        //obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6,5)));
+       // obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10)));
 
         // Load debug texture.
-        textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 32, 4);
     };
 
     /**
@@ -62,6 +65,16 @@ public class Display extends JFrame{
         addKeyListener(k);
     }
 
+    public void addPlayer(Player player){ this.player = player; }
+    public void addDrone(Drone drone){
+        if(this.drone == null)
+            this.drone = new Drone[]{drone};
+        else
+            this.drone[0] = drone;
+    }
+    public void addDrones(Drone[] drone){
+        this.drone = drone;
+    }
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
 
         Vector2D diff = obstacle.getPosition().sub(player.position);
@@ -73,9 +86,8 @@ public class Display extends JFrame{
         double thresholdAngle = Math.PI / 2;
         return Math.abs(angle) > Math.PI - thresholdAngle;
     }
-    public void renderSprites(Player player, Graphics2D g){
-        for (Obstacle obstacle:obstacles) {
-            obstacle.z = -0.25;
+    public void renderSprites(Obstacle obstacle, Graphics2D g){
+            obstacle.z = 0.5;
             Vector2D diff = player.position.sub(obstacle.getPosition());
             double cs = Math.cos(player.rotation);
             double sn = Math.sin(player.rotation);
@@ -90,14 +102,17 @@ public class Display extends JFrame{
                 // System.out.println(a + " " + b);
                 BufferedImage oldImage = obstacle.getImage();
                 BufferedImage newImage;
-                g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
-            }
-        }
-        //g.setColor(Color.ORANGE);
-        //g.fillRect((int)a,(int) b,20,20);
-    }
+                g.setColor(Color.ORANGE);
+                int width = (int)(Config.WIDTH / diff.length());
+                int height = (int) (Config.HEIGHT / diff.length());
+                g.fillRect((int)a,(int) b,width,height);
+                // g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
 
-    public void renderWalls(Player player, Graphics2D g){
+            }
+
+
+    }
+    public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
         Ray[] rays = player.rays;
 
@@ -111,7 +126,9 @@ public class Display extends JFrame{
             double wallHeight = (double) DIS_HEIGHT / rays[i].getLength();
 
             // If the wall height for the ray exceeds the maximum wall height, it is reset to the maximum wall height possible (the window height).
-            if (wallHeight > DIS_HEIGHT) wallHeight = DIS_HEIGHT;
+            if (wallHeight > DIS_HEIGHT) {
+                wallHeight = DIS_HEIGHT;
+            }
 
             // Value to reset the walls to the center of the y-axis. Without this offset the walls would start in the middle of the window and exceed the window height.
             double lineOffset = (DIS_HEIGHT / 2.0);
@@ -127,6 +144,7 @@ public class Display extends JFrame{
             int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.size);
             int texelXVertical = (int) (textureXVertical * textureAtlas.size);
 
+
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
                 int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.size);
@@ -139,13 +157,15 @@ public class Display extends JFrame{
 
                 if(rays[i].getHorizontal()) {
                     // Get the RGB value of the texture at the texture atlas offset for horizontal walls.
-                    texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
-                    color = new Color(texelColor);
+                    //texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
+                    //color = new Color(texelColor);
+                    color = textureAtlas.getColor(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                 }
                 else{
                     // Get the RGB value of the texture at the texture atlas offset for vertical walls.
-                    texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
-                    color = new Color(texelColor);//.darker().darker();
+                    //texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
+                    //color = new Color(texelColor);//.darker().darker();
+                    color = textureAtlas.getColor((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
                 }
 
                 // Set the color of the wall segment
@@ -167,10 +187,8 @@ public class Display extends JFrame{
 
     /**
      * Render the pseudo 3D walls from the players perspective.
-     *
-     * @param player Player object to access properties.
      */
-    public void render(Player player) {
+    public void render() {
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
             createBufferStrategy(3);
@@ -195,9 +213,14 @@ public class Display extends JFrame{
         g.setColor(Config.colorGround);
         g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
 
-        renderWalls(player, g);
+        renderWalls(g);
+        for (Obstacle obstacle:obstacles) {
+            renderSprites(obstacle, g);
+        }
+        for (Drone d : drone) {
+            renderSprites(d.obstacle, g);
+        }
 
-        renderSprites(player, g);
         bs.show();
     }
 }
