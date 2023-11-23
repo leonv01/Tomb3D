@@ -18,7 +18,12 @@ import core.utils.Vector2D;
 /**
  * The Display class represents the graphical display for rendering the game world.
  */
-public class Display extends JFrame{
+public class Display extends JFrame implements Runnable{
+
+    // TODO: IMPLEMENT LOOKUP TABLE FOR SIN AND COS FUNCTIONS.
+
+    private boolean running;
+    private final Thread thread;
 
     // Displayed image.
     BufferedImage image;
@@ -33,6 +38,8 @@ public class Display extends JFrame{
      * Constructs a Display object and initializes the display window.
      */
     public Display(){
+        thread = new Thread(this);
+
         // Initializing image renderer with Config values and RGB type.
         image = new BufferedImage(DIS_WIDTH, DIS_HEIGHT, BufferedImage.TYPE_INT_RGB);
         // Set window size with in Config defined values.
@@ -49,11 +56,12 @@ public class Display extends JFrame{
         setVisible(true);
 
         obstacles = new ArrayList<>(2);
-        //obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6,5)));
-       // obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10)));
+        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5)));
+        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5)));
+        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(13,18)));
 
         // Load debug texture.
-        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 32, 4);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
     };
 
     /**
@@ -102,10 +110,10 @@ public class Display extends JFrame{
                 // System.out.println(a + " " + b);
                 BufferedImage oldImage = obstacle.getImage();
                 BufferedImage newImage;
-                g.setColor(Color.ORANGE);
+                g.setColor(obstacle.getColor());
                 int width = (int)(Config.WIDTH / diff.length());
                 int height = (int) (Config.HEIGHT / diff.length());
-                g.fillRect((int)a,(int) b,width,height);
+               g.fillRect((int)a,(int) b,width,height);
                 // g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
 
             }
@@ -222,5 +230,48 @@ public class Display extends JFrame{
         }
 
         bs.show();
+    }
+
+    public synchronized void start(){
+        running = true;
+        thread.start();
+    }
+
+    public synchronized void stop(){
+        running = false;
+        try{
+            thread.join();
+        } catch (InterruptedException e){
+            System.out.println("threads couldn't join");
+        }
+    }
+
+    @Override
+    public void run() {
+        long lastTime = System.nanoTime();
+        long timer = System.currentTimeMillis();
+        final double ns = 1000000000.0 / 60.0;//60 times per second
+        double delta = 0;
+        int frames = 0;
+
+        while(running){
+
+            // Calculate the time difference.
+            long now = System.nanoTime();
+            delta = delta + ((now-lastTime) / ns);
+            lastTime = now;
+
+            // While loop only gets executed 60 times per second.
+            while (delta >= 1)
+            {
+                frames++;
+
+                // Player gets updated.
+                this.render();
+
+                delta--;
+
+            }
+        }
     }
 }

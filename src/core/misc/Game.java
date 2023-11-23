@@ -63,10 +63,8 @@ public class Game implements Runnable{
         display.addPlayer(player);
 
         // Create a new thread for display rendering.
-        RenderingThread renderingThread = new RenderingThread(display, player);
-        Thread renderThread = new Thread(renderingThread);
-        renderThread.start();
 
+        display.start();
         start();
     }
 
