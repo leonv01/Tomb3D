@@ -113,4 +113,19 @@ public class Vector2D {
     public String toString(){
         return String.format("x: %.3f y: %.3f", x,y);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vector2D v) {
+            return this.x == v.x && this.y == v.y;
+        }
+        return false;
+    }
+
+    public double getX() {
+        return x;
+    }
+    public double getY(){
+        return y;
+    }
 }

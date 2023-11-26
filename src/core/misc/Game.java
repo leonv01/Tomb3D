@@ -46,13 +46,15 @@ public class Game implements Runnable{
         player = new Player(
             new Vector2D((double) map.map.length / 2, (double) map.map.length / 2)
         );
+        /*
         enemy = new Drone[]{
                 new Drone(new Vector2D(1.5, 1.5)),
                 new Drone(new Vector2D(5.5, 4.5)),
                 new Drone(new Vector2D(7.5, 1.5)),
                 new Drone(new Vector2D(9.5, 2.5))
         };
-
+         */
+        enemy = new Drone[]{};
         mapRender = new MapRender(map);
 
         mapRender.setKeyListener(inputHandler);

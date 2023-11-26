@@ -127,13 +127,13 @@ public class Player {
             }
 
             // This calculation is done to prevent the 'fisheye' effect when standing to close to a wall.
-            double temp = rotation - tempAngle;
-            if(temp < 0) temp += 2 * Math.PI;
-            if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
-            length *= Math.cos(temp);
+            //double temp = rotation - tempAngle;
+          // if(temp < 0) temp += 2 * Math.PI;
+           // if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
+           // length *= Math.cos(temp);
 
             // A new ray is stored in the array with the values of the shortest ray, the length, color and the indicator if it was a horizontal wall or not.
-            rays[i] = new Ray(new Vector2D(newX, newY), length, horizontal, wallID);
+            rays[i] = new Ray(new Vector2D(newX, newY), tempAngle, length, horizontal, wallID);
         }
     }
 
@@ -226,7 +226,7 @@ public class Player {
                 dof++;
             }
         }
-        return new Ray(new Vector2D(rayX, rayY), 0, false, wallID);
+        return new Ray(new Vector2D(rayX, rayY), angle, 0, false, wallID);
     }
 
     /**
@@ -318,7 +318,7 @@ public class Player {
             }
         }
 
-        return new Ray(new Vector2D(rayX, rayY), 0, true, wallID);
+        return new Ray(new Vector2D(rayX, rayY), angle, 0, true, wallID);
     }
 
     /**
@@ -420,8 +420,8 @@ public class Player {
             if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
 
-            /*
-            TODO: Implement wall building mechanic + remove designated walls
+
+            //TODO: Implement wall building mechanic + remove designated walls
             else if(
                     map.getWall(directionX, directionY).equals(Map.WALLS.EMPTY)
                     && (directionX != (int) position.x || directionY != (int) position.y)
@@ -429,7 +429,7 @@ public class Player {
                 map.setValue(directionX, directionY, Map.WALLS.WOOD);
             }
 
-             */
+
 
 
         }

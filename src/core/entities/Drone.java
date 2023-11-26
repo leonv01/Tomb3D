@@ -16,18 +16,15 @@ public class Drone {
         rotation = 0;
     }
 
-    public Drone(Vector2D position, Vector2D direction, double rotation) {
-        this.direction = direction;
-        this.rotation = rotation;
-        this.position = position;
-
-    }
-
     public Drone(Vector2D position) {
         this.position = position;
         this.rotation = 0;
         this.direction = new Vector2D(1, 0);
         obstacle = new Obstacle("src/textures/brick.png", position);
+    }
+
+    public void takeDamage(int i){
+
     }
 
     public void update(Map map, Player player) {
@@ -55,14 +52,22 @@ public class Drone {
         Vector2D collision = new Vector2D(position);
         collision.add(direction);
 
-        int collisionMapX = (int) collision.x;
-        int collisionMapY = (int) collision.y;
+        Vector2D collisionRounded = new Vector2D(
+                Math.round(collision.x * 100) / 100.0,
+                Math.round(collision.y * 100) / 100.0
+        );
 
-        int playerMapX = (int) player.getX();
-        int playerMapY = (int) player.getY();
-        if(
-                collisionMapX == playerMapX && collisionMapY == playerMapY
-        ){
+        Vector2D positionRounded = new Vector2D(
+                Math.round(position.x * 100) / 100.0,
+                Math.round(position.y * 100) / 100.0
+        );
+
+        Vector2D playerRounded = new Vector2D(
+                Math.round(player.position.x * 100) / 100.0,
+                Math.round(player.position.y * 100) / 100.0
+        );
+
+        if(collisionRounded.equals(playerRounded)){
             player.takeDamage(20);
         }
 

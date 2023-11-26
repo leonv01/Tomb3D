@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
@@ -18,12 +19,7 @@ import core.utils.Vector2D;
 /**
  * The Display class represents the graphical display for rendering the game world.
  */
-public class Display extends JFrame implements Runnable{
-
-    // TODO: IMPLEMENT LOOKUP TABLE FOR SIN AND COS FUNCTIONS.
-
-    private boolean running;
-    private final Thread thread;
+public class Display extends JFrame{
 
     // Displayed image.
     BufferedImage image;
@@ -34,12 +30,13 @@ public class Display extends JFrame implements Runnable{
     Drone[] drone = null;
     Player player = null;
 
+    double[] zBuffer;
+    double[] depth;
+
     /**
      * Constructs a Display object and initializes the display window.
      */
     public Display(){
-        thread = new Thread(this);
-
         // Initializing image renderer with Config values and RGB type.
         image = new BufferedImage(DIS_WIDTH, DIS_HEIGHT, BufferedImage.TYPE_INT_RGB);
         // Set window size with in Config defined values.
@@ -57,8 +54,12 @@ public class Display extends JFrame implements Runnable{
 
         obstacles = new ArrayList<>(2);
         obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5)));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5)));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(13,18)));
+        //obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10)));
+
+        zBuffer = new double[Config.rayResolution * Config.FOV];
+        depth = new double[zBuffer.length];
+        Arrays.fill(zBuffer, Double.MAX_VALUE);
+        Arrays.fill(depth, 0);
 
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
@@ -95,31 +96,40 @@ public class Display extends JFrame implements Runnable{
         return Math.abs(angle) > Math.PI - thresholdAngle;
     }
     public void renderSprites(Obstacle obstacle, Graphics2D g){
-            obstacle.z = 0.5;
-            Vector2D diff = player.position.sub(obstacle.getPosition());
-            double cs = Math.cos(player.rotation);
-            double sn = Math.sin(player.rotation);
+        double fovRadians = Math.toRadians(Config.FOV);
+        double viewPlaneWidth = 2 * Math.tan(fovRadians / 2);
 
-            double a = diff.y * cs + diff.x * sn;
-            double b = diff.x * cs - diff.y * sn;
+        Vector2D relativePosVector2d = obstacle.getPosition().sub(player.position);
+        double distance = relativePosVector2d.length();
+        double spriteScreenSize = (((DIS_WIDTH) / (zBuffer.length + 1)) / viewPlaneWidth);// * (1 / distance);
 
-            a = (a * Config.WIDTH / b) + (Config.WIDTH / 2.0);
-            b = (obstacle.z * Config.HEIGHT / b) + (Config.HEIGHT / 2.0);
+        double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.direction.y, player.direction.x);
+        int rectX = (int) (angle * Config.WIDTH / fovRadians + Config.WIDTH / 2 - spriteScreenSize / 2);
+        int rectY = (int) (Config.HEIGHT / 2 - spriteScreenSize / 2);
+        int rectWidth = (int) spriteScreenSize;
+        int rectHeight = (int) spriteScreenSize;
 
-            if(!isSpriteBehindPlayer(player, obstacle)) {
-                // System.out.println(a + " " + b);
-                BufferedImage oldImage = obstacle.getImage();
-                BufferedImage newImage;
-                g.setColor(obstacle.getColor());
-                int width = (int)(Config.WIDTH / diff.length());
-                int height = (int) (Config.HEIGHT / diff.length());
-               g.fillRect((int)a,(int) b,width,height);
-                // g.drawImage(obstacle.getImage(), (int) a, (int) b, null);
+        // Adjust the size of the rendered rectangle
+        int smallerRectSize = rectWidth / 2; // Set the size of the smaller rectangle
 
+        // Calculate the new position for the smaller rectangle within the larger one
+        int smallerRectX = rectX + (rectWidth - smallerRectSize) / 2;
+        int smallerRectY = rectY + (rectHeight - smallerRectSize) / 2;
+
+        int index = (rectX / ((DIS_WIDTH) / (zBuffer.length + 1)));
+        if(index >= 0 && index < zBuffer.length - 1){
+            if(!(zBuffer[index] < distance))
+            {
+                g.setColor(Color.RED);
+                // Render the smaller rectangle
+                g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
             }
-
-
+            else{
+                System.out.println(index);
+            }
+        }
     }
+
     public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
         Ray[] rays = player.rays;
@@ -130,8 +140,19 @@ public class Display extends JFrame implements Runnable{
         // Rendering for each ray.
         for (int i = 0; i < rays.length; i++) {
 
+            double angleDifference = Math.abs(rays[i].getAngle() - player.rotation);
+            double correctedDistance = rays[i].getLength() * Math.cos(angleDifference);
+
+            int column = (rays.length - 1) - i;
+            depth[i] = correctedDistance;
+
+            if(depth[i] < zBuffer[column]){
+                zBuffer[column] = depth[i];
+                //System.out.println(zBuffer[column]);
+            }
+
             // Determining the wall height by dividing the maximum wall height possible (the window height) with the individual ray length.
-            double wallHeight = (double) DIS_HEIGHT / rays[i].getLength();
+            double wallHeight = (double) DIS_HEIGHT / correctedDistance; //rays[i].getLength();
 
             // If the wall height for the ray exceeds the maximum wall height, it is reset to the maximum wall height possible (the window height).
             if (wallHeight > DIS_HEIGHT) {
@@ -152,6 +173,7 @@ public class Display extends JFrame implements Runnable{
             int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.size);
             int texelXVertical = (int) (textureXVertical * textureAtlas.size);
 
+            depth[i] = rays[i].getLength();
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
@@ -221,57 +243,17 @@ public class Display extends JFrame implements Runnable{
         g.setColor(Config.colorGround);
         g.fillRect(0, DIS_HEIGHT / 2, DIS_WIDTH, DIS_HEIGHT);
 
+        Arrays.fill(zBuffer, Double.MAX_VALUE);
+
+
         renderWalls(g);
         for (Obstacle obstacle:obstacles) {
             renderSprites(obstacle, g);
         }
         for (Drone d : drone) {
-            renderSprites(d.obstacle, g);
+            // renderSprites(d.obstacle, g);
         }
 
         bs.show();
-    }
-
-    public synchronized void start(){
-        running = true;
-        thread.start();
-    }
-
-    public synchronized void stop(){
-        running = false;
-        try{
-            thread.join();
-        } catch (InterruptedException e){
-            System.out.println("threads couldn't join");
-        }
-    }
-
-    @Override
-    public void run() {
-        long lastTime = System.nanoTime();
-        long timer = System.currentTimeMillis();
-        final double ns = 1000000000.0 / 60.0;//60 times per second
-        double delta = 0;
-        int frames = 0;
-
-        while(running){
-
-            // Calculate the time difference.
-            long now = System.nanoTime();
-            delta = delta + ((now-lastTime) / ns);
-            lastTime = now;
-
-            // While loop only gets executed 60 times per second.
-            while (delta >= 1)
-            {
-                frames++;
-
-                // Player gets updated.
-                this.render();
-
-                delta--;
-
-            }
-        }
     }
 }
