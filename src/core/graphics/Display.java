@@ -19,7 +19,7 @@ import core.utils.Vector2D;
 /**
  * The Display class represents the graphical display for rendering the game world.
  */
-public class Display extends JFrame{
+public class Display extends JFrame implements Runnable{
 
     // Displayed image.
     BufferedImage image;
@@ -30,6 +30,9 @@ public class Display extends JFrame{
     Drone[] drone = null;
     Player player = null;
 
+    private final Thread thread;
+    boolean running;
+
     double[] zBuffer;
     double[] depth;
 
@@ -37,6 +40,9 @@ public class Display extends JFrame{
      * Constructs a Display object and initializes the display window.
      */
     public Display(){
+
+        thread = new Thread(this);
+
         // Initializing image renderer with Config values and RGB type.
         image = new BufferedImage(DIS_WIDTH, DIS_HEIGHT, BufferedImage.TYPE_INT_RGB);
         // Set window size with in Config defined values.
@@ -255,5 +261,46 @@ public class Display extends JFrame{
         }
 
         bs.show();
+    }
+    public synchronized void start(){
+        running = true;
+        thread.start();
+    }
+
+    public synchronized void stop(){
+        running = false;
+        try{
+            thread.join();
+        } catch (InterruptedException e){
+            System.out.println("threads couldn't join");
+        }
+    }
+    @Override
+    public void run() {
+        long lastTime = System.nanoTime();
+        long timer = System.currentTimeMillis();
+        final double ns = 1000000000.0 / 60.0;//60 times per second
+        double delta = 0;
+        int frames = 0;
+
+        while(running){
+
+            // Calculate the time difference.
+            long now = System.nanoTime();
+            delta = delta + ((now-lastTime) / ns);
+            lastTime = now;
+
+            // While loop only gets executed 60 times per second.
+            while (delta >= 1)
+            {
+                frames++;
+
+                // Player gets updated.
+                this.render();
+
+                delta--;
+
+            }
+        }
     }
 }
