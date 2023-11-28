@@ -12,8 +12,9 @@ public class Obstacle {
     public double z;
     private BufferedImage image;
     private int width, height;
-
-    public Obstacle(String path, Vector2D position){
+    private boolean collectible, visible;
+    private final double radius = 2;
+    public Obstacle(String path, Vector2D position, boolean collectible){
         try {
             image = ImageIO.read(new File(path));
 
@@ -21,9 +22,27 @@ public class Obstacle {
             throw new RuntimeException(e);
         }
 
+        this.collectible = collectible;
         this.position = position;
         this.width = image.getWidth();
         this.height = image.getHeight();
+        this.visible = true;
+    }
+
+
+    public void checkCollision(Vector2D pos){
+        int x = (int) position.getX();
+        int y = (int) position.getY();
+
+        int posX = (int) pos.getX();
+        int posY = (int) pos.getY();
+
+        if(
+                x == posX && posY == y
+        ){
+            visible = false;
+            System.out.println("No longer visible");
+        }
     }
 
     public BufferedImage getImage(){
@@ -39,5 +58,21 @@ public class Obstacle {
 
     public Vector2D getPosition() {
         return position;
+    }
+
+    public boolean isCollectible() {
+        return collectible;
+    }
+
+    public void setCollectible(boolean collectible) {
+        this.collectible = collectible;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

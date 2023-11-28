@@ -20,7 +20,7 @@ public class Drone {
         this.position = position;
         this.rotation = 0;
         this.direction = new Vector2D(1, 0);
-        obstacle = new Obstacle("src/textures/brick.png", position);
+        obstacle = new Obstacle("src/textures/brick.png", position, false);
     }
 
     public void takeDamage(int i){

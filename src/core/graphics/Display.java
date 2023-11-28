@@ -27,7 +27,7 @@ public class Display extends JFrame implements Runnable{
     private final int DIS_WIDTH = Config.WIDTH;
     Texture textureAtlas;
     ArrayList<Obstacle> obstacles;
-    Drone[] drone = null;
+    ArrayList<Drone> drones;
     Player player = null;
 
     private final Thread thread;
@@ -58,9 +58,9 @@ public class Display extends JFrame implements Runnable{
         setLocationRelativeTo(null);
         setVisible(true);
 
-        obstacles = new ArrayList<>(2);
-        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5)));
-        //obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10)));
+        obstacles = new ArrayList<>();
+        drones = new ArrayList<>();
+
 
         zBuffer = new double[Config.rayResolution * Config.FOV];
         depth = new double[zBuffer.length];
@@ -81,15 +81,11 @@ public class Display extends JFrame implements Runnable{
     }
 
     public void addPlayer(Player player){ this.player = player; }
-    public void addDrone(Drone drone){
-        if(this.drone == null)
-            this.drone = new Drone[]{drone};
-        else
-            this.drone[0] = drone;
+    public void addDrones(ArrayList<Drone> drones){
+        this.drones = this.drones;
     }
-    public void addDrones(Drone[] drone){
-        this.drone = drone;
-    }
+    public void addObstacle(ArrayList<Obstacle> obstacles) {this.obstacles = obstacles;}
+
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
 
         Vector2D diff = obstacle.getPosition().sub(player.position);
@@ -107,31 +103,41 @@ public class Display extends JFrame implements Runnable{
 
         Vector2D relativePosVector2d = obstacle.getPosition().sub(player.position);
         double distance = relativePosVector2d.length();
-        double spriteScreenSize = (((DIS_WIDTH) / (zBuffer.length + 1)) / viewPlaneWidth);// * (1 / distance);
+        double spriteScreenSize = (((double) (DIS_WIDTH) / distance)); //(zBuffer.length + 1)) / viewPlaneWidth);// * (1 / distance);
 
         double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.direction.y, player.direction.x);
         int rectX = (int) (angle * Config.WIDTH / fovRadians + Config.WIDTH / 2 - spriteScreenSize / 2);
         int rectY = (int) (Config.HEIGHT / 2 - spriteScreenSize / 2);
+
+
+
         int rectWidth = (int) spriteScreenSize;
         int rectHeight = (int) spriteScreenSize;
 
         // Adjust the size of the rendered rectangle
-        int smallerRectSize = rectWidth / 2; // Set the size of the smaller rectangle
+        int smallerRectSize = rectWidth ;/// 2; // Set the size of the smaller rectangle
 
         // Calculate the new position for the smaller rectangle within the larger one
-        int smallerRectX = rectX + (rectWidth - smallerRectSize) / 2;
-        int smallerRectY = rectY + (rectHeight - smallerRectSize) / 2;
+        int smallerRectX = rectX; //+ (rectWidth - smallerRectSize) / 2;
+        int smallerRectY = rectY ;//+ (rectHeight - smallerRectSize) / 2;
+
+        //System.out.println(smallerRectX + " " + smallerRectY);
 
         int index = (rectX / ((DIS_WIDTH) / (zBuffer.length + 1)));
         if(index >= 0 && index < zBuffer.length - 1){
             if(!(zBuffer[index] < distance))
             {
-                g.setColor(Color.RED);
-                // Render the smaller rectangle
-                g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
+                if(obstacle.isVisible()) {
+                    g.setColor(Color.RED);
+                    // Render the smaller rectangle
+                    g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
+                }
+                //TODO: implement pick up for player
+                // player.add(item);
+
             }
             else{
-                System.out.println(index);
+                //System.out.println(index);
             }
         }
     }
@@ -256,7 +262,7 @@ public class Display extends JFrame implements Runnable{
         for (Obstacle obstacle:obstacles) {
             renderSprites(obstacle, g);
         }
-        for (Drone d : drone) {
+        for (Drone d : drones) {
             // renderSprites(d.obstacle, g);
         }
 
@@ -303,4 +309,6 @@ public class Display extends JFrame implements Runnable{
             }
         }
     }
+
+
 }

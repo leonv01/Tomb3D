@@ -104,6 +104,10 @@ public class Vector2D {
         }
     }
 
+    public boolean isInRadius(Vector2D vec, double radius){
+        return this.distance(vec) <= radius;
+    }
+
     /**
      * Returns a string representation of the vector with formatted x and y values.
      *
