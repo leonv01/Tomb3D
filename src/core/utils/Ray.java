@@ -10,6 +10,7 @@ public class Ray {
     private double length;
     private boolean horitontal;
     private final int wallID;
+    private final double angle;
 
     /**
      * Constructs a new Ray with default values.
@@ -19,6 +20,7 @@ public class Ray {
         this.length = 0;
         this.horitontal = false;
         this.wallID = 0;
+        this.angle = 0;
     }
 
     /**
@@ -28,11 +30,12 @@ public class Ray {
      * @param length The length of the ray.
      * @param horizontal Indicates whether the ray is horizontal (true) or vertical (false).
      */
-    public Ray(Vector2D position, double length, boolean horizontal, int wallID) {
+    public Ray(Vector2D position, double angle, double length, boolean horizontal, int wallID) {
         this.position = position;
         this.length = length;
         this.horitontal = horizontal;
         this.wallID = wallID;
+        this.angle = angle;
     }
 
     /**
@@ -75,4 +78,11 @@ public class Ray {
      * @return The length of the ray.
      */
     public double getLength(){ return length; }
+
+    /**
+     * Get the angle of the ray.
+     *
+     * @return The angle of the ray.
+     */
+    public double getAngle(){ return angle; }
 }

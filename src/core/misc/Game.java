@@ -1,10 +1,14 @@
 package core.misc;
 
+import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
 import core.graphics.MapRender;
 import core.utils.Vector2D;
 import core.entities.Drone;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * The Game class represents the main game engine that manages the game loop and components.
@@ -23,14 +27,16 @@ public class Game implements Runnable{
     // Player object.
     private final Player player;
 
-    // Map object.
-    private final Map map;
+
 
     // MapRender object to render 2D view.
     private final MapRender mapRender;
+    private Map currentMap;
 
-    private Drone enemy;
-
+    // Map object.
+    private final ArrayList<Map> map;
+    private final ArrayList<Drone> enemy;
+    private final ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
 
     /**
@@ -39,26 +45,46 @@ public class Game implements Runnable{
     public Game(){
         thread = new Thread(this);
         display = new Display();
-        map = new Map();
         inputHandler = new InputHandler();
 
 
+
+
+        map = new ArrayList<>();
+        map.add(new Map());
+        currentMap = map.get(0);
+
         player = new Player(
-            new Vector2D((double) map.map.length / 2, (double) map.map.length / 2)
+                new Vector2D((double) currentMap.map.length / 2, (double) currentMap.map.length / 2)
         );
-        enemy = new Drone(new Vector2D(1.5, 1.5));
-        mapRender = new MapRender(map);
+
+        enemy = new ArrayList<>(4);
+        enemy.add(new Drone(new Vector2D(1.5, 1.5)));
+        enemy.add(new Drone(new Vector2D(5.5, 4.5)));
+        enemy.add(new Drone(new Vector2D(7.5, 1.5)));
+        enemy.add(new Drone(new Vector2D(9.5, 2.5)));
+
+        obstacles = new ArrayList<>();
+        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5),true));
+        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10), true));
+
+        mapRender = new MapRender(currentMap);
 
         mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
         player.setKeyListener(inputHandler);
 
-        // Create a new thread for display rendering.
-        RenderingThread renderingThread = new RenderingThread(display, player);
-        Thread renderThread = new Thread(renderingThread);
-        renderThread.start();
+        display.addDrones(enemy);
+        display.addPlayer(player);
+        display.addObstacle(obstacles);
 
+        // Create a new thread for display rendering.
+
+        display.start();
         start();
+    }
+
+    public void initGame(){
     }
 
     /**
@@ -111,15 +137,24 @@ public class Game implements Runnable{
                 frames++;
 
                 // Player gets updated.
-                player.update(map);
+                player.update(currentMap);
+
+                Vector2D temp = player.position;
+                for (Obstacle obstacle : obstacles){
+
+                    obstacle.checkCollision(temp);
+                }
 
                 // Enemy gets updated.
-                //enemy.update(map, player);
+                for (Drone d : enemy) {
+
+                    d.update(currentMap, player);
+                    mapRender.render(player, d);
+                }
+
 
                 delta--;
 
-                // The MapRender function is called to update.
-                mapRender.render(player, enemy);
             }
             //display.render(player);
 

@@ -8,6 +8,7 @@ public class Drone {
     public Vector2D position;
     public Vector2D direction;
     public double rotation;
+    public Obstacle obstacle;
 
     public Drone() {
         position = new Vector2D();
@@ -15,29 +16,18 @@ public class Drone {
         rotation = 0;
     }
 
-    public Drone(Vector2D position, Vector2D direction, double rotation) {
-        this.direction = direction;
-        this.rotation = rotation;
-        this.position = position;
-    }
-
     public Drone(Vector2D position) {
         this.position = position;
         this.rotation = 0;
         this.direction = new Vector2D(1, 0);
+        obstacle = new Obstacle("src/textures/brick.png", position, false);
     }
 
-    public void caluclateAngle(Player player) {
-        rotation = Math.acos(
-                position.mul(player.position) /
-                        (position.length() * player.position.length()));
-        System.out.println(Math.toDegrees(rotation));
+    public void takeDamage(int i){
+
     }
 
     public void update(Map map, Player player) {
-        // caluclateAngle(player);
-        // rotateEnemy();
-
         double diffX = player.position.x - position.x;
         double diffY = player.position.y - position.y;
 
@@ -59,9 +49,29 @@ public class Drone {
             position.y = tempY;
         }
 
-/*
-        position.x += direction.x * Config.MOVEMENT_SPEED;
-        position.y += direction.y * Config.MOVEMENT_SPEED;
- */
+        Vector2D collision = new Vector2D(position);
+        collision.add(direction);
+
+        Vector2D collisionRounded = new Vector2D(
+                Math.round(collision.x * 100) / 100.0,
+                Math.round(collision.y * 100) / 100.0
+        );
+
+        Vector2D positionRounded = new Vector2D(
+                Math.round(position.x * 100) / 100.0,
+                Math.round(position.y * 100) / 100.0
+        );
+
+        Vector2D playerRounded = new Vector2D(
+                Math.round(player.position.x * 100) / 100.0,
+                Math.round(player.position.y * 100) / 100.0
+        );
+
+        if(collisionRounded.equals(playerRounded)){
+            player.takeDamage(20);
+        }
+
+
+        obstacle.setPosition(position);
     }
 }

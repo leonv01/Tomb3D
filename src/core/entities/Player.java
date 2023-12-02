@@ -25,10 +25,12 @@ public class Player {
     private InputHandler inputHandler;
 
     // Rotation value of the player.
-    double rotation;
+    public double rotation;
 
     // FOV value.
     int fov = Config.FOV;
+
+    int health;
 
     /**
      * Default constructor for the Player class. Initializes player properties.
@@ -43,6 +45,8 @@ public class Player {
         // Creates array of rays based on the FOV and the ray resolution.
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
+
+        this.health = 100;
     }
 
     /**
@@ -61,6 +65,8 @@ public class Player {
         // Creates array of rays based on the FOV and the ray resolution.
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
+
+        this.health = 100;
     }
 
     /**
@@ -121,13 +127,13 @@ public class Player {
             }
 
             // This calculation is done to prevent the 'fisheye' effect when standing to close to a wall.
-            double temp = rotation - tempAngle;
-            if(temp < 0) temp += 2 * Math.PI;
-            if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
-            length *= Math.cos(temp);
+            //double temp = rotation - tempAngle;
+          // if(temp < 0) temp += 2 * Math.PI;
+           // if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
+           // length *= Math.cos(temp);
 
             // A new ray is stored in the array with the values of the shortest ray, the length, color and the indicator if it was a horizontal wall or not.
-            rays[i] = new Ray(new Vector2D(newX, newY), length, horizontal, wallID);
+            rays[i] = new Ray(new Vector2D(newX, newY), tempAngle, length, horizontal, wallID);
         }
     }
 
@@ -220,7 +226,7 @@ public class Player {
                 dof++;
             }
         }
-        return new Ray(new Vector2D(rayX, rayY), 0, false, wallID);
+        return new Ray(new Vector2D(rayX, rayY), angle, 0, false, wallID);
     }
 
     /**
@@ -312,7 +318,7 @@ public class Player {
             }
         }
 
-        return new Ray(new Vector2D(rayX, rayY), 0, true, wallID);
+        return new Ray(new Vector2D(rayX, rayY), angle, 0, true, wallID);
     }
 
     /**
@@ -407,17 +413,37 @@ public class Player {
         }
 
         if(inputHandler.use){
-
-
             int directionX = (int) (direction.x + position.x);
             int directionY = (int) (direction.y + position.y);
 
+
             if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+
+
+            //TODO: Implement wall building mechanic + remove designated walls
+            else if(
+                    map.getWall(directionX, directionY).equals(Map.WALLS.EMPTY)
+                    && (directionX != (int) position.x || directionY != (int) position.y)
+            ) {
+                map.setValue(directionX, directionY, Map.WALLS.WOOD);
+            }
+
+
+
+
         }
 
         // Start the ray casting.
         castRays(map);
+    }
+
+    public void takeDamage(int i) {
+        health -= i;
+        if(health <= 0)
+            System.out.println("DEAD");
+
+        System.out.println(health);
     }
 
     /**
@@ -457,4 +483,6 @@ public class Player {
     public void setKeyListener(InputHandler i){
         this.inputHandler = i;
     }
+
+
 }

@@ -104,6 +104,10 @@ public class Vector2D {
         }
     }
 
+    public boolean isInRadius(Vector2D vec, double radius){
+        return this.distance(vec) <= radius;
+    }
+
     /**
      * Returns a string representation of the vector with formatted x and y values.
      *
@@ -112,5 +116,20 @@ public class Vector2D {
     @Override
     public String toString(){
         return String.format("x: %.3f y: %.3f", x,y);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vector2D v) {
+            return this.x == v.x && this.y == v.y;
+        }
+        return false;
+    }
+
+    public double getX() {
+        return x;
+    }
+    public double getY(){
+        return y;
     }
 }
