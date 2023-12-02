@@ -27,12 +27,14 @@ public class Game implements Runnable{
     // Player object.
     private final Player player;
 
-    // Map object.
-    private final Map map;
+
 
     // MapRender object to render 2D view.
     private final MapRender mapRender;
+    private Map currentMap;
 
+    // Map object.
+    private final ArrayList<Map> map;
     private final ArrayList<Drone> enemy;
     private final ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
@@ -43,12 +45,17 @@ public class Game implements Runnable{
     public Game(){
         thread = new Thread(this);
         display = new Display();
-        map = new Map();
         inputHandler = new InputHandler();
 
 
+
+
+        map = new ArrayList<>();
+        map.add(new Map());
+        currentMap = map.get(0);
+
         player = new Player(
-            new Vector2D((double) map.map.length / 2, (double) map.map.length / 2)
+                new Vector2D((double) currentMap.map.length / 2, (double) currentMap.map.length / 2)
         );
 
         enemy = new ArrayList<>(4);
@@ -61,7 +68,7 @@ public class Game implements Runnable{
         obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5),true));
         obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10), true));
 
-        mapRender = new MapRender(map);
+        mapRender = new MapRender(currentMap);
 
         mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
@@ -130,7 +137,7 @@ public class Game implements Runnable{
                 frames++;
 
                 // Player gets updated.
-                player.update(map);
+                player.update(currentMap);
 
                 Vector2D temp = player.position;
                 for (Obstacle obstacle : obstacles){
@@ -141,7 +148,7 @@ public class Game implements Runnable{
                 // Enemy gets updated.
                 for (Drone d : enemy) {
 
-                    d.update(map, player);
+                    d.update(currentMap, player);
                     mapRender.render(player, d);
                 }
 

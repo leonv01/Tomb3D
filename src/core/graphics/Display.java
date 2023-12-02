@@ -82,7 +82,7 @@ public class Display extends JFrame implements Runnable{
 
     public void addPlayer(Player player){ this.player = player; }
     public void addDrones(ArrayList<Drone> drones){
-        this.drones = this.drones;
+        this.drones = drones;
     }
     public void addObstacle(ArrayList<Obstacle> obstacles) {this.obstacles = obstacles;}
 
@@ -130,7 +130,8 @@ public class Display extends JFrame implements Runnable{
                 if(obstacle.isVisible()) {
                     g.setColor(Color.RED);
                     // Render the smaller rectangle
-                    g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
+                    //g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
+                    g.drawImage(obstacle.getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
                 }
                 //TODO: implement pick up for player
                 // player.add(item);
@@ -263,7 +264,7 @@ public class Display extends JFrame implements Runnable{
             renderSprites(obstacle, g);
         }
         for (Drone d : drones) {
-            // renderSprites(d.obstacle, g);
+            renderSprites(d.obstacle, g);
         }
 
         bs.show();
