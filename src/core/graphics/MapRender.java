@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -64,9 +65,9 @@ public class MapRender extends JFrame{
      * Renders the map with player and enemy from a top-down perspective.
      *
      * @param player The player object that will be rendered.
-     * @param enemy The enemy object that will be rendered
+     * @param enemies The enemy object that will be rendered
      */
-    public void render(Player player, Drone enemy){
+    public void render(Player player, ArrayList<Drone> enemies){
         BufferStrategy bs = getBufferStrategy();
         if(bs == null){
             createBufferStrategy(3);
@@ -114,14 +115,15 @@ public class MapRender extends JFrame{
 
 
         // If an enemy exists, it should be rendered as a square with a width of 5 and its directional vector.
-        if(enemy != null){
-            g.setColor(Color.orange);
-            g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
-            g.setColor(Color.BLUE);
-            g.drawLine(
-                    (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
-                    (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
-
+        if(enemies != null){
+            for (Drone enemy : enemies) {
+                g.setColor(Color.orange);
+                g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
+                g.setColor(Color.BLUE);
+                g.drawLine(
+                        (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
+                        (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
+            }
         }
         bs.show();
 

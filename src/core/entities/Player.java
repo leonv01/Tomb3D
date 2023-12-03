@@ -6,47 +6,35 @@ import core.utils.Config;
 import core.utils.Ray;
 import core.utils.Vector2D;
 
+import javax.swing.*;
+
 /**
  * The Player class represents the player entity in the game.
  */
 public class Player {
-    // Player position.
-    public Vector2D position;
-    // Player look direction.
-    public Vector2D direction;
-    // Ray for horizontal grid line check.
-    public Ray horizontal;
-    // Ray for vertical grid line check.
-    public Ray vertical;
-    // Array of Rays.
-    public Ray[] rays;
+    public Vector2D position;   // Player position.
+    public Vector2D direction;  // Player look direction.
+    public Ray horizontal;  // Ray for horizontal grid line check.
+    public Ray vertical;    // Ray for vertical grid line check.
+    public Ray[] rays; // Array of Rays.
 
-    // InputHandler to react to user input.
-    private InputHandler inputHandler;
+    private InputHandler inputHandler; // InputHandler to react to user input.
+    private Timer timer; // Timer for shooting.
 
-    // Rotation value of the player.
-    public double rotation;
+    public double rotation; // Rotation value of the player.
 
-    // FOV value.
-    int fov = Config.FOV;
+    private final int fov = Config.FOV; // FOV value.
 
-    int health;
+    private EntityAttributes attributes;
+
+    boolean isShooting;
+    int shootDelay = 200;
 
     /**
      * Default constructor for the Player class. Initializes player properties.
      */
     public Player(){
-        this.position = new Vector2D();
-        this.direction = new Vector2D(1,0);
-        this.rotation = 0;
-        this.horizontal = new Ray();
-        this.vertical = new Ray();
-
-        // Creates array of rays based on the FOV and the ray resolution.
-        this.rays = new Ray[Config.rayResolution * fov];
-        for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
-
-        this.health = 100;
+        initPlayer(new Vector2D());
     }
 
     /**
@@ -55,18 +43,28 @@ public class Player {
      * @param position The initial position of the player.
      */
     public Player(Vector2D position){
-        // Sets position of the player to the parameter.
+        initPlayer(position);
+    }
+
+    private void initPlayer(Vector2D position){
         this.position = position;
         this.direction = new Vector2D(1,0);
         this.rotation = 0;
         this.horizontal = new Ray();
         this.vertical = new Ray();
 
-        // Creates array of rays based on the FOV and the ray resolution.
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
 
-        this.health = 100;
+        this.attributes = new EntityAttributes(
+                100, Config.MOVEMENT_SPEED, Config.RUN_SPEED, Config.ROTATION_SPEED,
+                15,100, 30,
+                30, 0, 0
+        );
+
+        isShooting = false;
+
+        timer = new Timer(shootDelay, e -> shoot());
     }
 
     /**
@@ -332,22 +330,17 @@ public class Player {
         int mapX;
         int mapY;
 
-        // Get movement speed from the config.
-        float MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
+        double playerSpeed = attributes.getSpeed();
 
-        // If player runs, the movement speed is increased.
         if(inputHandler.run){
-            MOVEMENT_SPEED = Config.RUN_SPEED;
+            playerSpeed = attributes.getRunSpeed();
         }
-        // Else the player movement speed is set to default.
-        else{
-            MOVEMENT_SPEED = Config.MOVEMENT_SPEED;
-        }
+
         // If the player moves forward.
         if(inputHandler.forward){
             // Calculate the temporary x and y values, based on the current position added with the direction where the player looks at multiplied by the movement speed.
-            tempX = position.x + direction.x * MOVEMENT_SPEED;
-            tempY = position.y + direction.y * MOVEMENT_SPEED;
+            tempX = position.x + direction.x * playerSpeed;
+            tempY = position.y + direction.y * playerSpeed;
 
             // Flooring the position to get the x and y index in the map.
             mapX = (int) (tempX);
@@ -365,8 +358,8 @@ public class Player {
         }
         if(inputHandler.back){
             // Calculate the temporary x and y values, based on the current position added with the direction where the player looks at multiplied by the movement speed.
-            tempX = position.x - direction.x * MOVEMENT_SPEED;
-            tempY = position.y - direction.y * MOVEMENT_SPEED;
+            tempX = position.x - direction.x * playerSpeed;
+            tempY = position.y - direction.y * playerSpeed;
 
             // Flooring the position to get the x and y index in the map.
             mapX = (int) tempX;
@@ -383,13 +376,10 @@ public class Player {
             }
         }
 
-        // Get the rotation speed from the config.
-        float ROTATION_SPEED = Config.ROTATION_SPEED;
-
         // If the player rotates right.
         if(inputHandler.right){
             // Rotation speed is subtracted from the player rotation.
-            rotation -= ROTATION_SPEED;
+            rotation -= attributes.getRotationSpeed();
 
             // Keeping the player rotation in bounds [0, 2 * PI]
             if(rotation <= 0)
@@ -402,7 +392,7 @@ public class Player {
         // If the player rotates left.
         if(inputHandler.left){
             // Rotation speed is added onto the player rotation.
-            rotation += ROTATION_SPEED;
+            rotation += attributes.getRotationSpeed();
 
             // Keeping the player rotation in bounds [0, 2 * PI]
             if(rotation >= 2 * Math.PI)
@@ -428,22 +418,41 @@ public class Player {
             ) {
                 map.setValue(directionX, directionY, Map.WALLS.WOOD);
             }
+        }
 
-
-
-
+        if(inputHandler.shoot){
+            isShooting = true;
+            timer.start();
         }
 
         // Start the ray casting.
         castRays(map);
     }
 
+    private void shoot(){
+        isShooting = false;
+        attributes.shoot();
+        System.out.println(attributes.getCurrentAmmo());
+        timer.stop();
+    }
     public void takeDamage(int i) {
-        health -= i;
-        if(health <= 0)
+        attributes.takeDamage(i);
+        if(attributes.getHealth() <= 0)
             System.out.println("DEAD");
 
-        System.out.println(health);
+        System.out.println(attributes.getHealth());
+    }
+    public void addScore(int i){
+        attributes.addScore(i);
+        System.out.println(attributes.getScore());
+    }
+    public void addHealth(int value) {
+        attributes.addHealth(value);
+        System.out.println(attributes.getHealth());
+    }
+    public void addAmmo(int value) {
+        attributes.addAmmo(value);
+        System.out.println(attributes.getCurrentAmmo());
     }
 
     /**
@@ -485,4 +494,7 @@ public class Player {
     }
 
 
+    public void printAttributes() {
+        System.out.println(attributes.toString());
+    }
 }

@@ -8,7 +8,6 @@ import core.utils.Vector2D;
 import core.entities.Drone;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * The Game class represents the main game engine that manages the game loop and components.
@@ -59,14 +58,14 @@ public class Game implements Runnable{
         );
 
         enemy = new ArrayList<>(4);
-        enemy.add(new Drone(new Vector2D(1.5, 1.5)));
-        enemy.add(new Drone(new Vector2D(5.5, 4.5)));
-        enemy.add(new Drone(new Vector2D(7.5, 1.5)));
-        enemy.add(new Drone(new Vector2D(9.5, 2.5)));
+        enemy.add(new Drone(new Vector2D(1.5, 1.5), Drone.Type.LIGHT));
+        enemy.add(new Drone(new Vector2D(6.5, 4.5), Drone.Type.MEDIUM));
+        enemy.add(new Drone(new Vector2D(7.5, 1.5), Drone.Type.HEAVY));
+        enemy.add(new Drone(new Vector2D(9.5, 2.5), Drone.Type.BOSS));
 
         obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5),true));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10), true));
+        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5), Obstacle.Type.COLLECTIBLE, 400));
+        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5), Obstacle.Type.AMMO_PACK, 60));
 
         mapRender = new MapRender(currentMap);
 
@@ -142,16 +141,16 @@ public class Game implements Runnable{
                 Vector2D temp = player.position;
                 for (Obstacle obstacle : obstacles){
 
-                    obstacle.checkCollision(temp);
+                    obstacle.checkCollision(player);
                 }
 
                 // Enemy gets updated.
                 for (Drone d : enemy) {
 
                     d.update(currentMap, player);
-                    mapRender.render(player, d);
                 }
 
+                mapRender.render(player, enemy);
 
                 delta--;
 

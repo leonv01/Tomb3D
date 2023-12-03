@@ -56,6 +56,8 @@ public class InputHandler implements KeyListener {
         // Keyboard Input for using item/door
         if(e.getKeyCode() == KeyEvent.VK_E)
             use = true;
+        if(e.getKeyCode() == KeyEvent.VK_SPACE)
+            shoot = true;
     }
 
     @Override
@@ -100,5 +102,7 @@ public class InputHandler implements KeyListener {
        if(e.getKeyCode() == KeyEvent.VK_E){
            use = false;
        }
+         if(e.getKeyCode() == KeyEvent.VK_SPACE)
+              shoot = false;
     }
 }

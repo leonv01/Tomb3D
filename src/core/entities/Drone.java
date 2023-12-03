@@ -5,26 +5,25 @@ import core.utils.Config;
 import core.utils.Vector2D;
 
 public class Drone {
+
+
+    public enum Type{
+        HEAVY, LIGHT, MEDIUM, BOSS
+    }
+    private Type type;
     public Vector2D position;
     public Vector2D direction;
     public double rotation;
     public Obstacle obstacle;
 
-    public Drone() {
-        position = new Vector2D();
-        direction = new Vector2D();
-        rotation = 0;
+    private EntityAttributes attributes;
+
+    public Drone(Vector2D position, Type type) {
+        initDrone(position, type);
     }
 
-    public Drone(Vector2D position) {
-        this.position = position;
-        this.rotation = 0;
-        this.direction = new Vector2D(1, 0);
-        obstacle = new Obstacle("src/textures/brick.png", position, false);
-    }
-
-    public void takeDamage(int i){
-
+    public void takeDamage(int damage){
+        attributes.takeDamage(damage);
     }
 
     public void update(Map map, Player player) {
@@ -36,8 +35,8 @@ public class Drone {
         direction.x = Math.cos(rotation);
         direction.y = Math.sin(rotation);
 
-        double tempX = position.x + direction.x * Config.DRONE_SPEED;
-        double tempY = position.y + direction.y * Config.DRONE_SPEED;
+        double tempX = position.x + direction.x * attributes.getSpeed();
+        double tempY = position.y + direction.y * attributes.getSpeed();
 
         int mapX = (int) tempX;
         int mapY = (int) tempY;
@@ -68,10 +67,63 @@ public class Drone {
         );
 
         if(collisionRounded.equals(playerRounded)){
-            player.takeDamage(20);
+            //player.takeDamage(20);
+            printAttributes();
         }
 
 
         obstacle.setPosition(position);
+    }
+
+    private void initDrone(Vector2D position, Type type){
+        this.position = position;
+        this.rotation = 0;
+        this.direction = new Vector2D(1, 0);
+
+        int health = 0;
+        double speed = 0;
+        int damage = 0;
+        int score = 0;
+
+        String texturePath = "src/textures/enemy/";
+
+        this.type = type;
+
+        switch (type){
+            case HEAVY -> {
+                health = 200;
+                speed = 0.01;
+                damage = 50;
+                score = 500;
+                texturePath = texturePath.concat("heavy.png");
+            }
+            case LIGHT -> {
+                health = 100;
+                speed = 0.025;
+                damage = 20;
+                score = 100;
+                texturePath = texturePath.concat("light.png");
+            }
+            case MEDIUM -> {
+                health = 150;
+                speed = 0.015;
+                damage = 30;
+                score = 250;
+                texturePath = texturePath.concat("medium.png");
+            }
+            case BOSS -> {
+                health = 500;
+                speed = 0.005;
+                damage = 100;
+                score = 1000;
+                texturePath = texturePath.concat("boss.png");
+            }
+        }
+        this.attributes = new EntityAttributes(health, speed, 0, 0, damage, health, 0,0,0,score);
+        this.obstacle = new Obstacle(texturePath, position, Obstacle.Type.ENEMY, 100);
+    }
+
+    public void printAttributes(){
+        System.out.println(attributes);
     }
 }

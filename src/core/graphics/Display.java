@@ -6,6 +6,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.swing.JFrame;
 
@@ -258,6 +259,8 @@ public class Display extends JFrame implements Runnable{
 
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
+
+        obstacles.sort(Comparator.comparingDouble(o -> o.getPosition().distance(player.position)));
 
         renderWalls(g);
         for (Obstacle obstacle:obstacles) {
