@@ -98,51 +98,50 @@ public class Display extends JFrame implements Runnable{
         double thresholdAngle = Math.PI / 2;
         return Math.abs(angle) > Math.PI - thresholdAngle;
     }
-    public void renderSprites(Obstacle obstacle, Graphics2D g){
+    public void renderSprites(Obstacle obstacle, Graphics2D g) {
         double fovRadians = Math.toRadians(Config.FOV);
         double viewPlaneWidth = 2 * Math.tan(fovRadians / 2);
 
         Vector2D relativePosVector2d = obstacle.getPosition().sub(player.position);
         double distance = relativePosVector2d.length();
-        double spriteScreenSize = (((double) (DIS_WIDTH) / distance)); //(zBuffer.length + 1)) / viewPlaneWidth);// * (1 / distance);
+        double spriteScreenSize = (((double) (DIS_WIDTH) / distance));
 
         double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.direction.y, player.direction.x);
+        angle = (angle + 2 * Math.PI) % (2 * Math.PI); // Ensure angle is within [0, 2*PI]
+
+        if (angle > Math.PI) {
+            angle -= 2 * Math.PI;
+        }
         int rectX = (int) (angle * Config.WIDTH / fovRadians + Config.WIDTH / 2 - spriteScreenSize / 2);
         int rectY = (int) (Config.HEIGHT / 2 - spriteScreenSize / 2);
-
-
 
         int rectWidth = (int) spriteScreenSize;
         int rectHeight = (int) spriteScreenSize;
 
-        // Adjust the size of the rendered rectangle
-        int smallerRectSize = rectWidth ;/// 2; // Set the size of the smaller rectangle
+        // Adjust the position to render the sprite from its center
+        int centerX = rectX + rectWidth / 2;
+        int centerY = rectY + rectHeight / 2;
 
         // Calculate the new position for the smaller rectangle within the larger one
-        int smallerRectX = rectX; //+ (rectWidth - smallerRectSize) / 2;
-        int smallerRectY = rectY ;//+ (rectHeight - smallerRectSize) / 2;
-
-        //System.out.println(smallerRectX + " " + smallerRectY);
+        int smallerRectSize = rectWidth;
+        int smallerRectX = centerX - smallerRectSize / 2;
+        int smallerRectY = centerY - smallerRectSize / 2;
 
         int index = (rectX / ((DIS_WIDTH) / (zBuffer.length + 1)));
-        if(index >= 0 && index < zBuffer.length - 1){
-            if(!(zBuffer[index] < distance))
-            {
-                if(obstacle.isVisible()) {
+
+        if (index >= 0 && index < zBuffer.length - 1) {
+            if (!(zBuffer[index] < distance)) {
+                if (obstacle.isVisible()) {
                     g.setColor(Color.RED);
-                    // Render the smaller rectangle
-                    //g.fillRect(smallerRectX, smallerRectY, smallerRectSize, smallerRectSize);
+                    // Render the image from its center
                     g.drawImage(obstacle.getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
                 }
                 //TODO: implement pick up for player
                 // player.add(item);
-
-            }
-            else{
-                //System.out.println(index);
             }
         }
     }
+
 
     public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
@@ -260,7 +259,12 @@ public class Display extends JFrame implements Runnable{
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
 
-        obstacles.sort(Comparator.comparingDouble(o -> o.getPosition().distance(player.position)));
+        drones.sort(new Comparator<Drone>() {
+            @Override
+            public int compare(Drone o1, Drone o2) {
+                return 0;
+            }
+        });
 
         renderWalls(g);
         for (Obstacle obstacle:obstacles) {
