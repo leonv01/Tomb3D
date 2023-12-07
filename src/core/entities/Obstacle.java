@@ -16,7 +16,7 @@ public class Obstacle {
     public double z;
     private final BufferedImage image;
     private final int width, height;
-    private boolean visible;
+    private boolean visible, active;
     private final double radius = 2;
     private final Type type;
     private final int value;
@@ -32,11 +32,16 @@ public class Obstacle {
         this.width = image.getWidth();
         this.height = image.getHeight();
         this.visible = true;
+        this.active = true;
         this.type = type;
         this.value = value;
     }
 
 
+    /**
+     * Checks if the player is colliding with the obstacle.
+     * @param player The player object.
+     */
     public void checkCollision(Player player){
         int x = (int) position.getX();
         int y = (int) position.getY();
@@ -79,6 +84,7 @@ public class Obstacle {
     public BufferedImage getImage(){
         return image;
     }
+
     public void setPosition(Vector2D position){
         this.position = position;
     }
@@ -101,5 +107,13 @@ public class Obstacle {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isActive(){
+        return active;
+    }
+
+    public void setActive(boolean active){
+        this.active = active;
     }
 }

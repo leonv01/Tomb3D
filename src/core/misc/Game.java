@@ -29,7 +29,7 @@ public class Game implements Runnable{
 
 
     // MapRender object to render 2D view.
-    private final MapRender mapRender;
+ //   private final MapRender mapRender;
     private Map currentMap;
 
     // Map object.
@@ -58,24 +58,26 @@ public class Game implements Runnable{
         );
 
         enemy = new ArrayList<>(4);
-        enemy.add(new Drone(new Vector2D(1.5, 1.5), Drone.Type.LIGHT));
-        enemy.add(new Drone(new Vector2D(6.5, 4.5), Drone.Type.MEDIUM));
-        enemy.add(new Drone(new Vector2D(7.5, 1.5), Drone.Type.HEAVY));
-        enemy.add(new Drone(new Vector2D(9.5, 2.5), Drone.Type.BOSS));
+        enemy.add(new Drone(new Vector2D(1.5, 1.5), currentMap, Drone.Type.LIGHT, player));
+        enemy.add(new Drone(new Vector2D(6.5, 4.5), currentMap, Drone.Type.MEDIUM, player));
+        enemy.add(new Drone(new Vector2D(7.5, 1.5), currentMap, Drone.Type.HEAVY, player));
+        enemy.add(new Drone(new Vector2D(9.5, 2.5), currentMap, Drone.Type.BOSS, player));
 
         obstacles = new ArrayList<>();
         obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5), Obstacle.Type.COLLECTIBLE, 400));
         obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5), Obstacle.Type.AMMO_PACK, 60));
 
-        mapRender = new MapRender(currentMap);
+       // mapRender = new MapRender(currentMap);
 
-        mapRender.setKeyListener(inputHandler);
+      //  mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
         player.setKeyListener(inputHandler);
 
+        display.addMap(currentMap);
         display.addDrones(enemy);
         display.addPlayer(player);
         display.addObstacle(obstacles);
+
 
         // Create a new thread for display rendering.
 
@@ -147,10 +149,10 @@ public class Game implements Runnable{
                 // Enemy gets updated.
                 for (Drone d : enemy) {
 
-                    d.update(currentMap, player);
+                    d.update();
                 }
 
-                mapRender.render(player, enemy);
+                //mapRender.render(player, enemy);
 
                 delta--;
 
@@ -160,7 +162,7 @@ public class Game implements Runnable{
             // Update the FPS text in the window.
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
+               // mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
                 frames = 0;
             }
         }

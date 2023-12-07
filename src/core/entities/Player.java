@@ -46,6 +46,11 @@ public class Player {
         initPlayer(position);
     }
 
+    /**
+     * Initialize the player properties.
+     *
+     * @param position The initial position of the player.
+     */
     private void initPlayer(Vector2D position){
         this.position = position;
         this.direction = new Vector2D(1,0);
@@ -59,7 +64,7 @@ public class Player {
         this.attributes = new EntityAttributes(
                 100, Config.MOVEMENT_SPEED, Config.RUN_SPEED, Config.ROTATION_SPEED,
                 15,100, 30,
-                30, 0, 0
+                30, 0, 0,0
         );
 
         isShooting = false;
@@ -429,12 +434,20 @@ public class Player {
         castRays(map);
     }
 
+    /**
+     * Shoots a bullet.
+     */
     private void shoot(){
         isShooting = false;
         attributes.shoot();
         System.out.println(attributes.getCurrentAmmo());
         timer.stop();
     }
+
+    /**
+     * Checks if the player is colliding with the obstacle.
+     * @param player The player object.
+     */
     public void takeDamage(int i) {
         attributes.takeDamage(i);
         if(attributes.getHealth() <= 0)
@@ -442,14 +455,29 @@ public class Player {
 
         System.out.println(attributes.getHealth());
     }
+
+    /**
+     * Adds score to the player.
+     * @param score The score to be added.
+     */
     public void addScore(int i){
         attributes.addScore(i);
         System.out.println(attributes.getScore());
     }
+
+    /**
+     * Adds health to the player.
+     * @param health The health to be added.
+     */
     public void addHealth(int value) {
         attributes.addHealth(value);
         System.out.println(attributes.getHealth());
     }
+
+    /**
+     * Adds ammo to the player.
+     * @param ammo The ammo to be added.
+     */
     public void addAmmo(int value) {
         attributes.addAmmo(value);
         System.out.println(attributes.getCurrentAmmo());

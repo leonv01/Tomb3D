@@ -10,10 +10,10 @@ public class EntityAttributes {
     private final double rotationSpeed;
     private final int damage;
 
-
     private int currentAmmo;
     private final int maxAmmo;
-    private final int ammoPack;
+    private int ammoPack;
+    private final int maxAmmoPack;
 
     private int score;
 
@@ -27,6 +27,7 @@ public class EntityAttributes {
             int currentAmmo,
             int maxAmmo,
             int ammoPack,
+            int maxAmmoPack,
             int score
     ){
         this.health = health;
@@ -39,31 +40,57 @@ public class EntityAttributes {
         this.maxAmmo = maxAmmo;
         this.ammoPack = ammoPack;
         this.score = score;
+        this.maxAmmoPack = maxAmmoPack;
         isAlive = true;
     }
 
+    /**
+     * Takes damage from entity.
+     *
+     * @param damage The damage to be taken.
+     */
     public void takeDamage(int damage){
         health -= damage;
         if(health <= 0)
             isAlive = false;
     }
 
+    /**
+     * Adds health to the entity.
+     *
+     * @param health The health to be added.
+     */
     public void addHealth(int health){
         this.health += health;
         if(this.health > maxHealth)
             this.health = maxHealth;
     }
 
+    /**
+     * Adds ammo to the entity.
+     *
+     * @param ammo The ammo to be added.
+     */
     public void addAmmo(int ammo){
         currentAmmo += ammo;
-        if(currentAmmo > maxAmmo)
+        if(currentAmmo > maxAmmo){
+            ammoPack += currentAmmo - maxAmmo;
             currentAmmo = maxAmmo;
+        }
     }
 
+    /**
+     * Adds score to the player.
+     *
+     * @param score The score to be added.
+     */
     public void addScore(int score){
         this.score += score;
     }
 
+    /**
+     * Shoots a bullet.
+     */
     public void shoot(){
         currentAmmo--;
         if(currentAmmo < 0) {
@@ -73,6 +100,7 @@ public class EntityAttributes {
             else currentAmmo = 0;
         }
     }
+
 
     public boolean isAlive() {
         return isAlive;

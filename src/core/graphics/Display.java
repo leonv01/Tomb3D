@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import core.entities.Drone;
 import core.entities.Obstacle;
 import core.entities.Player;
+import core.misc.InputHandler;
+import core.misc.Map;
 import core.utils.Config;
 import core.utils.Ray;
 import core.utils.Vector2D;
@@ -21,6 +23,8 @@ import core.utils.Vector2D;
  * The Display class represents the graphical display for rendering the game world.
  */
 public class Display extends JFrame implements Runnable{
+    MapRender mapRender;
+    Map map;
 
     // Displayed image.
     BufferedImage image;
@@ -30,6 +34,8 @@ public class Display extends JFrame implements Runnable{
     ArrayList<Obstacle> obstacles;
     ArrayList<Drone> drones;
     Player player = null;
+
+    InputHandler inputHandler;
 
     private final Thread thread;
     boolean running;
@@ -41,6 +47,8 @@ public class Display extends JFrame implements Runnable{
      * Constructs a Display object and initializes the display window.
      */
     public Display(){
+
+        this.inputHandler = new InputHandler();
 
         thread = new Thread(this);
 
@@ -78,14 +86,44 @@ public class Display extends JFrame implements Runnable{
      * @param k KeyListener to detect user input.
      */
     public void setKeyListener(KeyListener k){
+        this.inputHandler = (InputHandler) k;
         addKeyListener(k);
     }
 
-    public void addPlayer(Player player){ this.player = player; }
-    public void addDrones(ArrayList<Drone> drones){
-        this.drones = drones;
+    /**
+     * Add a map to the renderer.
+     * @param map The map to be added.
+     */
+    public void addMap(Map map){
+        this.map = map;
     }
-    public void addObstacle(ArrayList<Obstacle> obstacles) {this.obstacles = obstacles;}
+
+    /**
+     * Add a player to the renderer.
+     * @param player The player to be added.
+     */
+    public void addPlayer(Player player){ this.player = player; }
+
+    /**
+     * Add a drone to the list of obstacles.
+     * @param drones The drone to be added.
+     */
+    public void addDrones(ArrayList<Drone> drones){
+        System.out.println(obstacles.size());
+        this.drones = drones;
+        for(Drone drone : drones){
+            obstacles.add(drone.obstacle);
+        }
+        System.out.println(obstacles.size());
+    }
+
+    /**
+     * Add an obstacle to the list of obstacles.
+     * @param obstacles The obstacle to be added.
+     */
+    public void addObstacle(ArrayList<Obstacle> obstacles) {
+        this.obstacles.addAll(obstacles);
+    }
 
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
 
@@ -98,6 +136,12 @@ public class Display extends JFrame implements Runnable{
         double thresholdAngle = Math.PI / 2;
         return Math.abs(angle) > Math.PI - thresholdAngle;
     }
+
+    /**
+     * Render the sprites from the players perspective.
+     * @param obstacle The obstacle to be rendered.
+     * @param g Graphics2D component.
+     */
     public void renderSprites(Obstacle obstacle, Graphics2D g) {
         double fovRadians = Math.toRadians(Config.FOV);
         double viewPlaneWidth = 2 * Math.tan(fovRadians / 2);
@@ -131,18 +175,26 @@ public class Display extends JFrame implements Runnable{
 
         if (index >= 0 && index < zBuffer.length - 1) {
             if (!(zBuffer[index] < distance)) {
+                obstacle.setActive(true);
                 if (obstacle.isVisible()) {
-                    g.setColor(Color.RED);
+
                     // Render the image from its center
                     g.drawImage(obstacle.getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
                 }
                 //TODO: implement pick up for player
                 // player.add(item);
             }
+            else {
+                obstacle.setActive(false);
+            }
         }
     }
 
 
+    /**
+     * Render the walls from the players perspective.
+     * @param g Graphics2D component.
+     */
     public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
         Ray[] rays = player.rays;
@@ -229,7 +281,7 @@ public class Display extends JFrame implements Runnable{
     }
 
     /**
-     * Render the pseudo 3D walls from the players perspective.
+     * Render the image to the window.
      */
     public void render() {
         BufferStrategy bs = getBufferStrategy();
@@ -258,20 +310,11 @@ public class Display extends JFrame implements Runnable{
 
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
-
-        drones.sort(new Comparator<Drone>() {
-            @Override
-            public int compare(Drone o1, Drone o2) {
-                return 0;
-            }
-        });
+        obstacles.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.position).length(), o1.getPosition().sub(player.position).length()));
 
         renderWalls(g);
         for (Obstacle obstacle:obstacles) {
             renderSprites(obstacle, g);
-        }
-        for (Drone d : drones) {
-            renderSprites(d.obstacle, g);
         }
 
         bs.show();
@@ -311,6 +354,11 @@ public class Display extends JFrame implements Runnable{
 
                 // Player gets updated.
                 this.render();
+
+                if(inputHandler.map) {
+                    add(new MapRender(map, player, drones));
+                    System.out.println("map");
+                }
 
                 delta--;
 
