@@ -46,9 +46,6 @@ public class Game implements Runnable{
         display = new Display();
         inputHandler = new InputHandler();
 
-
-
-
         map = new ArrayList<>();
         map.add(new Map());
         currentMap = map.get(0);
@@ -63,10 +60,11 @@ public class Game implements Runnable{
         enemy.add(new Drone(new Vector2D(7.5, 1.5), currentMap, Drone.Type.HEAVY, player));
         enemy.add(new Drone(new Vector2D(9.5, 2.5), currentMap, Drone.Type.BOSS, player));
 
-        obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5), Obstacle.Type.COLLECTIBLE, 400));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14.5,10.5), Obstacle.Type.AMMO_PACK, 60));
-
+        obstacles = new ArrayList<>(3);
+        obstacles.add(new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(8.5,10.5), Obstacle.Type.HEAL_ITEM, 40));
+        obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
+        obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
+        obstacles.add(new Obstacle("src/textures/collectibles/mcdonalds64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
        // mapRender = new MapRender(currentMap);
 
       //  mapRender.setKeyListener(inputHandler);

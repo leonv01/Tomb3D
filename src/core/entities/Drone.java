@@ -11,7 +11,7 @@ import java.util.Random;
 public class Drone {
 
     public enum State{
-        IDLE, CHASE, ATTACK, DEAD
+        IDLE, CHASE, DEAD
     }
 
     public enum Type{
@@ -20,7 +20,7 @@ public class Drone {
     private Type type;
     private State state;
     private Map map;
-    private Timer timer;
+    private Timer timer, idleTimer;
     private Player player;
     public Vector2D position, direction;
     public double rotation, radius;
@@ -32,10 +32,7 @@ public class Drone {
         initDrone(position, map, type, player);
     }
 
-    /**
-     * Returns the position of the drone.
-     * @return The position of the drone.
-     */
+
     public void takeDamage(int damage){
         attributes.takeDamage(damage);
     }
@@ -54,11 +51,8 @@ public class Drone {
         switch(state){
             case IDLE -> idle(playerPosition);
             case CHASE -> chase(playerPosition);
-            case ATTACK -> attack(player);
             case DEAD -> dead();
         }
-
-
         obstacle.setPosition(position);
     }
 
@@ -78,6 +72,12 @@ public class Drone {
             if (Math.random() < Config.HIT_ACCURACY_THRESHOLD)
                 player.takeDamage(attributes.getDamage());
         }
+        timer.stop();
+    }
+
+    private void setDirection(double angle){
+        direction.x = Math.cos(angle);
+        direction.y = Math.sin(angle);
     }
 
     /**
@@ -90,8 +90,7 @@ public class Drone {
 
         rotation = Math.atan2(diffY, diffX);
 
-        direction.x = Math.cos(rotation);
-        direction.y = Math.sin(rotation);
+        setDirection(rotation);
 
         double tempX = position.x + direction.x * attributes.getSpeed();
         double tempY = position.y + direction.y * attributes.getSpeed();
@@ -117,6 +116,25 @@ public class Drone {
      */
     private void idle(Vector2D playerPosition){
 
+        setDirection(rotation);
+
+        double  tempX = position.x + direction.x * attributes.getSpeed() * 0.5;
+        double tempY = position.y + direction.y * attributes.getSpeed() * 0.5;
+
+        int mapX = (int) tempX;
+        int mapY = (int) tempY;
+
+        if(map.map[(int) position.y][mapX] == 0){
+            position.x = tempX;
+        }
+        if(map.map[mapY][(int) position.x] == 0){
+            position.y = tempY;
+        }
+
+        Vector2D collision = new Vector2D(position);
+        collision.add(direction);
+
+        idleTimer.start();
     }
 
     /**
@@ -145,6 +163,12 @@ public class Drone {
         this.type = type;
         this.state = State.IDLE;
         this.timer = new Timer(1000, e -> attack(player));
+        this.idleTimer = new Timer(1000, e -> {
+            if(state == State.IDLE){
+                rotation += Math.random() * Math.PI / 2;
+                if(rotation > Math.PI * 2) rotation -= Math.PI * 2;
+            }
+        });
         switch (type){
             case HEAVY -> {
                 health = Config.HEAVY_ENEMY_HEALTH;

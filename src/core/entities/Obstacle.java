@@ -38,6 +38,10 @@ public class Obstacle {
     }
 
 
+    public void initObstacle(){
+
+    }
+
     /**
      * Checks if the player is colliding with the obstacle.
      * @param player The player object.
