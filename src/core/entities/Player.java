@@ -58,7 +58,7 @@ public class Player {
         this.horizontal = new Ray();
         this.vertical = new Ray();
 
-        this.rays = new Ray[Config.rayResolution * fov];
+        this.rays = new Ray[Config.RESOLUTION * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
 
         this.attributes = new EntityAttributes(
@@ -94,7 +94,7 @@ public class Player {
 
         // For each ray the horizontal and vertical rays are calculated.
         for (int i = 0; i < rays.length; i++) {
-            double tempAngle = lookRadiant + Math.toRadians((i / (double)Config.rayResolution));
+            double tempAngle = lookRadiant + Math.toRadians((i / (double)Config.RESOLUTION));
             if(tempAngle < 0) tempAngle += 2 * Math.PI;
             if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
 

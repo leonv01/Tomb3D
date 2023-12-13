@@ -26,6 +26,12 @@ public class Game implements Runnable{
     // Player object.
     private final Player player;
 
+    private enum State{
+        RUNNING,
+        PAUSED,
+        INACTIVE
+    }
+
 
 
     // MapRender object to render 2D view.

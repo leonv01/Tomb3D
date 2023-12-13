@@ -6,7 +6,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import javax.swing.JFrame;
 
@@ -71,7 +70,7 @@ public class Display extends JFrame implements Runnable{
         drones = new ArrayList<>();
 
 
-        zBuffer = new double[Config.rayResolution * Config.FOV];
+        zBuffer = new double[Config.RESOLUTION * Config.FOV];
         depth = new double[zBuffer.length];
         Arrays.fill(zBuffer, Double.MAX_VALUE);
         Arrays.fill(depth, 0);

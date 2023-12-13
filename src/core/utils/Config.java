@@ -3,8 +3,10 @@ package core.utils;
 import java.awt.Color;
 
 public class Config {
-    public final static int WIDTH = 1600;
-    public final static int HEIGHT = 1600;
+    public static String PLAYER_NAME = "Player";
+
+    public final static int WIDTH = 1000;
+    public final static int HEIGHT = 1000;
     public final static int MAP_WIDTH = 1600;
     public final static int MAP_HEIGHT = 1600;
     public final static float MOVEMENT_SPEED = .05f;
@@ -44,8 +46,8 @@ public class Config {
     public final static double BOSS_ENEMY_SPEED = 0.005;
 
 
-    public final static int FOV = 40;
-    public final static int rayResolution = 4;
+    public static int FOV = 45;
+    public static int RESOLUTION = 2;
 
 
 }
