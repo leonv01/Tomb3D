@@ -8,13 +8,19 @@ import java.io.File;
 import java.io.IOException;
 
 public class Obstacle {
+    public enum Type{
+        COLLECTIBLE, OBSTACLE, HEAL_ITEM, AMMO_PACK, ENEMY, KEY
+    }
+
     private Vector2D position;
     public double z;
-    private BufferedImage image;
-    private int width, height;
-    private boolean collectible, visible;
+    private final BufferedImage image;
+    private final int width, height;
+    private boolean visible, active;
     private final double radius = 2;
-    public Obstacle(String path, Vector2D position, boolean collectible){
+    private final Type type;
+    private final int value;
+    public Obstacle(String path, Vector2D position, Type type, int value){
         try {
             image = ImageIO.read(new File(path));
 
@@ -22,24 +28,58 @@ public class Obstacle {
             throw new RuntimeException(e);
         }
 
-        this.collectible = collectible;
         this.position = position;
         this.width = image.getWidth();
         this.height = image.getHeight();
         this.visible = true;
+        this.active = true;
+        this.type = type;
+        this.value = value;
     }
 
 
-    public void checkCollision(Vector2D pos){
+    public void initObstacle(){
+
+    }
+
+    /**
+     * Checks if the player is colliding with the obstacle.
+     * @param player The player object.
+     */
+    public void checkCollision(Player player){
         int x = (int) position.getX();
         int y = (int) position.getY();
 
-        int posX = (int) pos.getX();
-        int posY = (int) pos.getY();
+        int posX = (int) player.getX();
+        int posY = (int) player.getY();
 
         if(
-                x == posX && posY == y
+                x == posX && posY == y &&
+                visible
         ){
+            switch (type) {
+                case COLLECTIBLE -> {
+                    player.addScore(value);
+                    System.out.println("Collected");
+                }
+                case OBSTACLE -> System.out.println("Hit obstacle");
+                case HEAL_ITEM -> {
+                    player.addHealth(value);
+                    System.out.println("Healed");
+                }
+                case AMMO_PACK -> {
+                    System.out.println("Ammo");
+                    player.addAmmo(value);
+                }
+                case ENEMY -> {
+                    player.takeDamage(value);
+                    System.out.println("Hit enemy");
+                }
+                case KEY -> {
+                    System.out.println("Key");
+                }
+            }
+            player.printAttributes();
             visible = false;
             System.out.println("No longer visible");
         }
@@ -48,6 +88,7 @@ public class Obstacle {
     public BufferedImage getImage(){
         return image;
     }
+
     public void setPosition(Vector2D position){
         this.position = position;
     }
@@ -61,11 +102,7 @@ public class Obstacle {
     }
 
     public boolean isCollectible() {
-        return collectible;
-    }
-
-    public void setCollectible(boolean collectible) {
-        this.collectible = collectible;
+        return type.equals(Type.COLLECTIBLE);
     }
 
     public boolean isVisible() {
@@ -74,5 +111,13 @@ public class Obstacle {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isActive(){
+        return active;
+    }
+
+    public void setActive(boolean active){
+        this.active = active;
     }
 }

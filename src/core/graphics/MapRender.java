@@ -1,14 +1,13 @@
 package core.graphics;
 
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import core.entities.Drone;
 import core.entities.Player;
@@ -20,12 +19,14 @@ import core.utils.Vector2D;
 /**
  * Represents the map renderer for the top-down perspective of the game.
  */
-public class MapRender extends JFrame{
+public class MapRender extends JPanel {
     Map map;
+    Player player;
+    ArrayList<Drone> enemies;
     BufferedImage image;
 
-    final int MAP_WIDTH = Config.WIDTH;
-    final int MAP_HEIGHT = Config.HEIGHT;
+    final int MAP_WIDTH = Config.MAP_WIDTH;
+    final int MAP_HEIGHT = Config.MAP_HEIGHT;
 
     final int TILE_X;
     final int TILE_Y;
@@ -35,54 +36,42 @@ public class MapRender extends JFrame{
      *
      * @param map The map that will be rendered.
      */
-    public MapRender(Map map){
+    public MapRender(Map map, Player player, ArrayList<Drone> enemies){
         this.map = map;
+        this.player = player;
+        this.enemies = enemies;
         image = new BufferedImage(MAP_WIDTH, MAP_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
         TILE_X = MAP_WIDTH / map.map[0].length;
         TILE_Y = MAP_HEIGHT / map.map.length;
 
-        setSize(MAP_WIDTH, MAP_HEIGHT);
-        setResizable(false);
-        setTitle("Map Renderer");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBackground(Color.BLACK);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setPreferredSize(new Dimension(MAP_WIDTH, MAP_HEIGHT));
     }
 
-    /**
-     * Sets the KeyListener for this window.
-     *
-     * @param k The KeyListener for input detection.
-     */
-    public void setKeyListener(KeyListener k){
-        addKeyListener(k);
+    public void render(Player player, ArrayList<Drone> enemies){
+        repaint();
     }
 
     /**
      * Renders the map with player and enemy from a top-down perspective.
      *
      * @param player The player object that will be rendered.
-     * @param enemy The enemy object that will be rendered
+     * @param enemies The enemy object that will be rendered
      */
-    public void render(Player player, Drone enemy){
-        BufferStrategy bs = getBufferStrategy();
-        if(bs == null){
-            createBufferStrategy(3);
-            return;
-        }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
+        Graphics2D g2d = (Graphics2D) g;
         Color color;
-        Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
         // For each value in the map, a tile will be rendered.
         for (int y = 0; y < map.map.length; y++) {
             for (int x = 0; x < map.map[y].length; x++) {
 
                 color = map.getColor(x,y);
-                g.setColor(color);
-                g.fillPolygon(
+                g2d.setColor(color);
+                g2d.fillPolygon(
                     new int[]{
                         x * TILE_X, (x + 1) * TILE_X, (x + 1) * TILE_X, x * TILE_X
                     },
@@ -94,9 +83,9 @@ public class MapRender extends JFrame{
         }
 
         // Render the player as a square with a width of 5.
-        g.setColor(Color.red);
-        g.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
-        g.setStroke(new BasicStroke(5));
+        g2d.setColor(Color.red);
+        g2d.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
+        g2d.setStroke(new BasicStroke(5));
 
         // Render the rays of the player.
         for (Ray ray : player.rays) {
@@ -114,16 +103,15 @@ public class MapRender extends JFrame{
 
 
         // If an enemy exists, it should be rendered as a square with a width of 5 and its directional vector.
-        if(enemy != null){
-            g.setColor(Color.orange);
-            g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
-            g.setColor(Color.BLUE);
-            g.drawLine(
-                    (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
-                    (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
-
+        if(enemies != null){
+            for (Drone enemy : enemies) {
+                g.setColor(Color.orange);
+                g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
+                g.setColor(Color.BLUE);
+                g.drawLine(
+                        (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
+                        (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
+            }
         }
-        bs.show();
-
     }
 }

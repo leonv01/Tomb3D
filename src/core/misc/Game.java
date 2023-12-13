@@ -8,7 +8,6 @@ import core.utils.Vector2D;
 import core.entities.Drone;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * The Game class represents the main game engine that manages the game loop and components.
@@ -30,7 +29,7 @@ public class Game implements Runnable{
 
 
     // MapRender object to render 2D view.
-    private final MapRender mapRender;
+ //   private final MapRender mapRender;
     private Map currentMap;
 
     // Map object.
@@ -47,9 +46,6 @@ public class Game implements Runnable{
         display = new Display();
         inputHandler = new InputHandler();
 
-
-
-
         map = new ArrayList<>();
         map.add(new Map());
         currentMap = map.get(0);
@@ -59,24 +55,27 @@ public class Game implements Runnable{
         );
 
         enemy = new ArrayList<>(4);
-        enemy.add(new Drone(new Vector2D(1.5, 1.5)));
-        enemy.add(new Drone(new Vector2D(5.5, 4.5)));
-        enemy.add(new Drone(new Vector2D(7.5, 1.5)));
-        enemy.add(new Drone(new Vector2D(9.5, 2.5)));
+        enemy.add(new Drone(new Vector2D(1.5, 1.5), currentMap, Drone.Type.LIGHT, player));
+        enemy.add(new Drone(new Vector2D(6.5, 4.5), currentMap, Drone.Type.MEDIUM, player));
+        enemy.add(new Drone(new Vector2D(7.5, 1.5), currentMap, Drone.Type.HEAVY, player));
+        enemy.add(new Drone(new Vector2D(9.5, 2.5), currentMap, Drone.Type.BOSS, player));
 
-        obstacles = new ArrayList<>();
-        obstacles.add(new Obstacle("src/textures/bluestone.png", new Vector2D(6.5,5.5),true));
-        obstacles.add(new Obstacle("src/textures/brick.png", new Vector2D(14,10), true));
+        obstacles = new ArrayList<>(3);
+        obstacles.add(new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(8.5,10.5), Obstacle.Type.HEAL_ITEM, 40));
+        obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
+        obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
+        obstacles.add(new Obstacle("src/textures/collectibles/mcdonalds64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
+       // mapRender = new MapRender(currentMap);
 
-        mapRender = new MapRender(currentMap);
-
-        mapRender.setKeyListener(inputHandler);
+      //  mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
         player.setKeyListener(inputHandler);
 
+        display.addMap(currentMap);
         display.addDrones(enemy);
         display.addPlayer(player);
         display.addObstacle(obstacles);
+
 
         // Create a new thread for display rendering.
 
@@ -142,16 +141,16 @@ public class Game implements Runnable{
                 Vector2D temp = player.position;
                 for (Obstacle obstacle : obstacles){
 
-                    obstacle.checkCollision(temp);
+                    obstacle.checkCollision(player);
                 }
 
                 // Enemy gets updated.
                 for (Drone d : enemy) {
 
-                    d.update(currentMap, player);
-                    mapRender.render(player, d);
+                    d.update();
                 }
 
+                //mapRender.render(player, enemy);
 
                 delta--;
 
@@ -161,7 +160,7 @@ public class Game implements Runnable{
             // Update the FPS text in the window.
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
+               // mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
                 frames = 0;
             }
         }
