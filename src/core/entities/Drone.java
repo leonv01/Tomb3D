@@ -2,11 +2,9 @@ package core.entities;
 
 import core.misc.Map;
 import core.utils.Config;
-import core.utils.Ray;
 import core.utils.Vector2D;
 
 import javax.swing.*;
-import java.util.Random;
 
 public class Drone {
 
@@ -20,11 +18,14 @@ public class Drone {
     private Type type;
     private State state;
     private Map map;
-    private Timer timer, idleTimer;
+    private Timer timer, idleTimer, renderAttack, renderReset;
     private Player player;
     public Vector2D position, direction;
     public double rotation, radius;
-    public Obstacle obstacle;
+    public Obstacle idleSprite;
+    public Obstacle attackSprite;
+    public Obstacle attackingSprite;
+    public Obstacle renderSprite;
 
     private EntityAttributes attributes;
 
@@ -53,7 +54,7 @@ public class Drone {
             case CHASE -> chase(playerPosition);
             case DEAD -> dead();
         }
-        obstacle.setPosition(position);
+        idleSprite.setPosition(position);
     }
 
     /**
@@ -68,9 +69,12 @@ public class Drone {
      * @param player The player that the drone will attack.
      */
     private void attack(Player player){
-        if(obstacle.isActive()) {
-            if (Math.random() < Config.HIT_ACCURACY_THRESHOLD)
+        if(idleSprite.isActive()) {
+            if (Math.random() < Config.HIT_ACCURACY_THRESHOLD) {
                 player.takeDamage(attributes.getDamage());
+                renderSprite = attackingSprite;
+                renderAttack.start();
+            }
         }
         timer.stop();
     }
@@ -159,6 +163,9 @@ public class Drone {
         int score = 0;
 
         String texturePath = "src/textures/enemy/";
+        String idlePath = "";
+        String attackPath = "";
+        String attackingPath = "";
 
         this.type = type;
         this.state = State.IDLE;
@@ -169,26 +176,42 @@ public class Drone {
                 if(rotation > Math.PI * 2) rotation -= Math.PI * 2;
             }
         });
+        this.renderAttack = new Timer(200, e ->{
+            renderSprite = attackSprite;
+            renderAttack.stop();
+            renderReset.start();
+        });
+        this.renderReset = new Timer(200, e -> {
+            renderSprite = idleSprite;
+            renderReset.stop();
+        });
+
         switch (type){
             case HEAVY -> {
                 health = Config.HEAVY_ENEMY_HEALTH;
                 speed = Config.HEAVY_ENEMY_SPEED;
                 damage = Config.HEAVY_ENEMY_DAMAGE;
                 score = Config.HEAVY_ENEMY_SCORE;
-                texturePath = texturePath.concat("heavy.png");
+                idlePath = texturePath.concat("heavy/heavyIdle.png");
+                attackPath = texturePath.concat("heavy/heavyAttack.png");
+                attackingPath = texturePath.concat("heavy/heavyAttacking.png");
             }
             case LIGHT -> {
                 health = Config.LIGHT_ENEMY_HEALTH;
                 speed = Config.LIGHT_ENEMY_SPEED;
                 damage = Config.LIGHT_ENEMY_DAMAGE;
                 score = Config.LIGHT_ENEMY_SCORE;
-                texturePath = texturePath.concat("light.png");
+                idlePath = texturePath.concat("light/lightIdle.png");
+                attackPath = texturePath.concat("light/lightAttack.png");
+                attackingPath = texturePath.concat("light/lightAttacking.png");
             }
             case MEDIUM -> {
                 health = Config.MEDIUM_ENEMY_HEALTH;
                 speed = Config.MEDIUM_ENEMY_SPEED;
                 damage = Config.MEDIUM_ENEMY_DAMAGE;
-                texturePath = texturePath.concat("medium.png");
+                idlePath = texturePath.concat("medium/mediumIdle.png");
+                attackPath = texturePath.concat("medium/mediumAttack.png");
+                attackingPath = texturePath.concat("medium/mediumAttacking.png");
                 score = Config.MEDIUM_ENEMY_SCORE;
             }
             case BOSS -> {
@@ -196,11 +219,16 @@ public class Drone {
                 speed = Config.BOSS_ENEMY_SPEED;
                 damage = Config.BOSS_ENEMY_DAMAGE;
                 score = Config.BOSS_ENEMY_SCORE;
-                texturePath = texturePath.concat("boss.png");
+                idlePath = texturePath.concat("medium/mediumIdle.png");
+                attackPath = texturePath.concat("medium/mediumAttack.png");
+                attackingPath = texturePath.concat("medium/mediumAttack.png");
             }
         }
         this.attributes = new EntityAttributes(health, speed, 0, 0, damage, health, 0,0,0,0,score);
-        this.obstacle = new Obstacle(texturePath, position, Obstacle.Type.ENEMY, 100);
+        this.idleSprite = new Obstacle(idlePath, position, Obstacle.Type.ENEMY, 100);
+        this.attackSprite = new Obstacle(attackPath, position, Obstacle.Type.ENEMY, 100);
+        this.attackingSprite = new Obstacle(attackingPath, position, Obstacle.Type.ENEMY, 100);
+        renderSprite = idleSprite;
     }
 
     public void printAttributes(){

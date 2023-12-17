@@ -1,5 +1,6 @@
 package core.entities;
 
+import core.misc.HighscoreEntry;
 import core.misc.InputHandler;
 import core.misc.Map;
 import core.utils.Config;
@@ -30,6 +31,14 @@ public class Player {
     boolean isShooting;
     int shootDelay = 200;
 
+    HighscoreEntry highscoreEntry;
+
+    private enum State {
+        ALIVE, DEAD
+    };
+    State state;
+
+
     /**
      * Default constructor for the Player class. Initializes player properties.
      */
@@ -52,6 +61,8 @@ public class Player {
      * @param position The initial position of the player.
      */
     private void initPlayer(Vector2D position){
+        this.state = State.ALIVE;
+
         this.position = position;
         this.direction = new Vector2D(1,0);
         this.rotation = 0;
@@ -337,6 +348,10 @@ public class Player {
 
         double playerSpeed = attributes.getSpeed();
 
+        if(state.equals(State.DEAD)){
+            System.out.println("Dead");
+        }
+
         if(inputHandler.run){
             playerSpeed = attributes.getRunSpeed();
         }
@@ -419,7 +434,7 @@ public class Player {
             //TODO: Implement wall building mechanic + remove designated walls
             else if(
                     map.getWall(directionX, directionY).equals(Map.WALLS.EMPTY)
-                    && (directionX != (int) position.x || directionY != (int) position.y)
+                    && (directionX != (int) position.x || directionY != (int) position.y) && false
             ) {
                 map.setValue(directionX, directionY, Map.WALLS.WOOD);
             }
@@ -451,7 +466,7 @@ public class Player {
     public void takeDamage(int i) {
         attributes.takeDamage(i);
         if(attributes.getHealth() <= 0)
-            System.out.println("DEAD");
+            state = State.DEAD;
 
         System.out.println(attributes.getHealth());
     }

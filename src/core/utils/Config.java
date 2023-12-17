@@ -45,7 +45,7 @@ public class Config {
 
 
     public final static int FOV = 40;
-    public final static int rayResolution = 4;
+    public final static int rayResolution = 3;
 
 
 }

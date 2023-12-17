@@ -6,7 +6,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import javax.swing.JFrame;
 
@@ -33,6 +32,8 @@ public class Display extends JFrame implements Runnable{
     Texture textureAtlas;
     ArrayList<Obstacle> obstacles;
     ArrayList<Drone> drones;
+    ArrayList<Obstacle> renderSprite;
+
     Player player = null;
 
     InputHandler inputHandler;
@@ -69,6 +70,7 @@ public class Display extends JFrame implements Runnable{
 
         obstacles = new ArrayList<>();
         drones = new ArrayList<>();
+        renderSprite = new ArrayList<>();
 
 
         zBuffer = new double[Config.rayResolution * Config.FOV];
@@ -109,12 +111,10 @@ public class Display extends JFrame implements Runnable{
      * @param drones The drone to be added.
      */
     public void addDrones(ArrayList<Drone> drones){
-        System.out.println(obstacles.size());
         this.drones = drones;
         for(Drone drone : drones){
-            obstacles.add(drone.obstacle);
+            obstacles.add(drone.idleSprite);
         }
-        System.out.println(obstacles.size());
     }
 
     /**
@@ -122,7 +122,8 @@ public class Display extends JFrame implements Runnable{
      * @param obstacles The obstacle to be added.
      */
     public void addObstacle(ArrayList<Obstacle> obstacles) {
-        this.obstacles.addAll(obstacles);
+        this.obstacles = obstacles;
+        this.renderSprite.addAll(obstacles);
     }
 
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
@@ -171,10 +172,11 @@ public class Display extends JFrame implements Runnable{
         int smallerRectX = centerX - smallerRectSize / 2;
         int smallerRectY = centerY - smallerRectSize / 2;
 
-        int index = (rectX / ((DIS_WIDTH) / (zBuffer.length + 1)));
-
-        if (index >= 0 && index < zBuffer.length - 1) {
-            if (!(zBuffer[index] < distance)) {
+        int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
+        System.out.println(index);
+        System.out.println(rectX + " " + rectY);
+        if (index >= 0 && index < zBuffer.length) {
+            if (distance < zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
 
@@ -293,7 +295,9 @@ public class Display extends JFrame implements Runnable{
         // Get Graphics2D component for more functionality.
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
-
+        renderSprite.addAll(obstacles);
+        drones.forEach(drone -> renderSprite.add(drone.renderSprite));
+        //renderSprite.add(obstacles.get(0));
         /*
         Sky color:
         Fill a rectangle from top to half of the window height with the color gray.
@@ -310,13 +314,14 @@ public class Display extends JFrame implements Runnable{
 
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
-        obstacles.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.position).length(), o1.getPosition().sub(player.position).length()));
+        renderSprite.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.position).length(), o1.getPosition().sub(player.position).length()));
 
         renderWalls(g);
-        for (Obstacle obstacle:obstacles) {
+        for (Obstacle obstacle:renderSprite) {
             renderSprites(obstacle, g);
         }
 
+        renderSprite.clear();
         bs.show();
     }
     public synchronized void start(){
@@ -362,6 +367,12 @@ public class Display extends JFrame implements Runnable{
 
                 delta--;
 
+            }
+
+            if(System.currentTimeMillis() - timer > 1000){
+                timer += 1000;
+                setTitle("Tomb3D - FPS: " + frames);
+                frames = 0;
             }
         }
     }

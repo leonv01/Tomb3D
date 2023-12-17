@@ -1,14 +1,20 @@
 package core.misc;
 
+import core.entities.Drone;
+import core.entities.Obstacle;
 import core.utils.Config;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * The Map class represents the game map with wall, floor and other tile values.
  */
 public class Map {
     public int[][] map;
+
+    private ArrayList<Drone> enemies;
+    private ArrayList<Obstacle> obstacles;
 
     public enum WALLS{
         EMPTY,
@@ -31,7 +37,7 @@ public class Map {
         Value index:
         0: No wall, empty space
         >0: Walls, Enemies
-         */
+
         map = new int[][]
                 {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -51,6 +57,54 @@ public class Map {
                 {1, 0, 0, 2, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         };
+
+        enemies = new ArrayList<>();
+        obstacles = new ArrayList<>();
+
+        // Maybe unused
+        Config.CELL_SIZE_X = Config.WIDTH / map[0].length;
+        Config.CELL_SIZE_Y = Config.HEIGHT / map.length;
+
+        // Sets the amount of cells for x and y.
+        Config.CELL_COUNT_X = map[0].length;
+        Config.CELL_COUNT_Y = map.length;
+
+        Config.CELL_SCREEN_WIDTH = Config.WIDTH / Config.CELL_COUNT_X;
+        Config.CELL_SCREEN_HEIGHT = Config.HEIGHT / Config.CELL_COUNT_Y;
+
+         */
+
+        initMap(new int[][]
+                {
+                        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
+                        {1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 2, 3, 4, 0, 1},
+                        {1, 0, 3, 1, 1, 2, 0, 0, 0, 0, 0, 0, 3, 4, 0, 1},
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1},
+                        {1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+                        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+                        {1, 0, 0, 1, 0, 0, 2, 1, 0, 0, 0, 1, 1, 2, 3, 1},
+                        {1, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 3, 1},
+                        {1, 0, 0, 2, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                }
+                );
+    }
+
+    public Map(int[][] map){
+        initMap(map);
+    }
+
+    public void initMap(int[][] map){
+        this.map = map;
+
+        enemies = new ArrayList<>();
+        obstacles = new ArrayList<>();
 
         // Maybe unused
         Config.CELL_SIZE_X = Config.WIDTH / map[0].length;
@@ -143,6 +197,15 @@ public class Map {
             }
         }
     }
+
+    public void addEnemy(Drone drone){ enemies.add(drone); }
+    public void addEnemies(ArrayList<Drone> enemies){
+        this.enemies.addAll(enemies);
+    }
+    public ArrayList<Drone> getEnemies(){ return enemies; }
+
+    public void addObstacle(Obstacle obstacle){ obstacles.add(obstacle); }
+    public ArrayList<Obstacle> getObstacles(){ return obstacles; }
 
 
     int[][] bigMap ={
