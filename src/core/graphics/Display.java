@@ -173,8 +173,6 @@ public class Display extends JFrame implements Runnable{
         int smallerRectY = centerY - smallerRectSize / 2;
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
-        System.out.println(index);
-        System.out.println(rectX + " " + rectY);
         if (index >= 0 && index < zBuffer.length) {
             if (distance < zBuffer[index]) {
                 obstacle.setActive(true);
@@ -252,13 +250,15 @@ public class Display extends JFrame implements Runnable{
                 int textureAtlasOffset = rays[i].getWallID() - 1;
                 Color color;
 
-                if(rays[i].getHorizontal()) {
+                if((textureAtlasOffset == -2)){
+                    color = Color.BLACK;
+                } else if(rays[i].getHorizontal()) {
                     // Get the RGB value of the texture at the texture atlas offset for horizontal walls.
                     //texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                     //color = new Color(texelColor);
                     color = textureAtlas.getColor(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                 }
-                else{
+                else {
                     // Get the RGB value of the texture at the texture atlas offset for vertical walls.
                     //texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
                     //color = new Color(texelColor);//.darker().darker();

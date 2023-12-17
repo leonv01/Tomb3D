@@ -64,7 +64,7 @@ public class Game implements Runnable{
         obstacles.add(new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(8.5,10.5), Obstacle.Type.HEAL_ITEM, 40));
         obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
         obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
-        obstacles.add(new Obstacle("src/textures/collectibles/mcdonalds64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
+        obstacles.add(new Obstacle("src/textures/collectibles/score64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
        // mapRender = new MapRender(currentMap);
 
       //  mapRender.setKeyListener(inputHandler);

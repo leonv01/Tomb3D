@@ -120,4 +120,6 @@ public class Obstacle {
     public void setActive(boolean active){
         this.active = active;
     }
+
+    public Type getType(){ return type; }
 }
