@@ -54,6 +54,8 @@ public class Game implements Runnable{
                 new Vector2D((double) currentMap.map.length / 2, (double) currentMap.map.length / 2)
         );
 
+        player.setMap(currentMap);
+
         enemy = new ArrayList<>(4);
         enemy.add(new Drone(new Vector2D(1.5, 1.5), currentMap, Drone.Type.LIGHT, player));
         enemy.add(new Drone(new Vector2D(6.5, 4.5), currentMap, Drone.Type.MEDIUM, player));
@@ -65,6 +67,9 @@ public class Game implements Runnable{
         obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
         obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
         obstacles.add(new Obstacle("src/textures/collectibles/score64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
+        obstacles.add(new Obstacle("src/textures/obstacles/ceilingLamp.png", new Vector2D(7.5, 7.5), Obstacle.Type.OBSTACLE, 0));
+
+        currentMap.addEnemies(enemy);
        // mapRender = new MapRender(currentMap);
 
       //  mapRender.setKeyListener(inputHandler);
@@ -136,7 +141,7 @@ public class Game implements Runnable{
                 frames++;
 
                 // Player gets updated.
-                player.update(currentMap);
+                player.update();
 
                 Vector2D temp = player.position;
                 for (Obstacle obstacle : obstacles){

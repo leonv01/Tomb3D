@@ -9,7 +9,7 @@ public class Config {
     public final static int MAP_HEIGHT = 1600;
     public final static float MOVEMENT_SPEED = .05f;
     public final static float RUN_SPEED = .1f;
-    public final static float ROTATION_SPEED = .05f;
+    public final static float ROTATION_SPEED = .03f;
     public final static Color colorSky = Color.GRAY;
     public final static Color colorGround = Color.lightGray;
     

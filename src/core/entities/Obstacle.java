@@ -1,5 +1,6 @@
 package core.entities;
 
+import core.graphics.Texture;
 import core.utils.Vector2D;
 
 import javax.imageio.ImageIO;
@@ -14,25 +15,25 @@ public class Obstacle {
 
     private Vector2D position;
     public double z;
-    private final BufferedImage image;
+    private Texture texture;
     private final int width, height;
-    private boolean visible, active;
+    private boolean visible, active, shootable;
     private final double radius = 2;
     private final Type type;
     private final int value;
     public Obstacle(String path, Vector2D position, Type type, int value){
-        try {
-            image = ImageIO.read(new File(path));
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+           // image = ImageIO.read(new File(path));
+        texture = new Texture(path);
+
+
 
         this.position = position;
-        this.width = image.getWidth();
-        this.height = image.getHeight();
+        this.width = texture.getImage().getWidth();
+        this.height = texture.getImage().getHeight();
         this.visible = true;
         this.active = true;
+        this.shootable = false;
         this.type = type;
         this.value = value;
     }
@@ -60,23 +61,22 @@ public class Obstacle {
             switch (type) {
                 case COLLECTIBLE -> {
                     player.addScore(value);
-                    System.out.println("Collected");
                 }
-                case OBSTACLE -> System.out.println("Hit obstacle");
+                case OBSTACLE -> {
+                    return;
+                }
                 case HEAL_ITEM -> {
                     player.addHealth(value);
-                    System.out.println("Healed");
                 }
                 case AMMO_PACK -> {
-                    System.out.println("Ammo");
                     player.addAmmo(value);
                 }
                 case ENEMY -> {
                     player.takeDamage(value);
-                    System.out.println("Hit enemy");
                 }
                 case KEY -> {
-                    System.out.println("Key");
+                    player.addKey();
+                    System.out.println("KEY");
                 }
             }
             player.printAttributes();
@@ -85,8 +85,8 @@ public class Obstacle {
         }
     }
 
-    public BufferedImage getImage(){
-        return image;
+    public Texture getTexture(){
+        return texture;
     }
 
     public void setPosition(Vector2D position){
@@ -94,7 +94,7 @@ public class Obstacle {
     }
 
     public int getSize(){
-        return image.getWidth();
+        return texture.getImage().getWidth();
     }
 
     public Vector2D getPosition() {
@@ -113,6 +113,14 @@ public class Obstacle {
         this.visible = visible;
     }
 
+    public void setShootable(boolean shootable){
+        this.shootable = shootable;
+    }
+
+    public boolean getShootable(){
+        return shootable;
+    }
+
     public boolean isActive(){
         return active;
     }
@@ -122,4 +130,6 @@ public class Obstacle {
     }
 
     public Type getType(){ return type; }
+
+    public void setTexture(Texture texture) { this.texture = texture; }
 }

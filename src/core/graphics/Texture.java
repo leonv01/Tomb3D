@@ -17,6 +17,8 @@ public class Texture {
     Color[] colorArray;
     int size;
     private int textureCount;
+
+    private BufferedImage image;
     /**
      * Constructs a new texture.
      *
@@ -34,6 +36,20 @@ public class Texture {
         for (int i = 0; i < colorArray.length; i++) {
             colorArray[i] = new Color(rgbArray[i]);
         }
+    }
+
+    public Texture(String path){
+        this.path = path;
+        try {
+            image = ImageIO.read(new File(path));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BufferedImage getImage(){
+        return image;
     }
 
     /**
@@ -68,6 +84,7 @@ public class Texture {
     public Color getColor(int y, int x){
 
         y = Math.abs(y);
+        x = Math.abs(x);
         return colorArray[y * (size * 2) + x];
     }
 }

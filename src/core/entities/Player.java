@@ -22,6 +22,8 @@ public class Player {
     private InputHandler inputHandler; // InputHandler to react to user input.
     private Timer timer; // Timer for shooting.
 
+    private Map map;
+
     public double rotation; // Rotation value of the player.
 
     private final int fov = Config.FOV; // FOV value.
@@ -37,6 +39,8 @@ public class Player {
         ALIVE, DEAD
     };
     State state;
+
+
 
 
     /**
@@ -88,7 +92,7 @@ public class Player {
      *
      * @param map The game map used for ray casting.
      */
-    public void castRays(Map map){
+    public void castRays(){
         // Temporary values to store the length of the horizontal/vertical rays for comparison.
         double vLength, hLength;
 
@@ -110,8 +114,8 @@ public class Player {
             if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
 
             // Calculate and get the horizontal/vertical ray that hit a grid line.
-            this.horizontal = getHorizontalRay(map, tempAngle);
-            this.vertical = getVerticalRay(map, tempAngle);
+            this.horizontal = getHorizontalRay(tempAngle);
+            this.vertical = getVerticalRay(tempAngle);
 
             // Calculate the difference between the player position and the rays.
             this.horizontal.calculateDifference(position);
@@ -159,7 +163,7 @@ public class Player {
      * @param angle The viewing angle in radians at which the ray is cast.
      * @return A Ray object representing the detected horizontal ray.
      */
-    private Ray getHorizontalRay(Map map, double angle){
+    private Ray getHorizontalRay(double angle){
         // Maximum iterations for the ray.
         int dof = 0;
 
@@ -251,7 +255,7 @@ public class Player {
      * @param angle The viewing angle in radians at which the ray is cast.
      * @return A Ray object representing the detected vertical ray.
      */
-    private Ray getVerticalRay(Map map, double angle){
+    private Ray getVerticalRay(double angle){
         // Maximum iterations for the ray.
         int dof = 0;
 
@@ -340,7 +344,7 @@ public class Player {
      *
      * @param map The game map used for collision detection and ray casting.
      */
-    public void update(Map map){
+    public void update(){
         double tempX;
         double tempY;
         int mapX;
@@ -427,9 +431,9 @@ public class Player {
             int directionY = (int) (direction.y + position.y);
 
 
-            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR))
+            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR) && attributes.getKey()) {
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
-
+            }
 
             //TODO: Implement wall building mechanic + remove designated walls
             else if(
@@ -441,30 +445,37 @@ public class Player {
         }
 
         if(inputHandler.shoot){
+            if(!isShooting)
+                for (Drone drone:map.getEnemies()) {
+                    if(drone.renderSprite.getShootable()){
+                        drone.takeDamage(40);
+                    }
+                }
             isShooting = true;
             timer.start();
         }
 
         // Start the ray casting.
-        castRays(map);
+        castRays();
     }
 
     /**
      * Shoots a bullet.
      */
     private void shoot(){
+
+
         isShooting = false;
         attributes.shoot();
-        System.out.println(attributes.getCurrentAmmo());
         timer.stop();
     }
 
     /**
      * Checks if the player is colliding with the obstacle.
-     * @param player The player object.
+     * @param damage The received damage    .
      */
-    public void takeDamage(int i) {
-        attributes.takeDamage(i);
+    public void takeDamage(int damage) {
+        attributes.takeDamage(damage);
         if(attributes.getHealth() <= 0)
             state = State.DEAD;
 
@@ -475,8 +486,8 @@ public class Player {
      * Adds score to the player.
      * @param score The score to be added.
      */
-    public void addScore(int i){
-        attributes.addScore(i);
+    public void addScore(int score){
+        attributes.addScore(score);
         System.out.println(attributes.getScore());
     }
 
@@ -484,8 +495,8 @@ public class Player {
      * Adds health to the player.
      * @param health The health to be added.
      */
-    public void addHealth(int value) {
-        attributes.addHealth(value);
+    public void addHealth(int health) {
+        attributes.addHealth(health);
         System.out.println(attributes.getHealth());
     }
 
@@ -493,9 +504,13 @@ public class Player {
      * Adds ammo to the player.
      * @param ammo The ammo to be added.
      */
-    public void addAmmo(int value) {
-        attributes.addAmmo(value);
+    public void addAmmo(int ammo) {
+        attributes.addAmmo(ammo);
         System.out.println(attributes.getCurrentAmmo());
+    }
+
+    public void addKey(){
+        attributes.setKey(true);
     }
 
     /**
@@ -536,7 +551,7 @@ public class Player {
         this.inputHandler = i;
     }
 
-
+    public void setMap(Map map){ this.map = map; }
     public void printAttributes() {
         System.out.println(attributes.toString());
     }

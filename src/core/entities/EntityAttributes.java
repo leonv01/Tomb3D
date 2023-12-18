@@ -15,6 +15,8 @@ public class EntityAttributes {
     private int ammoPack;
     private final int maxAmmoPack;
 
+    private boolean key;
+
     private int score;
 
     public EntityAttributes(
@@ -41,7 +43,8 @@ public class EntityAttributes {
         this.ammoPack = ammoPack;
         this.score = score;
         this.maxAmmoPack = maxAmmoPack;
-        isAlive = true;
+        this.isAlive = true;
+        this.key = false;
     }
 
     /**
@@ -145,6 +148,8 @@ public class EntityAttributes {
     public int getScore() {
         return score;
     }
+    public void setKey(boolean key){ this.key = key; }
+    public boolean getKey() { return key; }
 
     public void printAttributes(){
         System.out.println("Health: " + health);

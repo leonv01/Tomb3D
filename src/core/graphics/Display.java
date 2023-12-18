@@ -113,7 +113,7 @@ public class Display extends JFrame implements Runnable{
     public void addDrones(ArrayList<Drone> drones){
         this.drones = drones;
         for(Drone drone : drones){
-            obstacles.add(drone.idleSprite);
+            obstacles.add(drone.renderSprite);
         }
     }
 
@@ -172,14 +172,21 @@ public class Display extends JFrame implements Runnable{
         int smallerRectX = centerX - smallerRectSize / 2;
         int smallerRectY = centerY - smallerRectSize / 2;
 
+        int lowerBound = (int) (0.35 * zBuffer.length);
+        int upperBound = (int) (0.65 * zBuffer.length);
+
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
             if (distance < zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
-
                     // Render the image from its center
-                    g.drawImage(obstacle.getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
+                    g.drawImage(obstacle.getTexture().getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
+
+                    if(index < upperBound && index > lowerBound) {
+                        obstacle.setShootable(true);
+                    }
+                    else obstacle.setShootable(false);
                 }
                 //TODO: implement pick up for player
                 // player.add(item);
