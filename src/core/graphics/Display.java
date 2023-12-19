@@ -30,6 +30,13 @@ public class Display extends JFrame implements Runnable{
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
     Texture textureAtlas;
+    Texture crosshair;
+    Texture thirdDigit;
+    Texture secondDigit;
+
+    UserInterface ui;
+
+    Texture uiBar;
     ArrayList<Obstacle> obstacles;
     ArrayList<Drone> drones;
     ArrayList<Obstacle> renderSprite;
@@ -78,8 +85,15 @@ public class Display extends JFrame implements Runnable{
         Arrays.fill(zBuffer, Double.MAX_VALUE);
         Arrays.fill(depth, 0);
 
+        ui = new UserInterface();
+
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
+        crosshair = new Texture("src/textures/ui/crosshair.png");
+        uiBar = new Texture("src/textures/ui/uiBar.png");
+
+        //thirdDigit = new Texture("src/textures/ui/thirddigit9.png");
+        //secondDigit = new Texture("src/textures/ui/seconddigit0.png");
     };
 
     /**
@@ -329,6 +343,28 @@ public class Display extends JFrame implements Runnable{
         }
 
         renderSprite.clear();
+
+        // Render the crosshair
+        g.drawImage(crosshair.getImage(), DIS_WIDTH / 2 - crosshair.getImage().getWidth() / 2, DIS_HEIGHT / 2 - crosshair.getImage().getHeight() / 2, null);
+
+        // Render the UI bar
+        g.drawImage(uiBar.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+       // g.drawImage(thirdDigit.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+       // g.drawImage(secondDigit.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+        // Render the UI
+        int health = player.getHealth();
+        health = Math.max(health, 0);
+        int firstDigit = health % 10;
+        int secondDigit = (health / 10) % 10;
+        int thirdDigit = (health / 100) % 10;
+
+        g.drawImage(ui.getFirstDigit(firstDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+        g.drawImage(ui.getSecondDigit(secondDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+        g.drawImage(ui.getThirdDigit(thirdDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+       // g.drawImage(ui.getThirdDigit(9).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+
         bs.show();
     }
     public synchronized void start(){

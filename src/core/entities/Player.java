@@ -35,6 +35,10 @@ public class Player {
 
     HighscoreEntry highscoreEntry;
 
+    public int getHealth() {
+        return attributes.getHealth();
+    }
+
     private enum State {
         ALIVE, DEAD
     };

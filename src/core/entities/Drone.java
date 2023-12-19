@@ -37,6 +37,7 @@ public class Drone {
 
 
     public void takeDamage(int damage){
+        state = State.CHASE;
         attributes.takeDamage(damage);
         System.out.println(attributes.getHealth());
     }
