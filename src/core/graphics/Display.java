@@ -86,7 +86,7 @@ public class Display extends JFrame implements Runnable{
         Arrays.fill(depth, 0);
 
         ui = new UserInterface();
-        ui.start();
+     //   ui.start();
 
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
@@ -192,7 +192,7 @@ public class Display extends JFrame implements Runnable{
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
-            if (distance < zBuffer[index]) {
+            if (distance < (double) zBuffer[index] - 0.005) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
                     // Render the image from its center
@@ -351,21 +351,14 @@ public class Display extends JFrame implements Runnable{
         // Render the UI bar
         g.drawImage(uiBar.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
 
-       // g.drawImage(thirdDigit.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-       // g.drawImage(secondDigit.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-
         // Render the UI
         int health = player.getHealth();
         int ammo = player.getAmmo();
         int score = player.getScore();
+        int ammoPack = player.getAmmoPack();
+        boolean hasKey = player.getKey();
 
-        g.drawImage(ui.getCombinedImage(health, ammo, score), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-       // g.drawImage(ui.getThirdDigit(2).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-      //  g.drawImage(ui.getSecondDigit(2).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-     //   g.drawImage(ui.getFirstDigit(firstDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
-     //   g.drawImage(ui.getSecondDigit(secondDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
-     //   g.drawImage(ui.getThirdDigit(thirdDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
-       // g.drawImage(ui.getThirdDigit(9).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+        g.drawImage(ui.getCombinedImage(health, ammo, ammoPack, score, hasKey), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
 
         bs.show();
     }

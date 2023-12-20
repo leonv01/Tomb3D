@@ -13,7 +13,6 @@ public class EntityAttributes {
     private int currentAmmo;
     private final int maxAmmo;
     private int ammoPack;
-    private final int maxAmmoPack;
 
     private boolean key;
 
@@ -42,7 +41,6 @@ public class EntityAttributes {
         this.maxAmmo = maxAmmo;
         this.ammoPack = ammoPack;
         this.score = score;
-        this.maxAmmoPack = maxAmmoPack;
         this.isAlive = true;
         this.key = false;
     }
@@ -77,7 +75,7 @@ public class EntityAttributes {
     public void addAmmo(int ammo){
         currentAmmo += ammo;
         if(currentAmmo > maxAmmo){
-            ammoPack += currentAmmo - maxAmmo;
+            ammoPack++;
             currentAmmo = maxAmmo;
         }
     }
@@ -99,6 +97,7 @@ public class EntityAttributes {
         if(currentAmmo < 0) {
             if(ammoPack > 0){
                 currentAmmo = maxAmmo;
+                ammoPack--;
             }
             else currentAmmo = 0;
         }

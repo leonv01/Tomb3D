@@ -47,6 +47,14 @@ public class Player {
         return attributes.getScore();
     }
 
+    public int getAmmoPack() {
+        return attributes.getAmmoPack();
+    }
+
+    public boolean getKey() {
+        return attributes.getKey();
+    }
+
     private enum State {
         ALIVE, DEAD
     };

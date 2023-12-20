@@ -6,23 +6,24 @@ public class UserInterface implements Runnable {
 
     private final Texture[] digits;
 
-    private final Thread thread;
+    //private final Thread thread;
 
     public UserInterface() {
         int MAX = 10;
         digits = new Texture[MAX];
 
-        thread = new Thread(this);
+       // thread = new Thread(this);
 
         for(int i = 0; i < MAX; i++){
            digits[i] = new Texture("src/textures/ui/digit/digit" + i + ".png");
         }
     }
 
-    public BufferedImage getCombinedImage(int health, int ammo, int score){
+    public BufferedImage getCombinedImage(int health, int ammo, int ammoPack, int score, boolean isKey){
         health = Math.max(health, 0);
         ammo = Math.max(ammo, 0);
         score = Math.max(score, 0);
+        ammoPack = Math.max(ammoPack, 0);
 
         int healthFirst = health % 10;
         int healthSecond = (health / 10) % 10;
@@ -41,6 +42,18 @@ public class UserInterface implements Runnable {
         image.getGraphics().drawImage(getHealthImage(healthFirst, healthSecond, healthThird), 0, 0, null);
         image.getGraphics().drawImage(getAmmoImage(ammoFirst, ammoSecond, ammoThird), 0, 0, null);
         image.getGraphics().drawImage(getScoreImage(scoreFirst, scoreSecond, scoreThird, scoreFourth), 0, 0, null);
+        image.getGraphics().drawImage(getAmmoPackImage(ammoPack), 0, 0, null);
+
+        if(isKey){
+            image.getGraphics().drawImage(new Texture("src/textures/ui/key.png").getImage(), 0, 0, null);
+        }
+
+        return image;
+    }
+
+    private BufferedImage getAmmoPackImage(int ammoPack) {
+        BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+        image.getGraphics().drawImage(this.digits[ammoPack].getImage(), 55, 0, null);
         return image;
     }
 
@@ -55,18 +68,18 @@ public class UserInterface implements Runnable {
 
     private BufferedImage getScoreImage(int... values){
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
-        image.getGraphics().drawImage(this.digits[values[0]].getImage(), 77,0 , null);
-        image.getGraphics().drawImage(this.digits[values[1]].getImage(), 72, 0, null);
-        image.getGraphics().drawImage(this.digits[values[2]].getImage(), 67, 0, null);
-        image.getGraphics().drawImage(this.digits[values[3]].getImage(), 62, 0, null);
+        image.getGraphics().drawImage(this.digits[values[0]].getImage(), 92,0 , null);
+        image.getGraphics().drawImage(this.digits[values[1]].getImage(), 87, 0, null);
+        image.getGraphics().drawImage(this.digits[values[2]].getImage(), 82, 0, null);
+        image.getGraphics().drawImage(this.digits[values[3]].getImage(), 77, 0, null);
 
         return image;
     }
 
     private BufferedImage getHealthImage(int ... values) {
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
-        image.getGraphics().drawImage(this.digits[values[0]].getImage(), 5, 0, null);
-        image.getGraphics().drawImage(this.digits[values[1]].getImage(), 10, 0, null);
+        image.getGraphics().drawImage(this.digits[values[0]].getImage(), 10, 0, null);
+        image.getGraphics().drawImage(this.digits[values[1]].getImage(), 5, 0, null);
         image.getGraphics().drawImage(this.digits[values[2]].getImage(), 0, 0, null);
 
         return image;
@@ -80,6 +93,6 @@ public class UserInterface implements Runnable {
     }
 
     public void start(){
-        thread.start();
+      //  thread.start();
     }
 }
