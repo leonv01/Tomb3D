@@ -86,6 +86,7 @@ public class Display extends JFrame implements Runnable{
         Arrays.fill(depth, 0);
 
         ui = new UserInterface();
+        ui.start();
 
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
@@ -355,14 +356,12 @@ public class Display extends JFrame implements Runnable{
 
         // Render the UI
         int health = player.getHealth();
-        health = Math.max(health, 0);
-        int firstDigit = health % 10;
-        int secondDigit = (health / 10) % 10;
-        int thirdDigit = (health / 100) % 10;
 
-        g.drawImage(ui.getFirstDigit(firstDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
-        g.drawImage(ui.getSecondDigit(secondDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
-        g.drawImage(ui.getThirdDigit(thirdDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+        g.drawImage(ui.getHealthDigits(health), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+     //   g.drawImage(ui.getFirstDigit(firstDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+     //   g.drawImage(ui.getSecondDigit(secondDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
+     //   g.drawImage(ui.getThirdDigit(thirdDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
        // g.drawImage(ui.getThirdDigit(9).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
 
         bs.show();
