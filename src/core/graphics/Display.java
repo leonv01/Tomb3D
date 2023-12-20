@@ -187,8 +187,8 @@ public class Display extends JFrame implements Runnable{
         int smallerRectX = centerX - smallerRectSize / 2;
         int smallerRectY = centerY - smallerRectSize / 2;
 
-        int lowerBound = (int) (0.35 * zBuffer.length);
-        int upperBound = (int) (0.65 * zBuffer.length);
+        int lowerBound = (int) (0.40 * zBuffer.length);
+        int upperBound = (int) (0.60 * zBuffer.length);
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
@@ -356,9 +356,12 @@ public class Display extends JFrame implements Runnable{
 
         // Render the UI
         int health = player.getHealth();
+        int ammo = player.getAmmo();
+        int score = player.getScore();
 
-        g.drawImage(ui.getHealthDigits(health), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
-
+        g.drawImage(ui.getCombinedImage(health, ammo, score), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+       // g.drawImage(ui.getThirdDigit(2).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+      //  g.drawImage(ui.getSecondDigit(2).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
      //   g.drawImage(ui.getFirstDigit(firstDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
      //   g.drawImage(ui.getSecondDigit(secondDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );
      //   g.drawImage(ui.getThirdDigit(thirdDigit).getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null );

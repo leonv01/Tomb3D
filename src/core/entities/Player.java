@@ -39,6 +39,14 @@ public class Player {
         return attributes.getHealth();
     }
 
+    public int getAmmo() {
+        return attributes.getCurrentAmmo();
+    }
+
+    public int getScore() {
+        return attributes.getScore();
+    }
+
     private enum State {
         ALIVE, DEAD
     };
