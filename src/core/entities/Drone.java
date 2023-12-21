@@ -9,6 +9,7 @@ import javax.swing.*;
 
 public class Drone {
 
+
     public enum State{
         IDLE, CHASE, DEAD
     }
@@ -41,6 +42,9 @@ public class Drone {
         initDrone(position, map, type, player);
     }
 
+    public Drone(Drone drone){
+        this(drone.position, drone.map, drone.getType(), drone.player);
+    }
 
     /**
      * The drone will take damage.
@@ -56,6 +60,7 @@ public class Drone {
      * Updates the drone.
      */
     public void update() {
+        if(player == null) return;
         Vector2D playerPosition = new Vector2D(player.getPosition());
 
         double distance = playerPosition.sub(position).length();
@@ -178,17 +183,18 @@ public class Drone {
         int damage = 0;
         int score = 0;
 
+        this.type = type;
+
         String texturePath = "src/textures/enemy/";
         String idlePath = "";
         String attackStartPath = "";
         String attackEndPath = "";
 
-        this.type = type;
         this.state = State.IDLE;
         this.timer = new Timer(1000, e -> attack(player));
         this.idleTimer = new Timer(1000, e -> {
             if(state == State.IDLE){
-                rotation += Math.random() * Math.PI / 2 * (Math.random() < 0.5 ? -1 : 1);
+                rotation += Math.random() * Math.PI / 2 * (Math.random() < 0.2 ? -1 : 1);
                 if(rotation > Math.PI * 2) rotation -= Math.PI * 2;
             }
         });
@@ -249,6 +255,10 @@ public class Drone {
         this.renderSprite = new Obstacle(idlePath, position, Obstacle.Type.ENEMY, 200);
     }
 
+    public Type getType(){
+        return type;
+    }
+
     /**
      * Returns the attributes of the drone.
      * @return The attributes of the drone.
@@ -280,6 +290,11 @@ public class Drone {
     public Obstacle getRenderSprite(){
         return renderSprite;
     }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
 
     /**
      * Prints the attributes of the drone.

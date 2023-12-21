@@ -32,9 +32,6 @@ public class Display extends JFrame implements Runnable{
     Texture textureAtlas;
     Texture crosshair;
     Texture deathScreen;
-    Texture thirdDigit;
-    Texture secondDigit;
-
     UserInterface ui;
 
     Texture uiBar;
@@ -92,7 +89,6 @@ public class Display extends JFrame implements Runnable{
         // Load debug texture.
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
         crosshair = new Texture("src/textures/ui/crosshair.png");
-        uiBar = new Texture("src/textures/ui/uiBar.png");
         deathScreen = new Texture("src/textures/ui/deathScreen.png");
 
         //thirdDigit = new Texture("src/textures/ui/thirddigit9.png");
@@ -194,7 +190,7 @@ public class Display extends JFrame implements Runnable{
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
-            if (distance < (double) zBuffer[index] + 0.005) {
+            if (distance < zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
                     // Render the image from its center
@@ -259,15 +255,15 @@ public class Display extends JFrame implements Runnable{
             double textureXVertical = rays[i].getY() % 1.0;
 
             // Map the normalized X-coordinate to the texture width
-            int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.size);
-            int texelXVertical = (int) (textureXVertical * textureAtlas.size);
+            int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.getSize());
+            int texelXVertical = (int) (textureXVertical * textureAtlas.getSize());
 
             depth[i] = rays[i].getLength();
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
-                int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.size);
-                int texelYVertical = (int) ((j / wallHeight) * textureAtlas.size);
+                int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.getSize());
+                int texelYVertical = (int) ((j / wallHeight) * textureAtlas.getSize());
 
                 // Get the color of the texel from the texture
                 int texelColor;
@@ -280,13 +276,13 @@ public class Display extends JFrame implements Runnable{
                     // Get the RGB value of the texture at the texture atlas offset for horizontal walls.
                     //texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                     //color = new Color(texelColor);
-                    color = textureAtlas.getColor(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
+                    color = textureAtlas.getColor(((textureAtlas.getSize() - 1) - texelYHorizontal) + textureAtlas.getSize() * textureAtlasOffset, texelXHorizontal);
                 }
                 else {
                     // Get the RGB value of the texture at the texture atlas offset for vertical walls.
                     //texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
                     //color = new Color(texelColor);//.darker().darker();
-                    color = textureAtlas.getColor((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
+                    color = textureAtlas.getColor((textureAtlas.getSize() - 1 - texelYVertical) + textureAtlas.getSize() * textureAtlasOffset, texelXVertical + textureAtlas.getSize());
                 }
 
                 // Set the color of the wall segment
@@ -351,7 +347,7 @@ public class Display extends JFrame implements Runnable{
         g.drawImage(crosshair.getImage(), DIS_WIDTH / 2 - crosshair.getImage().getWidth() / 2, DIS_HEIGHT / 2 - crosshair.getImage().getHeight() / 2, null);
 
         // Render the UI bar
-        g.drawImage(uiBar.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+        //g.drawImage(uiBar.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
 
         // Render the UI
         int health = player.getHealth();

@@ -5,14 +5,13 @@ import java.awt.image.BufferedImage;
 public class UserInterface implements Runnable {
 
     private final Texture[] digits;
-
-    //private final Thread thread;
+    private final Texture uiBar;
 
     public UserInterface() {
         int MAX = 10;
         digits = new Texture[MAX];
 
-       // thread = new Thread(this);
+        uiBar = new Texture("src/textures/ui/uiBar.png");
 
         for(int i = 0; i < MAX; i++){
            digits[i] = new Texture("src/textures/ui/digit/digit" + i + ".png");
@@ -39,6 +38,9 @@ public class UserInterface implements Runnable {
         int scoreFourth = (score / 1000) % 10;
 
         BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+
+        image.getGraphics().drawImage(uiBar.getImage(), 0, 0, null);
+
         image.getGraphics().drawImage(getHealthImage(healthFirst, healthSecond, healthThird), 0, 0, null);
         image.getGraphics().drawImage(getAmmoImage(ammoFirst, ammoSecond, ammoThird), 0, 0, null);
         image.getGraphics().drawImage(getScoreImage(scoreFirst, scoreSecond, scoreThird, scoreFourth), 0, 0, null);

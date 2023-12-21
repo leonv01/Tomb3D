@@ -19,6 +19,7 @@ public class Player {
     private Ray vertical;    // Ray for vertical grid line check.
     private Ray[] rays; // Array of Rays.
 
+
     private InputHandler inputHandler; // InputHandler to react to user input.
     private Timer timer; // Timer for shooting.
 
@@ -32,8 +33,6 @@ public class Player {
 
     private boolean isShooting;
     private final int shootDelay = 200;
-
-    private HighscoreEntry highscoreEntry;
 
     private enum State {
         ALIVE, DEAD
@@ -524,6 +523,10 @@ public class Player {
      */
     public Vector2D getPosition() {
         return position;
+    }
+
+    public HighscoreEntry getHighscore() {
+        return new HighscoreEntry(Config.PLAYER_NAME, attributes.getScore());
     }
 
     /**

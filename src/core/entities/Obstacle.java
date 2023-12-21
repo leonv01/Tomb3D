@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Obstacle {
+
     public enum Type{
         COLLECTIBLE, OBSTACLE, HEAL_ITEM, AMMO_PACK, ENEMY, KEY
     }
@@ -24,15 +25,16 @@ public class Obstacle {
 
            // image = ImageIO.read(new File(path));
         texture = new Texture(path);
-
-
-
         this.position = position;
         this.visible = true;
         this.active = true;
         this.shootable = false;
         this.type = type;
         this.value = value;
+    }
+
+    public Obstacle(Obstacle obstacle){
+        this(obstacle.texture.getPath(), obstacle.position, obstacle.type, obstacle.value);
     }
 
     /**
@@ -121,4 +123,6 @@ public class Obstacle {
     public Type getType(){ return type; }
 
     public void setTexture(Texture texture) { this.texture = texture; }
+
+
 }
