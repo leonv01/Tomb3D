@@ -155,6 +155,12 @@ public class Game implements Runnable{
                     d.update();
                 }
 
+                if(!player.isAlive()){
+                    while(true){
+
+                    }
+                }
+
                 //mapRender.render(player, enemy);
 
                 delta--;

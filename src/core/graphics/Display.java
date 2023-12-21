@@ -31,6 +31,7 @@ public class Display extends JFrame implements Runnable{
     private final int DIS_WIDTH = Config.WIDTH;
     Texture textureAtlas;
     Texture crosshair;
+    Texture deathScreen;
     Texture thirdDigit;
     Texture secondDigit;
 
@@ -92,6 +93,7 @@ public class Display extends JFrame implements Runnable{
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
         crosshair = new Texture("src/textures/ui/crosshair.png");
         uiBar = new Texture("src/textures/ui/uiBar.png");
+        deathScreen = new Texture("src/textures/ui/deathScreen.png");
 
         //thirdDigit = new Texture("src/textures/ui/thirddigit9.png");
         //secondDigit = new Texture("src/textures/ui/seconddigit0.png");
@@ -192,7 +194,7 @@ public class Display extends JFrame implements Runnable{
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
-            if (distance < (double) zBuffer[index] - 0.005) {
+            if (distance < (double) zBuffer[index] + 0.005) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
                     // Render the image from its center
@@ -359,6 +361,10 @@ public class Display extends JFrame implements Runnable{
         boolean hasKey = player.getKey();
 
         g.drawImage(ui.getCombinedImage(health, ammo, ammoPack, score, hasKey), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+        if(!player.isAlive()){
+            g.drawImage(deathScreen.getImage(), 0,0, DIS_WIDTH, DIS_HEIGHT,null);
+        }
 
         bs.show();
     }

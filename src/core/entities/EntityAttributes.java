@@ -13,6 +13,7 @@ public class EntityAttributes {
     private int currentAmmo;
     private final int maxAmmo;
     private int ammoPack;
+    private final int maxAmmoPack;
 
     private boolean key;
 
@@ -40,6 +41,7 @@ public class EntityAttributes {
         this.currentAmmo = currentAmmo;
         this.maxAmmo = maxAmmo;
         this.ammoPack = ammoPack;
+        this.maxAmmoPack = maxAmmoPack;
         this.score = score;
         this.isAlive = true;
         this.key = false;
@@ -69,14 +71,10 @@ public class EntityAttributes {
 
     /**
      * Adds ammo to the entity.
-     *
-     * @param ammo The ammo to be added.
      */
-    public void addAmmo(int ammo){
-        currentAmmo += ammo;
-        if(currentAmmo > maxAmmo){
+    public void addAmmo(){
+        if(currentAmmo > maxAmmoPack){
             ammoPack++;
-            currentAmmo = maxAmmo;
         }
     }
 

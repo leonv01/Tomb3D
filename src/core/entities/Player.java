@@ -55,6 +55,10 @@ public class Player {
         return attributes.getKey();
     }
 
+    public boolean isAlive() {
+        return attributes.isAlive();
+    }
+
     private enum State {
         ALIVE, DEAD
     };
@@ -525,7 +529,7 @@ public class Player {
      * @param ammo The ammo to be added.
      */
     public void addAmmo(int ammo) {
-        attributes.addAmmo(ammo);
+        attributes.addAmmo();
         System.out.println(attributes.getCurrentAmmo());
     }
 

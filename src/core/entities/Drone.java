@@ -178,7 +178,7 @@ public class Drone {
         this.timer = new Timer(1000, e -> attack(player));
         this.idleTimer = new Timer(1000, e -> {
             if(state == State.IDLE){
-                rotation += Math.random() * Math.PI / 2;
+                rotation += Math.random() * Math.PI / 2 * (Math.random() < 0.5 ? -1 : 1);
                 if(rotation > Math.PI * 2) rotation -= Math.PI * 2;
             }
         });
