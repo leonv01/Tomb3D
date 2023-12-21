@@ -130,7 +130,7 @@ public class Display extends JFrame implements Runnable{
     public void addDrones(ArrayList<Drone> drones){
         this.drones = drones;
         for(Drone drone : drones){
-            obstacles.add(drone.renderSprite);
+            obstacles.add(drone.getRenderSprite());
         }
     }
 
@@ -145,9 +145,9 @@ public class Display extends JFrame implements Runnable{
 
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
 
-        Vector2D diff = obstacle.getPosition().sub(player.position);
+        Vector2D diff = obstacle.getPosition().sub(player.getPosition());
 
-        double angle = Math.atan2(diff.y, diff.x) - Math.atan2(player.direction.y, player.direction.x);
+        double angle = Math.atan2(diff.y, diff.x) - Math.atan2(player.getDirection().y, player.getDirection().x);
 
         angle = Math.atan2(Math.sin(angle), Math.cos(angle));
 
@@ -164,11 +164,11 @@ public class Display extends JFrame implements Runnable{
         double fovRadians = Math.toRadians(Config.FOV);
         double viewPlaneWidth = 2 * Math.tan(fovRadians / 2);
 
-        Vector2D relativePosVector2d = obstacle.getPosition().sub(player.position);
+        Vector2D relativePosVector2d = obstacle.getPosition().sub(player.getPosition());
         double distance = relativePosVector2d.length();
         double spriteScreenSize = (((double) (DIS_WIDTH) / distance));
 
-        double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.direction.y, player.direction.x);
+        double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.getDirection().y, player.getDirection().x);
         angle = (angle + 2 * Math.PI) % (2 * Math.PI); // Ensure angle is within [0, 2*PI]
 
         if (angle > Math.PI) {
@@ -221,7 +221,7 @@ public class Display extends JFrame implements Runnable{
      */
     public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
-        Ray[] rays = player.rays;
+        Ray[] rays = player.getRays();
 
         // Calculate the width for each ray on the image.
         int wallWidth = DIS_WIDTH / rays.length + 1;
@@ -229,7 +229,7 @@ public class Display extends JFrame implements Runnable{
         // Rendering for each ray.
         for (int i = 0; i < rays.length; i++) {
 
-            double angleDifference = Math.abs(rays[i].getAngle() - player.rotation);
+            double angleDifference = Math.abs(rays[i].getAngle() - player.getRotation());
             double correctedDistance = rays[i].getLength() * Math.cos(angleDifference);
 
             int column = (rays.length - 1) - i;
@@ -320,7 +320,7 @@ public class Display extends JFrame implements Runnable{
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
         renderSprite.addAll(obstacles);
-        drones.forEach(drone -> renderSprite.add(drone.renderSprite));
+        drones.forEach(drone -> renderSprite.add(drone.getRenderSprite()));
         //renderSprite.add(obstacles.get(0));
         /*
         Sky color:
@@ -338,7 +338,7 @@ public class Display extends JFrame implements Runnable{
 
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
-        renderSprite.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.position).length(), o1.getPosition().sub(player.position).length()));
+        renderSprite.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.getPosition()).length(), o1.getPosition().sub(player.getPosition()).length()));
 
         renderWalls(g);
         for (Obstacle obstacle:renderSprite) {
@@ -404,7 +404,7 @@ public class Display extends JFrame implements Runnable{
                 // Player gets updated.
                 this.render();
 
-                if(inputHandler.map) {
+                if(inputHandler.isMap()) {
                     add(new MapRender(map, player, drones));
                     System.out.println("map");
                 }

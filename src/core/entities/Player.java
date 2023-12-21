@@ -13,86 +13,53 @@ import javax.swing.*;
  * The Player class represents the player entity in the game.
  */
 public class Player {
-    public Vector2D position;   // Player position.
-    public Vector2D direction;  // Player look direction.
-    public Ray horizontal;  // Ray for horizontal grid line check.
-    public Ray vertical;    // Ray for vertical grid line check.
-    public Ray[] rays; // Array of Rays.
+    private Vector2D position;   // Player position.
+    private Vector2D direction;  // Player look direction.
+    private Ray horizontal;  // Ray for horizontal grid line check.
+    private Ray vertical;    // Ray for vertical grid line check.
+    private Ray[] rays; // Array of Rays.
 
     private InputHandler inputHandler; // InputHandler to react to user input.
     private Timer timer; // Timer for shooting.
 
     private Map map;
 
-    public double rotation; // Rotation value of the player.
+    private double rotation; // Rotation value of the player.
 
     private final int fov = Config.FOV; // FOV value.
 
     private EntityAttributes attributes;
 
-    boolean isShooting;
-    int shootDelay = 200;
+    private boolean isShooting;
+    private final int shootDelay = 200;
 
-    HighscoreEntry highscoreEntry;
-
-    public int getHealth() {
-        return attributes.getHealth();
-    }
-
-    public int getAmmo() {
-        return attributes.getCurrentAmmo();
-    }
-
-    public int getScore() {
-        return attributes.getScore();
-    }
-
-    public int getAmmoPack() {
-        return attributes.getAmmoPack();
-    }
-
-    public boolean getKey() {
-        return attributes.getKey();
-    }
-
-    public boolean isAlive() {
-        return attributes.isAlive();
-    }
+    private HighscoreEntry highscoreEntry;
 
     private enum State {
         ALIVE, DEAD
-    };
-    State state;
-
-
-
-
-    /**
-     * Default constructor for the Player class. Initializes player properties.
-     */
-    public Player(){
-        initPlayer(new Vector2D());
     }
+    private State state;
+
 
     /**
-     * Constructor for the Player class with an initial position.
+     * Constructs a new player object with a position.
      *
-     * @param position The initial position of the player.
+     * @param position The position of the player.
      */
-    public Player(Vector2D position){
+    public Player(Vector2D position) {
         initPlayer(position);
     }
 
     /**
-     * Initialize the player properties.
+     * Initializes the player object with a position.
      *
-     * @param position The initial position of the player.
+     * @param position The position of the player.
      */
-    private void initPlayer(Vector2D position){
+    private void initPlayer(Vector2D position) {
         this.state = State.ALIVE;
 
         this.position = position;
-        this.direction = new Vector2D(1,0);
+        this.direction = new Vector2D(1, 0);
         this.rotation = 0;
         this.horizontal = new Ray();
         this.vertical = new Ray();
@@ -102,8 +69,8 @@ public class Player {
 
         this.attributes = new EntityAttributes(
                 100, Config.MOVEMENT_SPEED, Config.RUN_SPEED, Config.ROTATION_SPEED,
-                15,100, 30,
-                30, 0, 0,0
+                15, 100, 30,
+                30, 0, 0, 0
         );
 
         isShooting = false;
@@ -112,11 +79,10 @@ public class Player {
     }
 
     /**
-     * Cast rays to detect walls in the game map.
-     *
-     * @param map The game map used for ray casting.
+     * Casts rays in the game map based on the player's position and viewing angle.
+     * The rays are used to detect walls in the game map.
      */
-    public void castRays(){
+    public void castRays() {
         // Temporary values to store the length of the horizontal/vertical rays for comparison.
         double vLength, hLength;
 
@@ -128,14 +94,14 @@ public class Player {
         double lookRadiant = rotation - (Math.toRadians(fov) / 2.0);
 
         // Reset angle to keep it in the limits [0, 2 * PI]
-        if(lookRadiant < 0) lookRadiant += 2 * Math.PI;
-        if(lookRadiant > 2 * Math.PI) lookRadiant -= 2 * Math.PI;
+        if (lookRadiant < 0) lookRadiant += 2 * Math.PI;
+        if (lookRadiant > 2 * Math.PI) lookRadiant -= 2 * Math.PI;
 
         // For each ray the horizontal and vertical rays are calculated.
         for (int i = 0; i < rays.length; i++) {
-            double tempAngle = lookRadiant + Math.toRadians((i / (double)Config.rayResolution));
-            if(tempAngle < 0) tempAngle += 2 * Math.PI;
-            if(tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
+            double tempAngle = lookRadiant + Math.toRadians((i / (double) Config.rayResolution));
+            if (tempAngle < 0) tempAngle += 2 * Math.PI;
+            if (tempAngle > 2 * Math.PI) tempAngle -= 2 * Math.PI;
 
             // Calculate and get the horizontal/vertical ray that hit a grid line.
             this.horizontal = getHorizontalRay(tempAngle);
@@ -152,7 +118,7 @@ public class Player {
             If the vertical ray is shorter than the horizontal, the x and y values are stored for a new ray with the values of
             the vertical Ray and the length of it.
              */
-            if((vertical.getLength() < this.horizontal.getLength())){
+            if ((vertical.getLength() < this.horizontal.getLength())) {
                 newX = vertical.getX();
                 newY = vertical.getY();
                 length = vertical.getLength();
@@ -160,7 +126,7 @@ public class Player {
                 horizontal = false;
             }
             // Else the horizontal ray is used to create a new ray.
-            else{
+            else {
                 newX = this.horizontal.getX();
                 newY = this.horizontal.getY();
                 length = this.horizontal.getLength();
@@ -170,9 +136,9 @@ public class Player {
 
             // This calculation is done to prevent the 'fisheye' effect when standing to close to a wall.
             //double temp = rotation - tempAngle;
-          // if(temp < 0) temp += 2 * Math.PI;
-           // if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
-           // length *= Math.cos(temp);
+            // if(temp < 0) temp += 2 * Math.PI;
+            // if(temp > 2 * Math.PI) temp -= 2 * Math.PI;
+            // length *= Math.cos(temp);
 
             // A new ray is stored in the array with the values of the shortest ray, the length, color and the indicator if it was a horizontal wall or not.
             rays[i] = new Ray(new Vector2D(newX, newY), tempAngle, length, horizontal, wallID);
@@ -182,12 +148,10 @@ public class Player {
     /**
      * Calculates a horizontal ray for ray casting based on the player's position and viewing angle.
      * The ray is used to detect horizontal walls in the game map.
-     *
-     * @param map   The game map used for ray casting and collision detection.
      * @param angle The viewing angle in radians at which the ray is cast.
      * @return A Ray object representing the detected horizontal ray.
      */
-    private Ray getHorizontalRay(double angle){
+    private Ray getHorizontalRay(double angle) {
         // Maximum iterations for the ray.
         int dof = 0;
 
@@ -195,16 +159,16 @@ public class Player {
         int dofEnd = Config.CELL_COUNT_X;
 
         // Determines the relative position of the player within the current cell.
-        double yRayDelta = position.y - (int)(position.y);
+        double yRayDelta = position.y - (int) (position.y);
 
-        double rayX = 0, rayY = 0;  
+        double rayX = 0, rayY = 0;
         double yRayOff = 0, xRayOff = 0;
 
         // Grid correction for the direction the player is looking at.
         int lookingUp = 1;
-        
+
         // If the player is looking down.
-        if(Math.sin(angle) > 0){
+        if (Math.sin(angle) > 0) {
             // Ray for the current cell ground is calculated based on the relative cell position.
             rayX = -yRayDelta / Math.tan(angle);
             rayX = position.x - rayX;
@@ -218,9 +182,9 @@ public class Player {
 
             // Grid correction is set to -1.
             lookingUp = -1;
-        } 
+        }
         // Else if the player is looking up.
-        else if(Math.sin(angle) < 0){
+        else if (Math.sin(angle) < 0) {
             // The relative cell position.
             yRayDelta = -yRayDelta + 1.0;
 
@@ -239,7 +203,7 @@ public class Player {
             lookingUp = 0;
         }
         // If player is looking directly horizontal, no horizontal lines are visible.
-        if(Math.sin(angle) == 0){
+        if (Math.sin(angle) == 0) {
             rayX = position.x;
             rayY = position.y;
 
@@ -250,19 +214,19 @@ public class Player {
         int wallID = 0;
 
         // The ray will iterate as long as no wall has been hit or the ray goes out of bounds.
-        while(dof < dofEnd){
+        while (dof < dofEnd) {
 
             // The x and y indexes are calculated by flooring the position of the ray.
-            int indexX = (int)(rayX);
-            int indexY = (int)(rayY) + lookingUp;
+            int indexX = (int) (rayX);
+            int indexY = (int) (rayY) + lookingUp;
 
             // If the indexes are within the boundaries and the value at the index is a wall, the loop will be exited.
-            if(map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0) {
+            if (map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0) {
                 wallID = map.getValue(indexX, indexY);
                 dof = dofEnd;
             }
             // Else the ray will iterate with the x and y offsets.
-            else{
+            else {
                 rayX -= xRayOff;
                 rayY -= yRayOff;
                 dof++;
@@ -272,14 +236,12 @@ public class Player {
     }
 
     /**
-     * Calculates a vertical ray for ray casting based on the player's position and viewing angle.
-     * The ray is used to detect vertical walls in the game map.
-     *
-     * @param map   The game map used for ray casting and collision detection.
+     * Calculates a horizontal ray for ray casting based on the player's position and viewing angle.
+     * The ray is used to detect horizontal walls in the game map.
      * @param angle The viewing angle in radians at which the ray is cast.
-     * @return A Ray object representing the detected vertical ray.
+     * @return A Ray object representing the detected horizontal ray.
      */
-    private Ray getVerticalRay(double angle){
+    private Ray getVerticalRay(double angle) {
         // Maximum iterations for the ray.
         int dof = 0;
 
@@ -287,7 +249,7 @@ public class Player {
         int dofEnd = Config.CELL_COUNT_Y;
 
         // Determines the relative position of the player within the current cell.
-        double xRayDelta = position.x - (int)(position.x);
+        double xRayDelta = position.x - (int) (position.x);
 
         double rayX = 0, rayY = 0;
         double yRayOff = 0, xRayOff = 0;
@@ -296,7 +258,7 @@ public class Player {
         int lookingLeft = 1;
 
         // If the player is looking left.
-        if(Math.cos(angle) < 0)   {
+        if (Math.cos(angle) < 0) {
             // Ray for the current cell ground is calculated based on the relative cell position.
             rayY = xRayDelta * Math.tan(angle);
             rayY = position.y + rayY;
@@ -331,7 +293,7 @@ public class Player {
             lookingLeft = 0;
         }
         // If player is looking directly vertical, no vertical lines are visible.
-        if(Math.cos(angle) == 0){
+        if (Math.cos(angle) == 0) {
             rayX = position.x;
             rayY = position.y;
 
@@ -341,19 +303,19 @@ public class Player {
 
         int wallID = 0;
         // The ray will iterate as long as no wall has been hit or the ray goes out of bounds.
-        while(dof < dofEnd){
+        while (dof < dofEnd) {
 
             // The x and y indexes are calculated by flooring the position of the ray.
-            int indexY = (int)(rayY);
-            int indexX = (int)(rayX) + lookingLeft;
+            int indexY = (int) (rayY);
+            int indexX = (int) (rayX) + lookingLeft;
 
             // If the indexes are within the boundaries and the value at the index is a wall, the loop will be exited.
-            if(map.inBounds(indexX, indexY)	&& map.getValue(indexX, indexY) != 0) {
+            if (map.inBounds(indexX, indexY) && map.getValue(indexX, indexY) != 0) {
                 wallID = map.getValue(indexX, indexY);
                 dof = dofEnd;
             }
             // Else the ray will iterate with the x and y offsets.
-            else{
+            else {
                 rayX -= xRayOff;
                 rayY -= yRayOff;
                 dof++;
@@ -364,11 +326,9 @@ public class Player {
     }
 
     /**
-     * Update the player's position, rotation, and cast rays in the game map based on user input.
-     *
-     * @param map The game map used for collision detection and ray casting.
+     * Updates the player position and direction based on user input.
      */
-    public void update(){
+    public void update() {
         double tempX;
         double tempY;
         int mapX;
@@ -376,16 +336,16 @@ public class Player {
 
         double playerSpeed = attributes.getSpeed();
 
-        if(state.equals(State.DEAD)){
+        if (state.equals(State.DEAD)) {
             System.out.println("Dead");
         }
 
-        if(inputHandler.run){
+        if (inputHandler.isRun()) {
             playerSpeed = attributes.getRunSpeed();
         }
 
         // If the player moves forward.
-        if(inputHandler.forward){
+        if (inputHandler.isForward()) {
             // Calculate the temporary x and y values, based on the current position added with the direction where the player looks at multiplied by the movement speed.
             tempX = position.x + direction.x * playerSpeed;
             tempY = position.y + direction.y * playerSpeed;
@@ -395,16 +355,16 @@ public class Player {
             mapY = (int) (tempY);
 
             // If the temporary x position doesn't hit a wall, the player's x position is set to the temporary x position.
-            if(map.map[(int) position.y][mapX] == 0){
+            if (map.map[(int) position.y][mapX] == 0) {
                 position.x = tempX;
             }
 
             // If the temporary y position doesn't hit a wall, the player's y position is set to the temporary y position.
-            if(map.map[mapY][(int) position.x] == 0){
+            if (map.map[mapY][(int) position.x] == 0) {
                 position.y = tempY;
             }
         }
-        if(inputHandler.back){
+        if (inputHandler.isBack()) {
             // Calculate the temporary x and y values, based on the current position added with the direction where the player looks at multiplied by the movement speed.
             tempX = position.x - direction.x * playerSpeed;
             tempY = position.y - direction.y * playerSpeed;
@@ -414,23 +374,23 @@ public class Player {
             mapY = (int) tempY;
 
             // If the temporary x position doesn't hit a wall, the player's x position is set to the temporary x position.
-            if(map.map[(int) position.y][mapX] == 0){
+            if (map.map[(int) position.y][mapX] == 0) {
                 position.x = tempX;
             }
 
             // If the temporary y position doesn't hit a wall, the player's y position is set to the temporary y position.
-            if(map.map[mapY][(int) position.x] == 0){
+            if (map.map[mapY][(int) position.x] == 0) {
                 position.y = tempY;
             }
         }
 
         // If the player rotates right.
-        if(inputHandler.right){
+        if (inputHandler.isRight()) {
             // Rotation speed is subtracted from the player rotation.
             rotation -= attributes.getRotationSpeed();
 
             // Keeping the player rotation in bounds [0, 2 * PI]
-            if(rotation <= 0)
+            if (rotation <= 0)
                 rotation = 2 * Math.PI;
 
             // Updating the player direction based on the rotation.
@@ -438,40 +398,43 @@ public class Player {
         }
 
         // If the player rotates left.
-        if(inputHandler.left){
+        if (inputHandler.isLeft()) {
             // Rotation speed is added onto the player rotation.
             rotation += attributes.getRotationSpeed();
 
             // Keeping the player rotation in bounds [0, 2 * PI]
-            if(rotation >= 2 * Math.PI)
+            if (rotation >= 2 * Math.PI)
                 rotation = 0;
 
             // Updating the player direction based on the rotation.
             updateDirection(direction);
         }
 
-        if(inputHandler.use){
+        if (inputHandler.isUse()) {
             int directionX = (int) (direction.x + position.x);
             int directionY = (int) (direction.y + position.y);
 
 
-            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR) && attributes.getKey()) {
+            if (map.getWall(directionX, directionY).equals(Map.WALLS.DOOR) && attributes.getKey()) {
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
             }
 
             //TODO: Implement wall building mechanic + remove designated walls
-            else if(
+            /*
+            else if (
                     map.getWall(directionX, directionY).equals(Map.WALLS.EMPTY)
-                    && (directionX != (int) position.x || directionY != (int) position.y) && false
+                            && (directionX != (int) position.x || directionY != (int) position.y) && false
             ) {
                 map.setValue(directionX, directionY, Map.WALLS.WOOD);
             }
+
+             */
         }
 
-        if(inputHandler.shoot){
-            if(!isShooting)
-                for (Drone drone:map.getEnemies()) {
-                    if(drone.renderSprite.getShootable()){
+        if (inputHandler.isShoot()) {
+            if (!isShooting)
+                for (Drone drone : map.getEnemies()) {
+                    if (drone.getRenderSprite().getShootable() && canShoot()) {
                         drone.takeDamage(40);
                     }
                 }
@@ -486,79 +449,15 @@ public class Player {
     /**
      * Shoots a bullet.
      */
-    private void shoot(){
-
-
+    private void shoot() {
         isShooting = false;
         attributes.shoot();
         timer.stop();
     }
 
     /**
-     * Checks if the player is colliding with the obstacle.
-     * @param damage The received damage    .
-     */
-    public void takeDamage(int damage) {
-        attributes.takeDamage(damage);
-        if(attributes.getHealth() <= 0)
-            state = State.DEAD;
-
-        System.out.println(attributes.getHealth());
-    }
-
-    /**
-     * Adds score to the player.
-     * @param score The score to be added.
-     */
-    public void addScore(int score){
-        attributes.addScore(score);
-        System.out.println(attributes.getScore());
-    }
-
-    /**
-     * Adds health to the player.
-     * @param health The health to be added.
-     */
-    public void addHealth(int health) {
-        attributes.addHealth(health);
-        System.out.println(attributes.getHealth());
-    }
-
-    /**
-     * Adds ammo to the player.
-     * @param ammo The ammo to be added.
-     */
-    public void addAmmo(int ammo) {
-        attributes.addAmmo();
-        System.out.println(attributes.getCurrentAmmo());
-    }
-
-    public void addKey(){
-        attributes.setKey(true);
-    }
-
-    /**
-     * Get the player's x-coordinate in the game world.
-     *
-     * @return The x-coordinate of the player's position.
-     */
-    public double getX(){
-        return position.x;
-    }
-
-    /**
-     * Get the player's y-coordinate in the game world.
-     *
-     * @return The y-coordinate of the player's position.
-     */
-    public double getY(){
-        return position.y;
-    }
-
-    /**
-     * Update the direction vector of the player based on the current rotation angle.
-     *
-     * @param vec The 2D vector to be updated with the new direction.
+     * Updates the player direction based on the rotation.
+     * @param vec The vector to be updated.
      */
     public void updateDirection(Vector2D vec) {
         vec.x = Math.cos(-rotation);
@@ -567,15 +466,165 @@ public class Player {
     }
 
     /**
-     * Set the input handler for the player to handle user input.
-     *
-     * @param i The input to be set for the player.
+     * Adds a key to the player.
      */
-    public void setKeyListener(InputHandler i){
+    public void addKey() {
+        attributes.setKey(true);
+    }
+
+    /**
+     * Adds ammo to the player.
+     */
+    public void addAmmo() {
+        attributes.addAmmo();
+    }
+
+    /**
+     * Adds health to the player.
+     * @param health The amount of health to be added.
+     */
+    public void addHealth(int health) {
+        attributes.addHealth(health);
+    }
+
+    /**
+     * Adds score to the player.
+     * @param score The amount of score to be added.
+     */
+    public void addScore(int score) {
+        attributes.addScore(score);
+        System.out.println(attributes.getScore());
+    }
+
+    /**
+     * Takes damage from entity.
+     * @param damage The damage to be taken.
+     */
+    public void takeDamage(int damage) {
+        attributes.takeDamage(damage);
+        if (attributes.getHealth() <= 0)
+            state = State.DEAD;
+    }
+
+    /**
+     * Returns the player's position.
+     * @return The player's position.
+     */
+    public double getY() {
+        return position.y;
+    }
+
+    public double getX() {
+        return position.x;
+    }
+
+    /**
+     * Returns the player's direction.
+     * @return The player's direction.
+     */
+    public Vector2D getPosition() {
+        return position;
+    }
+
+    /**
+     * Returns the player's direction.
+     * @return The player's direction.
+     */
+    public Vector2D getDirection() {
+        return direction;
+    }
+
+    /**
+     * Returns the player's rays.
+     * @return The player's rays.
+     */
+    public Ray[] getRays() {
+        return rays;
+    }
+
+    /**
+     * Returns the player's rotation.
+     * @return The player's rotation.
+     */
+    public double getRotation() {
+        return rotation;
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public int getHealth() {
+        return attributes.getHealth();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public int getAmmo() {
+        return attributes.getCurrentAmmo();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public int getScore() {
+        return attributes.getScore();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public int getAmmoPack() {
+        return attributes.getAmmoPack();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public boolean getKey() {
+        return attributes.getKey();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public boolean isAlive() {
+        return attributes.isAlive();
+    }
+
+    /**
+     * Returns the player's attributes.
+     * @return The player's attributes.
+     */
+    public boolean canShoot() {
+        return attributes.getCurrentAmmo() > 0;
+    }
+
+    /**
+     * Sets the InputHandler for the player.
+     * @param i The InputHandler object.
+     */
+    public void setKeyListener(InputHandler i) {
         this.inputHandler = i;
     }
 
-    public void setMap(Map map){ this.map = map; }
+    /**
+     * Sets the map for the player.
+     * @param map The map object.
+     */
+    public void setMap(Map map) {
+        this.map = map;
+    }
+
+    /**
+     * Prints the player's attributes.
+     */
     public void printAttributes() {
         System.out.println(attributes.toString());
     }

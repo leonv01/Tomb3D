@@ -21,21 +21,31 @@ public class Drone {
     private Map map;
     private Timer timer, idleTimer, renderAttack, renderReset;
     private Player player;
-    public Vector2D position, direction;
-    public double rotation, radius;
-    public Texture idleSprite;
-    public Texture attackStart;
-    public Texture attackEnd;
-    public Obstacle renderSprite;
+    private Vector2D position, direction;
+    private double rotation, radius;
+    private Texture idleSprite, attackStart, attackEnd;
+    private Obstacle renderSprite;
 
 
     private EntityAttributes attributes;
 
+    /**
+     * Constructs a new drone with a position, map, type and player.
+     *
+     * @param position The position of the drone.
+     * @param map The map that the drone will be placed on.
+     * @param type The type of the drone.
+     * @param player The player that the drone will attack.
+     */
     public Drone(Vector2D position, Map map, Type type, Player player) {
         initDrone(position, map, type, player);
     }
 
 
+    /**
+     * The drone will take damage.
+     * @param damage The damage that the drone will take.
+     */
     public void takeDamage(int damage){
         state = State.CHASE;
         attributes.takeDamage(damage);
@@ -46,7 +56,7 @@ public class Drone {
      * Updates the drone.
      */
     public void update() {
-        Vector2D playerPosition = new Vector2D(player.position);
+        Vector2D playerPosition = new Vector2D(player.getPosition());
 
         double distance = playerPosition.sub(position).length();
         if(!attributes.isAlive()) state = State.DEAD;
@@ -54,7 +64,7 @@ public class Drone {
             state = State.CHASE;
 
         switch(state){
-            case IDLE -> idle(playerPosition);
+            case IDLE -> idle();
             case CHASE -> chase(playerPosition);
             case DEAD -> dead();
         }
@@ -124,7 +134,7 @@ public class Drone {
     /**
      * The drone will idle around the map.
      */
-    private void idle(Vector2D playerPosition){
+    private void idle(){
 
         setDirection(rotation);
 
@@ -232,12 +242,6 @@ public class Drone {
             }
         }
         this.attributes = new EntityAttributes(health, speed, 0, 0, damage, health, 0,0,0,0,score);
-        //this.idleSprite = new Obstacle(idlePath, position, Obstacle.Type.ENEMY, 100);
-        //this.attackSprite = new Obstacle(attackPath, position, Obstacle.Type.ENEMY, 100);
-        //this.attackingSprite = new Obstacle(attackingPath, position, Obstacle.Type.ENEMY, 100);
-
-        //renderSprite = idleSprite;
-
         this.idleSprite = new Texture(idlePath);
         this.attackEnd = new Texture(attackEndPath);
         this.attackStart = new Texture(attackStartPath);
@@ -245,6 +249,41 @@ public class Drone {
         this.renderSprite = new Obstacle(idlePath, position, Obstacle.Type.ENEMY, 200);
     }
 
+    /**
+     * Returns the attributes of the drone.
+     * @return The attributes of the drone.
+     */
+    public Vector2D getPosition(){
+        return position;
+    }
+
+    /**
+     * Returns the attributes of the drone.
+     * @return The attributes of the drone.
+     */
+    public Vector2D getDirection(){
+        return direction;
+    }
+
+    /**
+     * Returns the attributes of the drone.
+     * @return The attributes of the drone.
+     */
+    public double getRotation(){
+        return rotation;
+    }
+
+    /**
+     * Returns the RenderSprite of the drone.
+     * @return The Obstacle object of the drone.
+     */
+    public Obstacle getRenderSprite(){
+        return renderSprite;
+    }
+
+    /**
+     * Prints the attributes of the drone.
+     */
     public void printAttributes(){
         System.out.println(attributes);
     }

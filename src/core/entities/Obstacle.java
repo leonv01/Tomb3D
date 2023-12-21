@@ -14,13 +14,12 @@ public class Obstacle {
     }
 
     private Vector2D position;
-    public double z;
     private Texture texture;
-    private final int width, height;
     private boolean visible, active, shootable;
     private final double radius = 2;
     private final Type type;
     private final int value;
+
     public Obstacle(String path, Vector2D position, Type type, int value){
 
            // image = ImageIO.read(new File(path));
@@ -29,18 +28,11 @@ public class Obstacle {
 
 
         this.position = position;
-        this.width = texture.getImage().getWidth();
-        this.height = texture.getImage().getHeight();
         this.visible = true;
         this.active = true;
         this.shootable = false;
         this.type = type;
         this.value = value;
-    }
-
-
-    public void initObstacle(){
-
     }
 
     /**
@@ -69,7 +61,7 @@ public class Obstacle {
                     player.addHealth(value);
                 }
                 case AMMO_PACK -> {
-                    player.addAmmo(value);
+                    player.addAmmo();
                 }
                 case ENEMY -> {
                     player.takeDamage(value);
@@ -93,9 +85,6 @@ public class Obstacle {
         this.position = position;
     }
 
-    public int getSize(){
-        return texture.getImage().getWidth();
-    }
 
     public Vector2D getPosition() {
         return position;

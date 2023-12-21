@@ -27,9 +27,6 @@ public class Game implements Runnable{
     private final Player player;
 
 
-
-    // MapRender object to render 2D view.
- //   private final MapRender mapRender;
     private Map currentMap;
 
     // Map object.
@@ -143,7 +140,7 @@ public class Game implements Runnable{
                 // Player gets updated.
                 player.update();
 
-                Vector2D temp = player.position;
+                Vector2D temp = player.getPosition();
                 for (Obstacle obstacle : obstacles){
 
                     obstacle.checkCollision(player);
