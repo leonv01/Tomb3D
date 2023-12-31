@@ -19,6 +19,7 @@ public class Player {
     private Ray vertical;    // Ray for vertical grid line check.
     private Ray[] rays; // Array of Rays.
 
+    private boolean activatedGoal;
 
     private InputHandler inputHandler; // InputHandler to react to user input.
     private Timer timer; // Timer for shooting.
@@ -34,10 +35,24 @@ public class Player {
     private boolean isShooting;
     private final int shootDelay = 200;
 
+    public void setPosition(Player player) {
+        this.position = player.position;
+    }
+
+    public EntityAttributes getAttributes() {
+        return attributes;
+    }
+
     private enum State {
         ALIVE, DEAD
     }
     private State state;
+
+
+    public Player() {
+        initPlayer(new Vector2D(1, 1));
+    }
+
 
 
     /**
@@ -62,9 +77,11 @@ public class Player {
         this.rotation = 0;
         this.horizontal = new Ray();
         this.vertical = new Ray();
+        this.activatedGoal = false;
 
         this.rays = new Ray[Config.rayResolution * fov];
         for (int i = 0; i < rays.length; i++) rays[i] = new Ray();
+
 
         this.attributes = new EntityAttributes(
                 100, Config.MOVEMENT_SPEED, Config.RUN_SPEED, Config.ROTATION_SPEED,
@@ -414,7 +431,8 @@ public class Player {
             int directionY = (int) (direction.y + position.y);
 
 
-            if (map.getWall(directionX, directionY).equals(Map.WALLS.DOOR) && attributes.getKey()) {
+            if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
+                activatedGoal = true;
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
             }
 
@@ -593,6 +611,10 @@ public class Player {
         return attributes.getKey();
     }
 
+    public boolean getActivatedGoal() {
+        return activatedGoal;
+    }
+
     /**
      * Returns the player's attributes.
      * @return The player's attributes.
@@ -623,6 +645,10 @@ public class Player {
      */
     public void setMap(Map map) {
         this.map = map;
+    }
+
+    public void setAttributes(EntityAttributes attributes) {
+        this.attributes = attributes;
     }
 
     /**

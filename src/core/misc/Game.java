@@ -1,9 +1,9 @@
 package core.misc;
 
+import core.entities.EntityAttributes;
 import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
-import core.graphics.MapRender;
 import core.utils.Vector2D;
 import core.entities.Drone;
 
@@ -24,15 +24,16 @@ public class Game implements Runnable{
     private final Display display;
 
     // Player object.
-    private final Player player;
+    private Player player;
 
 
     private Map currentMap;
 
     // Map object.
-    private final ArrayList<Map> map;
-    private final ArrayList<Drone> enemy;
-    private final ArrayList<Obstacle> obstacles;
+    private final ArrayList<Map> maps;
+    private int mapIndex;
+    private ArrayList<Drone> enemies;
+    private ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
 
     /**
@@ -43,41 +44,22 @@ public class Game implements Runnable{
         display = new Display();
         inputHandler = new InputHandler();
 
-        map = new ArrayList<>();
-        map.add(new Map());
-        currentMap = map.get(0);
+        mapIndex = 0;
 
-        player = new Player(
-                new Vector2D((double) currentMap.map.length / 2, (double) currentMap.map.length / 2)
-        );
+        this.player = new Player();
 
-        player.setMap(currentMap);
+        maps = new ArrayList<>();
+        maps.add(new Map());
+        maps.add(new Map());
+        maps.add(new Map());
 
-        enemy = new ArrayList<>(4);
-        enemy.add(new Drone(new Vector2D(1.5, 1.5), currentMap, Drone.Type.LIGHT, player));
-        enemy.add(new Drone(new Vector2D(6.5, 4.5), currentMap, Drone.Type.MEDIUM, player));
-        enemy.add(new Drone(new Vector2D(7.5, 1.5), currentMap, Drone.Type.HEAVY, player));
-        enemy.add(new Drone(new Vector2D(9.5, 2.5), currentMap, Drone.Type.BOSS, player));
+        this.enemies = new ArrayList<>();
+        this.obstacles = new ArrayList<>();
 
-        obstacles = new ArrayList<>(3);
-        obstacles.add(new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(8.5,10.5), Obstacle.Type.HEAL_ITEM, 40));
-        obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
-        obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
-        obstacles.add(new Obstacle("src/textures/collectibles/score64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
-        obstacles.add(new Obstacle("src/textures/obstacles/ceilingLamp.png", new Vector2D(7.5, 7.5), Obstacle.Type.OBSTACLE, 0));
+        changeMap();
 
-        currentMap.addEnemies(enemy);
-       // mapRender = new MapRender(currentMap);
-
-      //  mapRender.setKeyListener(inputHandler);
         display.setKeyListener(inputHandler);
         player.setKeyListener(inputHandler);
-
-        display.addMap(currentMap);
-        display.addDrones(enemy);
-        display.addPlayer(player);
-        display.addObstacle(obstacles);
-
 
         // Create a new thread for display rendering.
 
@@ -85,7 +67,20 @@ public class Game implements Runnable{
         start();
     }
 
-    public void initGame(){
+    public void changeMap(){
+        Map map = this.maps.get(mapIndex++ % this.maps.size());
+        EntityAttributes playerAttributes = this.player.getAttributes();
+        playerAttributes.setKey(false);
+        this.player = map.getPlayer();
+        this.player.setAttributes(playerAttributes);
+        this.player.setMap(map);
+        this.player.setKeyListener(inputHandler);
+        this.enemies.clear();
+        this.enemies.addAll(map.getEnemies());
+        this.obstacles.clear();
+        this.obstacles.addAll(map.getObstacles());
+        this.currentMap = map;
+        this.display.addMap(map);
     }
 
     /**
@@ -147,9 +142,13 @@ public class Game implements Runnable{
                 }
 
                 // Enemy gets updated.
-                for (Drone d : enemy) {
+                for (Drone d : enemies) {
 
                     d.update();
+                }
+
+                if(player.getActivatedGoal()){
+                    changeMap();
                 }
 
                 if(!player.isAlive()){

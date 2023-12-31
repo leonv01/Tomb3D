@@ -2,7 +2,9 @@ package core.misc;
 
 import core.entities.Drone;
 import core.entities.Obstacle;
+import core.entities.Player;
 import core.utils.Config;
+import core.utils.Vector2D;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,15 +15,22 @@ import java.util.ArrayList;
 public class Map {
     public int[][] map;
 
+    private Player player;
     private ArrayList<Drone> enemies;
     private ArrayList<Obstacle> obstacles;
+
+    public Player getPlayer() {
+        return player;
+    }
 
     public enum WALLS{
         EMPTY,
         WOOD,
         STONE,
         DOOR,
-        STONEBRICKS;
+        STONEBRICKS,
+        GOAL
+        ;
 
         private static final WALLS[] list = WALLS.values();
         public static WALLS getWall(int idx){
@@ -33,46 +42,6 @@ public class Map {
      * Constructor for the Map class. Initializes the map and sets configuration values.
      */
     public Map() {
-        /*
-        Value index:
-        0: No wall, empty space
-        >0: Walls, Enemies
-
-        map = new int[][]
-                {
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 1},
-                {1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 2, 3, 4, 0, 1},
-                {1, 0, 3, 1, 1, 2, 0, 0, 0, 0, 0, 0, 3, 4, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1},
-                {1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-                {1, 0, 0, 1, 0, 0, 2, 1, 0, 0, 0, 1, 1, 2, 3, 1},
-                {1, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 3, 1},
-                {1, 0, 0, 2, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        };
-
-        enemies = new ArrayList<>();
-        obstacles = new ArrayList<>();
-
-        // Maybe unused
-        Config.CELL_SIZE_X = Config.WIDTH / map[0].length;
-        Config.CELL_SIZE_Y = Config.HEIGHT / map.length;
-
-        // Sets the amount of cells for x and y.
-        Config.CELL_COUNT_X = map[0].length;
-        Config.CELL_COUNT_Y = map.length;
-
-        Config.CELL_SCREEN_WIDTH = Config.WIDTH / Config.CELL_COUNT_X;
-        Config.CELL_SCREEN_HEIGHT = Config.HEIGHT / Config.CELL_COUNT_Y;
-
-         */
 
         initMap(new int[][]
                 {
@@ -83,7 +52,7 @@ public class Map {
                         {1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 2, 4, 4, 0, 1},
                         {1, 0, 3, 1, 1, 2, 0, 0, 0, 0, 0, 0, 3, 4, 0, 1},
                         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 1},
-                        {1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 1, 4, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                         {1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                         {1, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
                         {1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
@@ -94,6 +63,21 @@ public class Map {
                         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 }
                 );
+        player = new Player(
+                new Vector2D((double) map.length / 2, (double) map.length / 2)
+        );
+        enemies = new ArrayList<>(4);
+        enemies.add(new Drone(new Vector2D(1.5, 1.5), this, Drone.Type.LIGHT, player));
+        enemies.add(new Drone(new Vector2D(6.5, 4.5), this, Drone.Type.MEDIUM, player));
+        enemies.add(new Drone(new Vector2D(7.5, 1.5), this, Drone.Type.HEAVY, player));
+        enemies.add(new Drone(new Vector2D(9.5, 2.5), this, Drone.Type.BOSS, player));
+
+        obstacles = new ArrayList<>(3);
+        obstacles.add(new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(8.5,10.5), Obstacle.Type.HEAL_ITEM, 40));
+        obstacles.add(new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(7.5,10.5), Obstacle.Type.AMMO_PACK, 60));
+        obstacles.add(new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(6.5,10.5), Obstacle.Type.KEY, 1));
+        obstacles.add(new Obstacle("src/textures/collectibles/score64.png", new Vector2D(5.5,10.5), Obstacle.Type.COLLECTIBLE, 2000));
+        obstacles.add(new Obstacle("src/textures/obstacles/ceilingLamp.png", new Vector2D(7.5, 7.5), Obstacle.Type.OBSTACLE, 0));
     }
 
     public Map(int[][] map){

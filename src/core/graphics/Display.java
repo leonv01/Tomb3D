@@ -22,32 +22,32 @@ import core.utils.Vector2D;
  * The Display class represents the graphical display for rendering the game world.
  */
 public class Display extends JFrame implements Runnable{
-    MapRender mapRender;
-    Map map;
+    private MapRender mapRender;
+    private Map map;
 
     // Displayed image.
-    BufferedImage image;
+    private BufferedImage image;
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
-    Texture textureAtlas;
-    Texture crosshair;
-    Texture deathScreen;
-    UserInterface ui;
+    private Texture textureAtlas;
+    private Texture crosshair;
+    private Texture deathScreen;
+    private UserInterface ui;
 
-    Texture uiBar;
-    ArrayList<Obstacle> obstacles;
-    ArrayList<Drone> drones;
-    ArrayList<Obstacle> renderSprite;
+    private Texture uiBar;
+    private ArrayList<Obstacle> obstacles;
+    private ArrayList<Drone> drones;
+    private ArrayList<Obstacle> renderSprite;
 
-    Player player = null;
+    private Player player = null;
 
-    InputHandler inputHandler;
+    private InputHandler inputHandler;
 
     private final Thread thread;
-    boolean running;
+    private boolean running;
 
-    double[] zBuffer;
-    double[] depth;
+    private double[] zBuffer;
+    private double[] depth;
 
     /**
      * Constructs a Display object and initializes the display window.
@@ -87,7 +87,7 @@ public class Display extends JFrame implements Runnable{
      //   ui.start();
 
         // Load debug texture.
-        textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 64, 5);
         crosshair = new Texture("src/textures/ui/crosshair.png");
         deathScreen = new Texture("src/textures/ui/deathScreen.png");
 
@@ -111,6 +111,14 @@ public class Display extends JFrame implements Runnable{
      */
     public void addMap(Map map){
         this.map = map;
+        this.addDrones(map.getEnemies());
+        this.addObstacle(map.getObstacles());
+        this.addPlayer(map.getPlayer());
+        try{
+            Thread.sleep(100);
+        } catch (InterruptedException e){
+            System.out.println("Thread couldn't sleep");
+        }
     }
 
     /**
