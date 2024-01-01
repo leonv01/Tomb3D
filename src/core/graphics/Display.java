@@ -209,8 +209,6 @@ public class Display extends JFrame implements Runnable{
                     }
                     else obstacle.setShootable(false);
                 }
-                //TODO: implement pick up for player
-                // player.add(item);
             }
             else {
                 obstacle.setActive(false);

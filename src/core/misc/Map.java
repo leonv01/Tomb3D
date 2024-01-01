@@ -38,6 +38,14 @@ public class Map {
         }
     };
 
+    public Map(int[][] map, ArrayList<Obstacle> obstacles, ArrayList<Drone>enemies, Player player){
+        initMap(map);
+        this.player = player;
+        this.obstacles = obstacles;
+        this.enemies = new ArrayList<>();
+        enemies.forEach(enemy -> this.enemies.add(new Drone(enemy.getPosition(), this, enemy.getType(), player)));
+    }
+
     /**
      * Constructor for the Map class. Initializes the map and sets configuration values.
      */

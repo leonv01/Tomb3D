@@ -21,6 +21,19 @@ public class Obstacle {
     private final Type type;
     private final int value;
 
+    public Obstacle(Vector2D position, Type type, int value){
+        this.type = type;
+        this.value = value;
+        this.position = position;
+        switch(type){
+            case HEAL_ITEM -> texture = new Texture("src/textures/collectibles/heal64.png");
+            case AMMO_PACK -> texture = new Texture("src/textures/collectibles/ammo64.png");
+            case OBSTACLE -> texture = new Texture("src/textures/obstacles/ceilingLamp.png");
+            case KEY -> texture = new Texture("src/textures/collectibles/key_yellow64.png");
+            case COLLECTIBLE -> texture = new Texture("src/textures/collectibles/score64.png");
+        }
+    }
+
     public Obstacle(String path, Vector2D position, Type type, int value){
 
            // image = ImageIO.read(new File(path));

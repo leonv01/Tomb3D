@@ -2,6 +2,7 @@ package core.utils;
 
 import core.entities.Drone;
 import core.entities.Obstacle;
+import core.entities.Player;
 import core.misc.HighscoreEntry;
 import core.misc.Map;
 
@@ -19,100 +20,136 @@ public class FileInterpreter {
      * @return The imported map.
      */
     public static Map importMap(File file) {
-        int[][] data = new int[0][0];
-        int[] tempData = new int[0];
-
-        ArrayList<Obstacle> obstacles = new ArrayList<>();
-        ArrayList<Drone> enemies = new ArrayList<>();
-
         BufferedReader reader;
-        int lineIdx = 0;
-        try {
+        int[][] mapArrangement = null;
+        int lineIndex;
+        Map map = null;
+
+        ArrayList<Obstacle> obstacles;
+        ArrayList<Drone> enemies;
+        Player player = null;
+
+        try{
+            obstacles = new ArrayList<>();
+            enemies = new ArrayList<>();
             reader = new BufferedReader(new FileReader(file));
             String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("dimension:")) {
-                    String token = line.split(":")[1].trim();
-                    int value = Integer.parseInt(token);
-                    data = new int[value][value];
-                    tempData = new int[value];
-                } else {
-                    String[] tokens = line.split(",");
-                    int idx = 0;
-                    Drone enemy = null;
-                    Obstacle obstacle = null;
+            lineIndex = 0;
+            while((line = reader.readLine()) != null){
+                line = line.toLowerCase().trim();
+                if(line.contains("dim")){
+                    int dimension = Integer.parseInt(line.trim().split(":")[1]);
+                    mapArrangement = new int[dimension][dimension];
+                }
+                else if(mapArrangement != null){
+                    String[] lineContent = line.trim().split(",");
 
-                    double posX, posY;
-                    for (String token : tokens) {
-                        String tempToken = token.toLowerCase().trim();
+                    int columnIndex = 0;
+                    for (String character: lineContent) {
+                        String temp = character;
+                        double objectPositionX = (double) columnIndex + 0.5;
+                        double objectPositionY = (double) lineIndex + 0.5;
 
-                        posX = idx - 0.5;
-                        posY = lineIdx - 0.5;
-                        switch (tempToken) {
-                            case "el" -> {
-                                System.out.println("Light Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.LIGHT, null);
+                        Vector2D position = new Vector2D(objectPositionX, objectPositionY);
+
+                        switch (temp){
+                            case " " -> temp = "0";
+                            case "x" -> temp = "5";
+                            case "k" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/key_yellow64.png",
+                                        position,
+                                        Obstacle.Type.KEY,
+                                        1
+                                ));
+                                temp = "0";
                             }
-                            case "em" -> {
-                                System.out.println("Medium Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.MEDIUM, null);
+                            case "l" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.LIGHT
+                                ));
+                                temp = "0";
                             }
-                            case "eh" -> {
-                                System.out.println("Heavy Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.HEAVY, null);
+                            case "m" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.MEDIUM
+                                ));
+                                temp = "0";
                             }
-                            case "eb" -> {
-                                System.out.println("Boss Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.BOSS, null);
+                            case "h" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.HEAVY
+                                ));
+                                temp = "0";
                             }
-                            case "ok" -> {
-                                System.out.println("Key");
-                                obstacle = new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(posX, posY), Obstacle.Type.KEY, 0);
+                            case "b" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.BOSS
+                                ));
+                                temp = "0";
                             }
-                            case "mp" -> {
-                                System.out.println("Medipack");
-                                obstacle = new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 25);
+                            case "p" -> {
+                                player = new Player(position);
+                                temp = "0";
                             }
-                            case "ap" -> {
-                                System.out.println("Ammopack");
-                                obstacle = new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 30);
+                            case "+" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/heal64.png",
+                                        position,
+                                        Obstacle.Type.HEAL_ITEM,
+                                        25
+                                ));
+                                temp = "0";
                             }
-                            case "sp" -> {
-                                System.out.println("Score");
-                                obstacle = new Obstacle("src/textures/collectibles/score64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 200);
+                            case "*" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/ammo64.png",
+                                        position,
+                                        Obstacle.Type.AMMO_PACK,
+                                        30
+                                ));
+                                temp = "0";
                             }
-                            default -> {
-                                if (tempToken.length() > 1 && tempToken.contains("o")) {
-                                    System.out.println("Various Obstacles");
-                                    obstacle = new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(posX, posY), Obstacle.Type.OBSTACLE, 0);
-                                }
+                            case "#" ->{
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/score64.png",
+                                        position,
+                                        Obstacle.Type.COLLECTIBLE ,
+                                        200
+                                ));
+                                temp = "0";
+                            }
+                            case "o" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/obstacles/ceilingLamp.png",
+                                        position,
+                                        Obstacle.Type.OBSTACLE,
+                                        0
+                                ));
+                                temp = "0";
                             }
                         }
-                        if (enemy != null) {
-                            enemies.add(enemy);
-                            tempData[idx] = 0;
-                            enemy = null;
-                            continue;
-                        }
-                        if (obstacle != null) {
-                            obstacles.add(obstacle);
-                            tempData[idx] = obstacle.getType() == Obstacle.Type.OBSTACLE ? -1 : 0;
-                            obstacle = null;
-                            continue;
-                        }
-                        int value = Integer.parseInt(token.trim());
-                        tempData[idx] = value;
+                        mapArrangement[lineIndex][columnIndex] = Integer.parseInt(temp);
+                        columnIndex++;
                     }
-                    data[lineIdx++] = tempData;
-                    System.out.println(line);
+                    lineIndex++;
                 }
             }
-            reader.close();
-        } catch (NumberFormatException | IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+            map = new Map(
+                    mapArrangement,
+                    obstacles,
+                    enemies,
+                    player
+            );
 
-        return new Map(data);
+        }catch (IOException e){
+            System.out.println("Map not found");
+        }
+        return map;
     }
 
     /**
@@ -187,6 +224,9 @@ public class FileInterpreter {
     }
 
     public static void main(String[] args) {
-        importMap(new File("src/maps/map1.txt"));
+        Map map = importMap(new File("src/maps/level1.txt"));
+        map.getEnemies().forEach(drone -> System.out.println(drone.getPlayer()));
+        Obstacle obstacle = map.getObstacles().get(2);
+        System.out.println(obstacle.getPosition().x);
     }
 }

@@ -10,6 +10,7 @@ import javax.swing.*;
 public class Drone {
 
 
+
     public enum State{
         IDLE, CHASE, DEAD
     }
@@ -42,6 +43,10 @@ public class Drone {
         initDrone(position, map, type, player);
     }
 
+    public Drone(Vector2D position, Type type){
+        initDrone(position, null, type, null);
+    }
+
     public Drone(Drone drone){
         this(drone.position, drone.map, drone.getType(), drone.player);
     }
@@ -54,6 +59,11 @@ public class Drone {
         state = State.CHASE;
         attributes.takeDamage(damage);
         System.out.println(attributes.getHealth());
+    }
+
+
+    public Player getPlayer() {
+        return player;
     }
 
     /**
@@ -294,6 +304,8 @@ public class Drone {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public void setMap(Map map) { this.map = map; }
 
 
     /**

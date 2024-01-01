@@ -4,9 +4,11 @@ import core.entities.EntityAttributes;
 import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
+import core.utils.FileInterpreter;
 import core.utils.Vector2D;
 import core.entities.Drone;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -49,9 +51,10 @@ public class Game implements Runnable{
         this.player = new Player();
 
         maps = new ArrayList<>();
+        maps.add(FileInterpreter.importMap(new File("src/maps/level1.txt")));
         maps.add(new Map());
         maps.add(new Map());
-        maps.add(new Map());
+
 
         this.enemies = new ArrayList<>();
         this.obstacles = new ArrayList<>();

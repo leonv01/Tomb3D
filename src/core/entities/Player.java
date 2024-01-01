@@ -431,7 +431,9 @@ public class Player {
             int directionY = (int) (direction.y + position.y);
 
 
-            if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
+            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR)){
+                map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+            }else if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
                 activatedGoal = true;
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
             }
