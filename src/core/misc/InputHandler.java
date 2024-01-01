@@ -8,14 +8,49 @@ import java.awt.event.KeyListener;
  */
 public class InputHandler implements KeyListener {
 
-    public boolean forward;
-    public boolean back;
-    public boolean left;
-    public boolean right;
-    public boolean shoot;
-    public boolean map;
-    public boolean run;
-    public boolean use;
+
+
+    private boolean forward;
+    private boolean back;
+    private boolean left;
+    private boolean right;
+    private boolean shoot;
+    private boolean map;
+    private boolean run;
+    private boolean use;
+
+    public boolean isForward() {
+        return forward;
+    }
+
+    public boolean isBack() {
+        return back;
+    }
+
+    public boolean isLeft() {
+        return left;
+    }
+
+    public boolean isRight() {
+        return right;
+    }
+
+    public boolean isShoot() {
+        return shoot;
+    }
+
+    public boolean isMap() {
+        return map;
+    }
+
+    public boolean isRun() {
+        return run;
+    }
+
+    public boolean isUse() {
+        return use;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
     }

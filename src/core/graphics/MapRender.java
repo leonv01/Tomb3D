@@ -48,16 +48,17 @@ public class MapRender extends JPanel {
         setPreferredSize(new Dimension(MAP_WIDTH, MAP_HEIGHT));
     }
 
-    public void render(Player player, ArrayList<Drone> enemies){
-        repaint();
-    }
-
     /**
      * Renders the map with player and enemy from a top-down perspective.
      *
      * @param player The player object that will be rendered.
      * @param enemies The enemy object that will be rendered
      */
+    public void render(Player player, ArrayList<Drone> enemies){
+        repaint();
+    }
+
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -84,11 +85,11 @@ public class MapRender extends JPanel {
 
         // Render the player as a square with a width of 5.
         g2d.setColor(Color.red);
-        g2d.fillRect((int)(player.position.x * TILE_X) -  5, (int) (player.position.y * TILE_Y) - 5, 10, 10);
+        g2d.fillRect((int)(player.getPosition().x * TILE_X) -  5, (int) (player.getPosition().y * TILE_Y) - 5, 10, 10);
         g2d.setStroke(new BasicStroke(5));
 
         // Render the rays of the player.
-        for (Ray ray : player.rays) {
+        for (Ray ray : player.getRays()) {
             g.setColor(Color.ORANGE.darker());
             g.drawLine(
             (int) (player.getX() * TILE_X), (int) (player.getY() * TILE_Y),
@@ -98,19 +99,19 @@ public class MapRender extends JPanel {
         // Render the directional vector where player is looking at.
         g.setColor(Color.BLUE);
         g.drawLine(
-                (int) (player.position.x * TILE_X), (int) (player.position.y * TILE_Y),
-                (int) ((player.position.x + player.direction.x) * TILE_X), (int) ((player.position.y + player.direction.y) * TILE_Y));
+                (int) (player.getPosition().x * TILE_X), (int) (player.getPosition().y * TILE_Y),
+                (int) ((player.getPosition().x + player.getDirection().x) * TILE_X), (int) ((player.getPosition().y + player.getDirection().y) * TILE_Y));
 
 
         // If an enemy exists, it should be rendered as a square with a width of 5 and its directional vector.
         if(enemies != null){
             for (Drone enemy : enemies) {
                 g.setColor(Color.orange);
-                g.fillRect((int)(enemy.position.x * TILE_X) -  5, (int) (enemy.position.y * TILE_Y) - 5, 10, 10);
+                g.fillRect((int)(enemy.getPosition().x * TILE_X) -  5, (int) (enemy.getPosition().y * TILE_Y) - 5, 10, 10);
                 g.setColor(Color.BLUE);
                 g.drawLine(
-                        (int) (enemy.position.x * TILE_X), (int) (enemy.position.y * TILE_Y),
-                        (int) ((enemy.position.x + enemy.direction.x) * TILE_X), (int) ((enemy.position.y + enemy.direction.y) * TILE_Y));
+                        (int) (enemy.getPosition().x * TILE_X), (int) (enemy.getPosition().y * TILE_Y),
+                        (int) ((enemy.getPosition().x + enemy.getDirection().x) * TILE_X), (int) ((enemy.getPosition().y + enemy.getDirection().y) * TILE_Y));
             }
         }
     }

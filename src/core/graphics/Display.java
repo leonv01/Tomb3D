@@ -6,7 +6,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import javax.swing.JFrame;
 
@@ -23,25 +22,32 @@ import core.utils.Vector2D;
  * The Display class represents the graphical display for rendering the game world.
  */
 public class Display extends JFrame implements Runnable{
-    MapRender mapRender;
-    Map map;
+    private MapRender mapRender;
+    private Map map;
 
     // Displayed image.
-    BufferedImage image;
+    private BufferedImage image;
     private final int DIS_HEIGHT = Config.HEIGHT;
     private final int DIS_WIDTH = Config.WIDTH;
-    Texture textureAtlas;
-    ArrayList<Obstacle> obstacles;
-    ArrayList<Drone> drones;
-    Player player = null;
+    private Texture textureAtlas;
+    private Texture crosshair;
+    private Texture deathScreen;
+    private UserInterface ui;
 
-    InputHandler inputHandler;
+    private Texture uiBar;
+    private ArrayList<Obstacle> obstacles;
+    private ArrayList<Drone> drones;
+    private ArrayList<Obstacle> renderSprite;
+
+    private Player player = null;
+
+    private InputHandler inputHandler;
 
     private final Thread thread;
-    boolean running;
+    private boolean running;
 
-    double[] zBuffer;
-    double[] depth;
+    private double[] zBuffer;
+    private double[] depth;
 
     /**
      * Constructs a Display object and initializes the display window.
@@ -69,6 +75,7 @@ public class Display extends JFrame implements Runnable{
 
         obstacles = new ArrayList<>();
         drones = new ArrayList<>();
+        renderSprite = new ArrayList<>();
 
 
         zBuffer = new double[Config.rayResolution * Config.FOV];
@@ -76,8 +83,16 @@ public class Display extends JFrame implements Runnable{
         Arrays.fill(zBuffer, Double.MAX_VALUE);
         Arrays.fill(depth, 0);
 
+        ui = new UserInterface();
+     //   ui.start();
+
         // Load debug texture.
-        textureAtlas = new Texture("src/textures/texture_atlas_shadow_2.png", 64, 4);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 64, 5);
+        crosshair = new Texture("src/textures/ui/crosshair.png");
+        deathScreen = new Texture("src/textures/ui/deathScreen.png");
+
+        //thirdDigit = new Texture("src/textures/ui/thirddigit9.png");
+        //secondDigit = new Texture("src/textures/ui/seconddigit0.png");
     };
 
     /**
@@ -96,6 +111,14 @@ public class Display extends JFrame implements Runnable{
      */
     public void addMap(Map map){
         this.map = map;
+        this.addDrones(map.getEnemies());
+        this.addObstacle(map.getObstacles());
+        this.addPlayer(map.getPlayer());
+        try{
+            Thread.sleep(100);
+        } catch (InterruptedException e){
+            System.out.println("Thread couldn't sleep");
+        }
     }
 
     /**
@@ -109,12 +132,10 @@ public class Display extends JFrame implements Runnable{
      * @param drones The drone to be added.
      */
     public void addDrones(ArrayList<Drone> drones){
-        System.out.println(obstacles.size());
         this.drones = drones;
         for(Drone drone : drones){
-            obstacles.add(drone.obstacle);
+            obstacles.add(drone.getRenderSprite());
         }
-        System.out.println(obstacles.size());
     }
 
     /**
@@ -122,14 +143,15 @@ public class Display extends JFrame implements Runnable{
      * @param obstacles The obstacle to be added.
      */
     public void addObstacle(ArrayList<Obstacle> obstacles) {
-        this.obstacles.addAll(obstacles);
+        this.obstacles = obstacles;
+        this.renderSprite.addAll(obstacles);
     }
 
     public boolean isSpriteBehindPlayer(Player player, Obstacle obstacle){
 
-        Vector2D diff = obstacle.getPosition().sub(player.position);
+        Vector2D diff = obstacle.getPosition().sub(player.getPosition());
 
-        double angle = Math.atan2(diff.y, diff.x) - Math.atan2(player.direction.y, player.direction.x);
+        double angle = Math.atan2(diff.y, diff.x) - Math.atan2(player.getDirection().y, player.getDirection().x);
 
         angle = Math.atan2(Math.sin(angle), Math.cos(angle));
 
@@ -146,11 +168,11 @@ public class Display extends JFrame implements Runnable{
         double fovRadians = Math.toRadians(Config.FOV);
         double viewPlaneWidth = 2 * Math.tan(fovRadians / 2);
 
-        Vector2D relativePosVector2d = obstacle.getPosition().sub(player.position);
+        Vector2D relativePosVector2d = obstacle.getPosition().sub(player.getPosition());
         double distance = relativePosVector2d.length();
         double spriteScreenSize = (((double) (DIS_WIDTH) / distance));
 
-        double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.direction.y, player.direction.x);
+        double angle = Math.atan2(relativePosVector2d.y, relativePosVector2d.x) - Math.atan2(player.getDirection().y, player.getDirection().x);
         angle = (angle + 2 * Math.PI) % (2 * Math.PI); // Ensure angle is within [0, 2*PI]
 
         if (angle > Math.PI) {
@@ -171,15 +193,21 @@ public class Display extends JFrame implements Runnable{
         int smallerRectX = centerX - smallerRectSize / 2;
         int smallerRectY = centerY - smallerRectSize / 2;
 
-        int index = (rectX / ((DIS_WIDTH) / (zBuffer.length + 1)));
+        int lowerBound = (int) (0.40 * zBuffer.length);
+        int upperBound = (int) (0.60 * zBuffer.length);
 
-        if (index >= 0 && index < zBuffer.length - 1) {
-            if (!(zBuffer[index] < distance)) {
+        int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
+        if (index >= 0 && index < zBuffer.length) {
+            if (distance < zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
-
                     // Render the image from its center
-                    g.drawImage(obstacle.getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
+                    g.drawImage(obstacle.getTexture().getImage(), smallerRectX, smallerRectY, smallerRectSize, smallerRectSize, null);
+
+                    if(index < upperBound && index > lowerBound) {
+                        obstacle.setShootable(true);
+                    }
+                    else obstacle.setShootable(false);
                 }
                 //TODO: implement pick up for player
                 // player.add(item);
@@ -197,7 +225,7 @@ public class Display extends JFrame implements Runnable{
      */
     public void renderWalls(Graphics2D g){
         // Get the array of calculated rays.
-        Ray[] rays = player.rays;
+        Ray[] rays = player.getRays();
 
         // Calculate the width for each ray on the image.
         int wallWidth = DIS_WIDTH / rays.length + 1;
@@ -205,7 +233,7 @@ public class Display extends JFrame implements Runnable{
         // Rendering for each ray.
         for (int i = 0; i < rays.length; i++) {
 
-            double angleDifference = Math.abs(rays[i].getAngle() - player.rotation);
+            double angleDifference = Math.abs(rays[i].getAngle() - player.getRotation());
             double correctedDistance = rays[i].getLength() * Math.cos(angleDifference);
 
             int column = (rays.length - 1) - i;
@@ -235,32 +263,34 @@ public class Display extends JFrame implements Runnable{
             double textureXVertical = rays[i].getY() % 1.0;
 
             // Map the normalized X-coordinate to the texture width
-            int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.size);
-            int texelXVertical = (int) (textureXVertical * textureAtlas.size);
+            int texelXHorizontal = (int) (textureXHorizontal * textureAtlas.getSize());
+            int texelXVertical = (int) (textureXVertical * textureAtlas.getSize());
 
             depth[i] = rays[i].getLength();
 
             for (int j = 0; j < wallHeight; j++) {
                 // Calculate the texel Y-coordinate based on the wall height
-                int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.size);
-                int texelYVertical = (int) ((j / wallHeight) * textureAtlas.size);
+                int texelYHorizontal = (int) ((j / wallHeight) * textureAtlas.getSize());
+                int texelYVertical = (int) ((j / wallHeight) * textureAtlas.getSize());
 
                 // Get the color of the texel from the texture
                 int texelColor;
                 int textureAtlasOffset = rays[i].getWallID() - 1;
                 Color color;
 
-                if(rays[i].getHorizontal()) {
+                if((textureAtlasOffset == -2)){
+                    color = Color.BLACK;
+                } else if(rays[i].getHorizontal()) {
                     // Get the RGB value of the texture at the texture atlas offset for horizontal walls.
                     //texelColor = textureAtlas.getRGB(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
                     //color = new Color(texelColor);
-                    color = textureAtlas.getColor(((textureAtlas.size - 1) - texelYHorizontal) + textureAtlas.size * textureAtlasOffset, texelXHorizontal);
+                    color = textureAtlas.getColor(((textureAtlas.getSize() - 1) - texelYHorizontal) + textureAtlas.getSize() * textureAtlasOffset, texelXHorizontal);
                 }
-                else{
+                else {
                     // Get the RGB value of the texture at the texture atlas offset for vertical walls.
                     //texelColor = textureAtlas.getRGB((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
                     //color = new Color(texelColor);//.darker().darker();
-                    color = textureAtlas.getColor((textureAtlas.size - 1 - texelYVertical) + textureAtlas.size * textureAtlasOffset, texelXVertical + textureAtlas.size);
+                    color = textureAtlas.getColor((textureAtlas.getSize() - 1 - texelYVertical) + textureAtlas.getSize() * textureAtlasOffset, texelXVertical + textureAtlas.getSize());
                 }
 
                 // Set the color of the wall segment
@@ -293,7 +323,9 @@ public class Display extends JFrame implements Runnable{
         // Get Graphics2D component for more functionality.
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
-
+        renderSprite.addAll(obstacles);
+        drones.forEach(drone -> renderSprite.add(drone.getRenderSprite()));
+        //renderSprite.add(obstacles.get(0));
         /*
         Sky color:
         Fill a rectangle from top to half of the window height with the color gray.
@@ -310,11 +342,32 @@ public class Display extends JFrame implements Runnable{
 
         Arrays.fill(zBuffer, Double.MAX_VALUE);
 
-        obstacles.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.position).length(), o1.getPosition().sub(player.position).length()));
+        renderSprite.sort((o1, o2) -> Double.compare(o2.getPosition().sub(player.getPosition()).length(), o1.getPosition().sub(player.getPosition()).length()));
 
         renderWalls(g);
-        for (Obstacle obstacle:obstacles) {
+        for (Obstacle obstacle:renderSprite) {
             renderSprites(obstacle, g);
+        }
+
+        renderSprite.clear();
+
+        // Render the crosshair
+        g.drawImage(crosshair.getImage(), DIS_WIDTH / 2 - crosshair.getImage().getWidth() / 2, DIS_HEIGHT / 2 - crosshair.getImage().getHeight() / 2, null);
+
+        // Render the UI bar
+        //g.drawImage(uiBar.getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+        // Render the UI
+        int health = player.getHealth();
+        int ammo = player.getAmmo();
+        int score = player.getScore();
+        int ammoPack = player.getAmmoPack();
+        boolean hasKey = player.getKey();
+
+        g.drawImage(ui.getCombinedImage(health, ammo, ammoPack, score, hasKey), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
+
+        if(!player.isAlive()){
+            g.drawImage(deathScreen.getImage(), 0,0, DIS_WIDTH, DIS_HEIGHT,null);
         }
 
         bs.show();
@@ -355,13 +408,19 @@ public class Display extends JFrame implements Runnable{
                 // Player gets updated.
                 this.render();
 
-                if(inputHandler.map) {
+                if(inputHandler.isMap()) {
                     add(new MapRender(map, player, drones));
                     System.out.println("map");
                 }
 
                 delta--;
 
+            }
+
+            if(System.currentTimeMillis() - timer > 1000){
+                timer += 1000;
+                setTitle("Tomb3D - FPS: " + frames);
+                frames = 0;
             }
         }
     }

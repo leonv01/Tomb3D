@@ -12,11 +12,13 @@ import java.awt.image.BufferedImage;
  * Represents the texture used for the wall in the game world.
  */
 public class Texture {
-    final String path;
-    int[] rgbArray;
-    Color[] colorArray;
-    int size;
+    private final String path;
+    private int[] rgbArray;
+    private Color[] colorArray;
+    private int size;
     private int textureCount;
+
+    private BufferedImage image;
     /**
      * Constructs a new texture.
      *
@@ -34,6 +36,20 @@ public class Texture {
         for (int i = 0; i < colorArray.length; i++) {
             colorArray[i] = new Color(rgbArray[i]);
         }
+    }
+
+    public Texture(String path){
+        this.path = path;
+        try {
+            image = ImageIO.read(new File(path));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BufferedImage getImage(){
+        return image;
     }
 
     /**
@@ -68,6 +84,15 @@ public class Texture {
     public Color getColor(int y, int x){
 
         y = Math.abs(y);
+        x = Math.abs(x);
         return colorArray[y * (size * 2) + x];
+    }
+
+    public String getPath(){
+        return path;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
