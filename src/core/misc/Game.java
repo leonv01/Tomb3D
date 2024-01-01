@@ -18,6 +18,7 @@ public class Game implements Runnable{
 
     // flag for thread.
     private boolean running;
+    private boolean gameEnd;
 
     // Thread for the game engine.
     private final Thread thread;
@@ -34,14 +35,15 @@ public class Game implements Runnable{
     // Map object.
     private final ArrayList<Map> maps;
     private int mapIndex;
-    private ArrayList<Drone> enemies;
-    private ArrayList<Obstacle> obstacles;
+    private final ArrayList<Drone> enemies;
+    private final ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
 
     /**
      * Constructor for the Game class. Initializes game components and starts the game loop.
      */
     public Game(){
+        gameEnd = false;
         thread = new Thread(this);
         display = new Display();
         inputHandler = new InputHandler();
@@ -50,10 +52,7 @@ public class Game implements Runnable{
 
         this.player = new Player();
 
-        maps = new ArrayList<>();
-        maps.add(FileInterpreter.importMap(new File("src/maps/level1.txt")));
-        maps.add(new Map());
-        maps.add(new Map());
+        maps = FileInterpreter.loadMapCollection();
 
 
         this.enemies = new ArrayList<>();
@@ -71,7 +70,8 @@ public class Game implements Runnable{
     }
 
     public void changeMap(){
-        Map map = this.maps.get(mapIndex++ % this.maps.size());
+        gameEnd = mapIndex == maps.size();
+        Map map = this.maps.get(mapIndex++);
         EntityAttributes playerAttributes = this.player.getAttributes();
         playerAttributes.setKey(false);
         this.player = map.getPlayer();
@@ -155,6 +155,11 @@ public class Game implements Runnable{
                 }
 
                 if(!player.isAlive()){
+                    while(true){
+
+                    }
+                }
+                if(gameEnd){
                     while(true){
 
                     }

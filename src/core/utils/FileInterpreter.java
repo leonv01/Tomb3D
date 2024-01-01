@@ -13,6 +13,22 @@ public class FileInterpreter {
 
     private final static int MAX_HIGHSCORE_ENTRIES = 10;
 
+    public static ArrayList<Map> loadMapCollection(){
+
+        String path = "src/maps/";
+
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+
+        assert files != null;
+        ArrayList<Map> maps = new ArrayList<>(files.length);
+
+        for(File file : files)
+            maps.add(importMap(file));
+
+        return maps;
+    }
+
     /**
      * Imports a map from a file.
      *
@@ -23,36 +39,44 @@ public class FileInterpreter {
         BufferedReader reader;
         int[][] mapArrangement = null;
         int lineIndex;
+
+        int healthFactor = 25;
+        int scoreFactor = 200;
+
         Map map = null;
 
         ArrayList<Obstacle> obstacles;
         ArrayList<Drone> enemies;
         Player player = null;
 
-        try{
+        try {
             obstacles = new ArrayList<>();
             enemies = new ArrayList<>();
             reader = new BufferedReader(new FileReader(file));
             String line;
             lineIndex = 0;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 line = line.toLowerCase().trim();
-                if(line.contains("dim")){
+                if (line.contains("dim")) {
                     int dimension = Integer.parseInt(line.trim().split(":")[1]);
                     mapArrangement = new int[dimension][dimension];
+                } else if (line.contains("health")) {
+                    healthFactor = Integer.parseInt(line.trim().split(":")[1]);
+                } else if (line.contains("score")) {
+                    scoreFactor = Integer.parseInt(line.trim().split(":")[1]);
                 }
-                else if(mapArrangement != null){
+                else if (mapArrangement != null) {
                     String[] lineContent = line.trim().split(",");
 
                     int columnIndex = 0;
-                    for (String character: lineContent) {
+                    for (String character : lineContent) {
                         String temp = character;
                         double objectPositionX = (double) columnIndex + 0.5;
                         double objectPositionY = (double) lineIndex + 0.5;
 
                         Vector2D position = new Vector2D(objectPositionX, objectPositionY);
 
-                        switch (temp){
+                        switch (temp) {
                             case " " -> temp = "0";
                             case "x" -> temp = "5";
                             case "k" -> {
@@ -101,7 +125,7 @@ public class FileInterpreter {
                                         "src/textures/collectibles/heal64.png",
                                         position,
                                         Obstacle.Type.HEAL_ITEM,
-                                        25
+                                        healthFactor
                                 ));
                                 temp = "0";
                             }
@@ -114,12 +138,12 @@ public class FileInterpreter {
                                 ));
                                 temp = "0";
                             }
-                            case "#" ->{
+                            case "#" -> {
                                 obstacles.add(new Obstacle(
                                         "src/textures/collectibles/score64.png",
                                         position,
-                                        Obstacle.Type.COLLECTIBLE ,
-                                        200
+                                        Obstacle.Type.COLLECTIBLE,
+                                        scoreFactor
                                 ));
                                 temp = "0";
                             }
@@ -146,7 +170,7 @@ public class FileInterpreter {
                     player
             );
 
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Map not found");
         }
         return map;
@@ -224,9 +248,6 @@ public class FileInterpreter {
     }
 
     public static void main(String[] args) {
-        Map map = importMap(new File("src/maps/level1.txt"));
-        map.getEnemies().forEach(drone -> System.out.println(drone.getPlayer()));
-        Obstacle obstacle = map.getObstacles().get(2);
-        System.out.println(obstacle.getPosition().x);
+        loadMapCollection();
     }
 }
