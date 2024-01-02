@@ -98,7 +98,10 @@ public class Map {
         enemies = new ArrayList<>();
         obstacles = new ArrayList<>();
 
-        // Maybe unused
+        setConfig();
+    }
+
+    public void setConfig(){
         Config.CELL_SIZE_X = Config.WIDTH / map[0].length;
         Config.CELL_SIZE_Y = Config.HEIGHT / map.length;
 

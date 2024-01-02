@@ -28,6 +28,7 @@ public class Drone {
     private Texture idleSprite, attackStart, attackEnd;
     private Obstacle renderSprite;
 
+    private boolean transactPoints;
 
     private EntityAttributes attributes;
 
@@ -74,7 +75,13 @@ public class Drone {
         Vector2D playerPosition = new Vector2D(player.getPosition());
 
         double distance = playerPosition.sub(position).length();
-        if(!attributes.isAlive()) state = State.DEAD;
+        if(!attributes.isAlive()){
+            if(transactPoints) {
+                player.addScore(attributes.getScore());
+                transactPoints = false;
+            }
+            state = State.DEAD;
+        }
         else if(distance < radius)
             state = State.CHASE;
 
@@ -257,6 +264,7 @@ public class Drone {
                 attackEndPath = texturePath.concat("medium/mediumAttack.png");
             }
         }
+        this.transactPoints = true;
         this.attributes = new EntityAttributes(health, speed, 0, 0, damage, health, 0,0,0,0,score);
         this.idleSprite = new Texture(idlePath);
         this.attackEnd = new Texture(attackEndPath);

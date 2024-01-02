@@ -198,7 +198,7 @@ public class Display extends JFrame implements Runnable{
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
-            if (distance < zBuffer[index]) {
+            if (distance - 0.1 <= zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
                     // Render the image from its center

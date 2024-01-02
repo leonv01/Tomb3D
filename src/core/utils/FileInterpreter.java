@@ -79,6 +79,7 @@ public class FileInterpreter {
                         switch (temp) {
                             case " " -> temp = "0";
                             case "x" -> temp = "5";
+                            case "d" -> temp = "3";
                             case "k" -> {
                                 obstacles.add(new Obstacle(
                                         "src/textures/collectibles/key_yellow64.png",

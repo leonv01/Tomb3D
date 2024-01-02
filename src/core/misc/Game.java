@@ -84,6 +84,8 @@ public class Game implements Runnable{
         this.obstacles.addAll(map.getObstacles());
         this.currentMap = map;
         this.display.addMap(map);
+
+        currentMap.setConfig();
     }
 
     /**
