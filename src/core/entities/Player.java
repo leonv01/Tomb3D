@@ -35,6 +35,9 @@ public class Player {
     private boolean isShooting;
     private final int shootDelay = 200;
 
+    private final double runSpeed = 0.1, playerSpeed = 0.05;
+
+
     public void setPosition(Player player) {
         this.position = player.position;
     }
@@ -47,7 +50,6 @@ public class Player {
         ALIVE, DEAD
     }
     private State state;
-
 
     public Player() {
         initPlayer(new Vector2D(1, 1));
@@ -84,7 +86,7 @@ public class Player {
 
 
         this.attributes = new EntityAttributes(
-                100, Config.MOVEMENT_SPEED, Config.RUN_SPEED, Config.ROTATION_SPEED,
+                100, playerSpeed, runSpeed, Config.ROTATION_SPEED,
                 15, 100, 30,
                 30, 0, 0, 0
         );
@@ -353,7 +355,6 @@ public class Player {
         double playerSpeed = attributes.getSpeed();
 
         if (state.equals(State.DEAD)) {
-            System.out.println("Dead");
         }
 
         if (inputHandler.isRun()) {
@@ -431,7 +432,9 @@ public class Player {
             int directionY = (int) (direction.y + position.y);
 
 
-            if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
+            if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR)){
+                map.setValue(directionX, directionY, Map.WALLS.EMPTY);
+            }else if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
                 activatedGoal = true;
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
             }

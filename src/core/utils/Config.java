@@ -5,13 +5,13 @@ import java.awt.Color;
 public class Config {
     public static String PLAYER_NAME = "Player";
 
-    public final static int WIDTH = 1200;
-    public final static int HEIGHT = 1200;
+    public static int WIDTH = 1200;
+    public static int HEIGHT = 1200;
     public final static int MAP_WIDTH = 1600;
     public final static int MAP_HEIGHT = 1600;
     public final static float MOVEMENT_SPEED = .05f;
     public final static float RUN_SPEED = .1f;
-    public final static float ROTATION_SPEED = .03f;
+    public static float ROTATION_SPEED = .03f;
     public final static Color colorSky = Color.GRAY;
     public final static Color colorGround = Color.lightGray;
     
@@ -46,8 +46,8 @@ public class Config {
     public final static double BOSS_ENEMY_SPEED = 0.005;
 
 
-    public final static int FOV = 40;
-    public final static int rayResolution = 3;
+    public static int FOV = 40;
+    public static int rayResolution = 3;
 
 
 }

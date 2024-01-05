@@ -31,7 +31,7 @@ public class Display extends JFrame implements Runnable{
     private final int DIS_WIDTH = Config.WIDTH;
     private Texture textureAtlas;
     private Texture crosshair;
-    private Texture deathScreen;
+    private Texture deathScreen, finishScreen;
     private UserInterface ui;
 
     private Texture uiBar;
@@ -45,6 +45,7 @@ public class Display extends JFrame implements Runnable{
 
     private final Thread thread;
     private boolean running;
+    private boolean gameEnd;
 
     private double[] zBuffer;
     private double[] depth;
@@ -53,6 +54,8 @@ public class Display extends JFrame implements Runnable{
      * Constructs a Display object and initializes the display window.
      */
     public Display(){
+
+        gameEnd = false;
 
         this.inputHandler = new InputHandler();
 
@@ -90,6 +93,7 @@ public class Display extends JFrame implements Runnable{
         textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 64, 5);
         crosshair = new Texture("src/textures/ui/crosshair.png");
         deathScreen = new Texture("src/textures/ui/deathScreen.png");
+        finishScreen = new Texture("src/textures/ui/finishScreen.png");
 
         //thirdDigit = new Texture("src/textures/ui/thirddigit9.png");
         //secondDigit = new Texture("src/textures/ui/seconddigit0.png");
@@ -119,6 +123,10 @@ public class Display extends JFrame implements Runnable{
         } catch (InterruptedException e){
             System.out.println("Thread couldn't sleep");
         }
+    }
+
+    public void setGameEnd(boolean value){
+        this.gameEnd = value;
     }
 
     /**
@@ -198,7 +206,7 @@ public class Display extends JFrame implements Runnable{
 
         int index = (int) ((double) (centerX)  / Config.WIDTH * zBuffer.length);
         if (index >= 0 && index < zBuffer.length) {
-            if (distance < zBuffer[index]) {
+            if (distance - 0.1 <= zBuffer[index]) {
                 obstacle.setActive(true);
                 if (obstacle.isVisible()) {
                     // Render the image from its center
@@ -209,8 +217,6 @@ public class Display extends JFrame implements Runnable{
                     }
                     else obstacle.setShootable(false);
                 }
-                //TODO: implement pick up for player
-                // player.add(item);
             }
             else {
                 obstacle.setActive(false);
@@ -366,7 +372,9 @@ public class Display extends JFrame implements Runnable{
 
         g.drawImage(ui.getCombinedImage(health, ammo, ammoPack, score, hasKey), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
 
-        if(!player.isAlive()){
+        if(gameEnd){
+            g.drawImage(finishScreen.getImage(), 0,0, DIS_WIDTH, DIS_HEIGHT,null);
+        }else if(!player.isAlive()){
             g.drawImage(deathScreen.getImage(), 0,0, DIS_WIDTH, DIS_HEIGHT,null);
         }
 

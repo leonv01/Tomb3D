@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Objects;
-import javax.swing.DefaultListModel;
+import javax.swing.*;
 
 /**
  *
@@ -43,16 +43,16 @@ public class MapEditor extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        addDataToMapButton = new javax.swing.JButton();
+        writeToFileButton = new javax.swing.JButton();
+        removeDataFromMapButton = new javax.swing.JButton();
+        readDataFromFileButton = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(153, 0, 0));
         jPanel1.setForeground(new java.awt.Color(153, 0, 0));
@@ -89,45 +89,45 @@ public class MapEditor extends javax.swing.JFrame {
         jPanel4.setMinimumSize(new java.awt.Dimension(600, 400));
         jPanel4.setPreferredSize(new java.awt.Dimension(400, 600));
 
-        jButton1.setBackground(new java.awt.Color(102, 0, 0));
-        jButton1.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/addDataToMap.png"))))); // NOI18N
-        jButton1.setBorder(null);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addDataToMapButton.setBackground(new java.awt.Color(102, 0, 0));
+        addDataToMapButton.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/addDataToMap.png"))))); // NOI18N
+        addDataToMapButton.setBorder(null);
+        addDataToMapButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        addDataToMapButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        addDataToMapButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton2.setBackground(new java.awt.Color(102, 0, 0));
-        jButton2.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/writeToFile.png"))))); // NOI18N
-        jButton2.setBorder(null);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        writeToFileButton.setBackground(new java.awt.Color(102, 0, 0));
+        writeToFileButton.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/writeToFile.png"))))); // NOI18N
+        writeToFileButton.setBorder(null);
+        writeToFileButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        writeToFileButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        writeToFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jButton3.setBackground(new java.awt.Color(102, 0, 0));
-        jButton3.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/removeDataFromMap.png"))))); // NOI18N
-        jButton3.setBorder(null);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        removeDataFromMapButton.setBackground(new java.awt.Color(102, 0, 0));
+        removeDataFromMapButton.setIcon(new javax.swing.ImageIcon((Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/removeDataFromMap.png"))))); // NOI18N
+        removeDataFromMapButton.setBorder(null);
+        removeDataFromMapButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        removeDataFromMapButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        removeDataFromMapButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
 
-        jButton4.setBackground(new java.awt.Color(102, 0, 0));
-        jButton4.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/readDataFromFile.png")))); // NOI18N
-        jButton4.setBorder(null);
-        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        readDataFromFileButton.setBackground(new java.awt.Color(102, 0, 0));
+        readDataFromFileButton.setIcon(new javax.swing.ImageIcon(Objects.requireNonNull(getClass().getResource("../../textures/mapEditor/readDataFromFile.png")))); // NOI18N
+        readDataFromFileButton.setBorder(null);
+        readDataFromFileButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        readDataFromFileButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        readDataFromFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
             }
@@ -142,10 +142,10 @@ public class MapEditor extends javax.swing.JFrame {
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGap(33, 33, 33)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(addDataToMapButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(writeToFileButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(removeDataFromMapButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(readDataFromFileButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(233, 233, 233))
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGap(20, 20, 20)
@@ -158,13 +158,13 @@ public class MapEditor extends javax.swing.JFrame {
                                 .addGap(67, 67, 67)
                                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(52, 52, 52)
-                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+                                .addComponent(addDataToMapButton, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                                .addComponent(writeToFileButton, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)
+                                .addComponent(removeDataFromMapButton)
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE)
+                                .addComponent(readDataFromFileButton, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE)
                                 .addGap(123, 123, 123))
         );
 
@@ -317,10 +317,10 @@ public class MapEditor extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton addDataToMapButton;
+    private javax.swing.JButton writeToFileButton;
+    private javax.swing.JButton removeDataFromMapButton;
+    private javax.swing.JButton readDataFromFileButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;

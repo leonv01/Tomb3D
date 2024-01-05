@@ -2,6 +2,7 @@ package core.utils;
 
 import core.entities.Drone;
 import core.entities.Obstacle;
+import core.entities.Player;
 import core.misc.HighscoreEntry;
 import core.misc.Map;
 
@@ -12,6 +13,22 @@ public class FileInterpreter {
 
     private final static int MAX_HIGHSCORE_ENTRIES = 10;
 
+    public static ArrayList<Map> loadMapCollection(){
+
+        String path = "src/maps/";
+
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+
+        assert files != null;
+        ArrayList<Map> maps = new ArrayList<>(files.length);
+
+        for(File file : files)
+            maps.add(importMap(file));
+
+        return maps;
+    }
+
     /**
      * Imports a map from a file.
      *
@@ -19,100 +36,145 @@ public class FileInterpreter {
      * @return The imported map.
      */
     public static Map importMap(File file) {
-        int[][] data = new int[0][0];
-        int[] tempData = new int[0];
-
-        ArrayList<Obstacle> obstacles = new ArrayList<>();
-        ArrayList<Drone> enemies = new ArrayList<>();
-
         BufferedReader reader;
-        int lineIdx = 0;
+        int[][] mapArrangement = null;
+        int lineIndex;
+
+        int healthFactor = 25;
+        int scoreFactor = 200;
+
+        Map map = null;
+
+        ArrayList<Obstacle> obstacles;
+        ArrayList<Drone> enemies;
+        Player player = null;
+
         try {
+            obstacles = new ArrayList<>();
+            enemies = new ArrayList<>();
             reader = new BufferedReader(new FileReader(file));
             String line;
+            lineIndex = 0;
             while ((line = reader.readLine()) != null) {
-                if (line.contains("dimension:")) {
-                    String token = line.split(":")[1].trim();
-                    int value = Integer.parseInt(token);
-                    data = new int[value][value];
-                    tempData = new int[value];
-                } else {
-                    String[] tokens = line.split(",");
-                    int idx = 0;
-                    Drone enemy = null;
-                    Obstacle obstacle = null;
+                line = line.toLowerCase().trim();
+                if (line.contains("dim")) {
+                    int dimension = Integer.parseInt(line.trim().split(":")[1]);
+                    mapArrangement = new int[dimension][dimension];
+                } else if (line.contains("health")) {
+                    healthFactor = Integer.parseInt(line.trim().split(":")[1]);
+                } else if (line.contains("score")) {
+                    scoreFactor = Integer.parseInt(line.trim().split(":")[1]);
+                }
+                else if (mapArrangement != null) {
+                    String[] lineContent = line.trim().split(",");
 
-                    double posX, posY;
-                    for (String token : tokens) {
-                        String tempToken = token.toLowerCase().trim();
+                    int columnIndex = 0;
+                    for (String character : lineContent) {
+                        String temp = character;
+                        double objectPositionX = (double) columnIndex + 0.5;
+                        double objectPositionY = (double) lineIndex + 0.5;
 
-                        posX = idx - 0.5;
-                        posY = lineIdx - 0.5;
-                        switch (tempToken) {
-                            case "el" -> {
-                                System.out.println("Light Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.LIGHT, null);
+                        Vector2D position = new Vector2D(objectPositionX, objectPositionY);
+
+                        switch (temp) {
+                            case " " -> temp = "0";
+                            case "x" -> temp = "5";
+                            case "d" -> temp = "3";
+                            case "k" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/key_yellow64.png",
+                                        position,
+                                        Obstacle.Type.KEY,
+                                        1
+                                ));
+                                temp = "0";
                             }
-                            case "em" -> {
-                                System.out.println("Medium Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.MEDIUM, null);
+                            case "l" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.LIGHT
+                                ));
+                                temp = "0";
                             }
-                            case "eh" -> {
-                                System.out.println("Heavy Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.HEAVY, null);
+                            case "m" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.MEDIUM
+                                ));
+                                temp = "0";
                             }
-                            case "eb" -> {
-                                System.out.println("Boss Enemy");
-                                enemy = new Drone(new Vector2D(lineIdx, idx), null, Drone.Type.BOSS, null);
+                            case "h" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.HEAVY
+                                ));
+                                temp = "0";
                             }
-                            case "ok" -> {
-                                System.out.println("Key");
-                                obstacle = new Obstacle("src/textures/collectibles/key_yellow64.png", new Vector2D(posX, posY), Obstacle.Type.KEY, 0);
+                            case "b" -> {
+                                enemies.add(new Drone(
+                                        position,
+                                        Drone.Type.BOSS
+                                ));
+                                temp = "0";
                             }
-                            case "mp" -> {
-                                System.out.println("Medipack");
-                                obstacle = new Obstacle("src/textures/collectibles/heal64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 25);
+                            case "p" -> {
+                                player = new Player(position);
+                                temp = "0";
                             }
-                            case "ap" -> {
-                                System.out.println("Ammopack");
-                                obstacle = new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 30);
+                            case "+" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/heal64.png",
+                                        position,
+                                        Obstacle.Type.HEAL_ITEM,
+                                        healthFactor
+                                ));
+                                temp = "0";
                             }
-                            case "sp" -> {
-                                System.out.println("Score");
-                                obstacle = new Obstacle("src/textures/collectibles/score64.png", new Vector2D(posX, posY), Obstacle.Type.HEAL_ITEM, 200);
+                            case "*" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/ammo64.png",
+                                        position,
+                                        Obstacle.Type.AMMO_PACK,
+                                        30
+                                ));
+                                temp = "0";
                             }
-                            default -> {
-                                if (tempToken.length() > 1 && tempToken.contains("o")) {
-                                    System.out.println("Various Obstacles");
-                                    obstacle = new Obstacle("src/textures/collectibles/ammo64.png", new Vector2D(posX, posY), Obstacle.Type.OBSTACLE, 0);
-                                }
+                            case "#" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/collectibles/score64.png",
+                                        position,
+                                        Obstacle.Type.COLLECTIBLE,
+                                        scoreFactor
+                                ));
+                                temp = "0";
+                            }
+                            case "o" -> {
+                                obstacles.add(new Obstacle(
+                                        "src/textures/obstacles/ceilingLamp.png",
+                                        position,
+                                        Obstacle.Type.OBSTACLE,
+                                        0
+                                ));
+                                temp = "0";
                             }
                         }
-                        if (enemy != null) {
-                            enemies.add(enemy);
-                            tempData[idx] = 0;
-                            enemy = null;
-                            continue;
-                        }
-                        if (obstacle != null) {
-                            obstacles.add(obstacle);
-                            tempData[idx] = obstacle.getType() == Obstacle.Type.OBSTACLE ? -1 : 0;
-                            obstacle = null;
-                            continue;
-                        }
-                        int value = Integer.parseInt(token.trim());
-                        tempData[idx] = value;
+                        mapArrangement[lineIndex][columnIndex] = Integer.parseInt(temp);
+                        columnIndex++;
                     }
-                    data[lineIdx++] = tempData;
-                    System.out.println(line);
+                    lineIndex++;
                 }
             }
-            reader.close();
-        } catch (NumberFormatException | IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+            map = new Map(
+                    mapArrangement,
+                    obstacles,
+                    enemies,
+                    player
+            );
 
-        return new Map(data);
+        } catch (IOException e) {
+            System.out.println("Map not found");
+        }
+        return map;
     }
 
     /**
@@ -137,10 +199,12 @@ public class FileInterpreter {
     }
 
     public static void exportHighscore(File file, HighscoreEntry entry) {
+        System.out.println("Exporting highscore");
         BufferedReader reader;
         BufferedWriter writer;
 
         ArrayList<HighscoreEntry> highscoreEntries = new ArrayList<>(MAX_HIGHSCORE_ENTRIES);
+        highscoreEntries.add(entry);
 
         int i = 0;
         try {
@@ -148,45 +212,70 @@ public class FileInterpreter {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                String splitEntry;
-                if ((splitEntry = line.split("Entry")[1]) != null && i++ < MAX_HIGHSCORE_ENTRIES) {
-                    String[] tempEntry = splitEntry.split("\0");
-                    int scoreEntry;
-                    try {
-                        scoreEntry = Integer.parseInt(tempEntry[1]);
-                    } catch (NumberFormatException e) {
-                        scoreEntry = 0;
-                    }
-                    highscoreEntries.add(new HighscoreEntry(tempEntry[0], scoreEntry));
+                if(line.contains("Name:") && line.contains("Score:")){
+                    String[] nameString = line.split("Name:");
+                    String name = nameString[1].trim();
+
+                    String[] scoreString = line.split("Score:");
+                    int score = Integer.parseInt(scoreString[1].trim());
+
+                    highscoreEntries.add(new HighscoreEntry(name, score));
                 }
             }
             reader.close();
-
-            int idx = 0;
-            for (HighscoreEntry e : highscoreEntries) {
-                if (e.getScore() < entry.getScore()) {
-                    highscoreEntries.add(idx, entry);
-                }
-                idx++;
-            }
-
-            writer = new BufferedWriter(new FileWriter(file));
-            writer.write("---\tHighscore\t---");
-            writer.write("Name\tScore");
-
-            idx = 0;
-            for (HighscoreEntry e : highscoreEntries) {
-                if (idx++ >= MAX_HIGHSCORE_ENTRIES) break;
-                writer.write(e.toString());
-            }
-
-            writer.close();
-
         } catch (IOException ignored) {
+        }
+        finally {
+            try{
+                writer = new BufferedWriter(new FileWriter(file));
+                writer.write("-------Highscore-------\n");
+                highscoreEntries.sort((o1, o2) -> o2.getScore() - o1.getScore());
+                highscoreEntries.forEach(highscoreEntry -> {
+                    try {
+                        writer.write("----------------------------------------------------------------------\n");
+                        writer.write(String.format("Name: %s\t|\tScore: %d\n", highscoreEntry.getName(), highscoreEntry.getScore()));
+                        writer.write("----------------------------------------------------------------------\n");
+                    } catch (IOException ignored) {
+                    }
+                });
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
     }
 
-    public static void main(String[] args) {
-        importMap(new File("src/maps/map1.txt"));
+    public static String loadHighscore(File file) {
+        StringBuilder highscore = new StringBuilder();
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                highscore.append(line).append("\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return highscore.toString();
     }
+
+    public static void clearHighscore(File file) {
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(file));
+            writer.write("-------Highscore-------\n");
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+    }
+
+    public static void main(String[] args) {
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), new HighscoreEntry("Test", 100));
+    }
+
+
 }

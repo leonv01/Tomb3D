@@ -10,6 +10,7 @@ import javax.swing.*;
 public class Drone {
 
 
+
     public enum State{
         IDLE, CHASE, DEAD
     }
@@ -27,6 +28,7 @@ public class Drone {
     private Texture idleSprite, attackStart, attackEnd;
     private Obstacle renderSprite;
 
+    private boolean transactPoints;
 
     private EntityAttributes attributes;
 
@@ -40,6 +42,10 @@ public class Drone {
      */
     public Drone(Vector2D position, Map map, Type type, Player player) {
         initDrone(position, map, type, player);
+    }
+
+    public Drone(Vector2D position, Type type){
+        initDrone(position, null, type, null);
     }
 
     public Drone(Drone drone){
@@ -56,6 +62,11 @@ public class Drone {
         System.out.println(attributes.getHealth());
     }
 
+
+    public Player getPlayer() {
+        return player;
+    }
+
     /**
      * Updates the drone.
      */
@@ -64,7 +75,13 @@ public class Drone {
         Vector2D playerPosition = new Vector2D(player.getPosition());
 
         double distance = playerPosition.sub(position).length();
-        if(!attributes.isAlive()) state = State.DEAD;
+        if(!attributes.isAlive()){
+            if(transactPoints) {
+                player.addScore(attributes.getScore());
+                transactPoints = false;
+            }
+            state = State.DEAD;
+        }
         else if(distance < radius)
             state = State.CHASE;
 
@@ -247,6 +264,7 @@ public class Drone {
                 attackEndPath = texturePath.concat("medium/mediumAttack.png");
             }
         }
+        this.transactPoints = true;
         this.attributes = new EntityAttributes(health, speed, 0, 0, damage, health, 0,0,0,0,score);
         this.idleSprite = new Texture(idlePath);
         this.attackEnd = new Texture(attackEndPath);
@@ -294,6 +312,8 @@ public class Drone {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public void setMap(Map map) { this.map = map; }
 
 
     /**

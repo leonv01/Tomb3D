@@ -4,9 +4,11 @@ import core.entities.EntityAttributes;
 import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
+import core.utils.FileInterpreter;
 import core.utils.Vector2D;
 import core.entities.Drone;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -16,6 +18,8 @@ public class Game implements Runnable{
 
     // flag for thread.
     private boolean running;
+    private boolean paused;
+    private boolean gameEnd;
 
     // Thread for the game engine.
     private final Thread thread;
@@ -32,14 +36,22 @@ public class Game implements Runnable{
     // Map object.
     private final ArrayList<Map> maps;
     private int mapIndex;
-    private ArrayList<Drone> enemies;
-    private ArrayList<Obstacle> obstacles;
+    private final ArrayList<Drone> enemies;
+    private final ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
 
+    private MainMenu mainMenu;
     /**
      * Constructor for the Game class. Initializes game components and starts the game loop.
      */
     public Game(){
+
+        paused = false;
+
+        mainMenu = MainMenu.getInstance();
+        mainMenu.setVisibility(false);
+
+        gameEnd = false;
         thread = new Thread(this);
         display = new Display();
         inputHandler = new InputHandler();
@@ -48,10 +60,8 @@ public class Game implements Runnable{
 
         this.player = new Player();
 
-        maps = new ArrayList<>();
-        maps.add(new Map());
-        maps.add(new Map());
-        maps.add(new Map());
+        maps = FileInterpreter.loadMapCollection();
+
 
         this.enemies = new ArrayList<>();
         this.obstacles = new ArrayList<>();
@@ -68,7 +78,13 @@ public class Game implements Runnable{
     }
 
     public void changeMap(){
-        Map map = this.maps.get(mapIndex++ % this.maps.size());
+        gameEnd = mapIndex == maps.size();
+        if(gameEnd) {
+            saveHighsore();
+            display.setGameEnd(true);
+            return;
+        }
+        Map map = this.maps.get(mapIndex++);
         EntityAttributes playerAttributes = this.player.getAttributes();
         playerAttributes.setKey(false);
         this.player = map.getPlayer();
@@ -81,6 +97,12 @@ public class Game implements Runnable{
         this.obstacles.addAll(map.getObstacles());
         this.currentMap = map;
         this.display.addMap(map);
+
+        currentMap.setConfig();
+    }
+
+    private void saveHighsore() {
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), player.getHighscore());
     }
 
     /**
@@ -106,6 +128,7 @@ public class Game implements Runnable{
         running = false;
         try{
             thread.join();
+            System.out.println("Joined");
         }catch (InterruptedException e){
             System.out.println("threads couldn't join");
         }
@@ -113,6 +136,8 @@ public class Game implements Runnable{
 
     @Override
     public void run() {
+        boolean endGame = false;
+
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
         final double ns = 1000000000.0 / 60.0;//60 times per second
@@ -151,11 +176,7 @@ public class Game implements Runnable{
                     changeMap();
                 }
 
-                if(!player.isAlive()){
-                    while(true){
-
-                    }
-                }
+                endGame = !player.isAlive() || gameEnd;
 
                 //mapRender.render(player, enemy);
 
@@ -170,6 +191,29 @@ public class Game implements Runnable{
                // mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
                 frames = 0;
             }
+
+
+
+            if(endGame)
+                break;
         }
+        System.out.println("END");
+        try {
+            Thread.sleep(gameEnd ? 5000 : 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        mainMenu.setVisibility(true);
+        display.setVisible(false);
+    }
+
+    public void setPaused(boolean b) {
+        paused = b;
+    }
+
+    public boolean getPaused() {
+        return paused;
     }
 }
