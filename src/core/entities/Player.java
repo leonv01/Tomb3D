@@ -355,7 +355,6 @@ public class Player {
         double playerSpeed = attributes.getSpeed();
 
         if (state.equals(State.DEAD)) {
-            System.out.println("Dead");
         }
 
         if (inputHandler.isRun()) {

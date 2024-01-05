@@ -18,6 +18,7 @@ public class Game implements Runnable{
 
     // flag for thread.
     private boolean running;
+    private boolean paused;
     private boolean gameEnd;
 
     // Thread for the game engine.
@@ -39,10 +40,17 @@ public class Game implements Runnable{
     private final ArrayList<Obstacle> obstacles;
     private final InputHandler inputHandler;
 
+    private MainMenu mainMenu;
     /**
      * Constructor for the Game class. Initializes game components and starts the game loop.
      */
     public Game(){
+
+        paused = false;
+
+        mainMenu = MainMenu.getInstance();
+        mainMenu.setVisibility(false);
+
         gameEnd = false;
         thread = new Thread(this);
         display = new Display();
@@ -71,6 +79,10 @@ public class Game implements Runnable{
 
     public void changeMap(){
         gameEnd = mapIndex == maps.size();
+        if(gameEnd) {
+            display.setGameEnd(true);
+            return;
+        }
         Map map = this.maps.get(mapIndex++);
         EntityAttributes playerAttributes = this.player.getAttributes();
         playerAttributes.setKey(false);
@@ -111,6 +123,7 @@ public class Game implements Runnable{
         running = false;
         try{
             thread.join();
+            System.out.println("Joined");
         }catch (InterruptedException e){
             System.out.println("threads couldn't join");
         }
@@ -118,6 +131,8 @@ public class Game implements Runnable{
 
     @Override
     public void run() {
+        boolean endGame = false;
+
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
         final double ns = 1000000000.0 / 60.0;//60 times per second
@@ -156,16 +171,7 @@ public class Game implements Runnable{
                     changeMap();
                 }
 
-                if(!player.isAlive()){
-                    while(true){
-
-                    }
-                }
-                if(gameEnd){
-                    while(true){
-
-                    }
-                }
+                endGame = !player.isAlive() || gameEnd;
 
                 //mapRender.render(player, enemy);
 
@@ -180,6 +186,29 @@ public class Game implements Runnable{
                // mapRender.setTitle(String.format("%s | %d fps", "MapRender", frames));
                 frames = 0;
             }
+
+
+
+            if(endGame)
+                break;
         }
+        System.out.println("END");
+        try {
+            Thread.sleep(gameEnd ? 5000 : 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        mainMenu.setVisibility(true);
+        display.setVisible(false);
+    }
+
+    public void setPaused(boolean b) {
+        paused = b;
+    }
+
+    public boolean getPaused() {
+        return paused;
     }
 }

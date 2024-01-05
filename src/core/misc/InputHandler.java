@@ -18,6 +18,7 @@ public class InputHandler implements KeyListener {
     private boolean map;
     private boolean run;
     private boolean use;
+    private boolean pause = false;
 
     public boolean isForward() {
         return forward;
@@ -49,6 +50,9 @@ public class InputHandler implements KeyListener {
 
     public boolean isUse() {
         return use;
+    }
+    public boolean isPause(){
+        return pause;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class InputHandler implements KeyListener {
         }
         // Keyboard Input for escaping the game
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
-            System.exit(69);
+            pause = !pause;
         // Keyboard Input for using item/door
         if(e.getKeyCode() == KeyEvent.VK_E)
             use = true;
