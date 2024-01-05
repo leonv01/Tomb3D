@@ -1,11 +1,15 @@
 package core.misc;
 
 import core.utils.Config;
+import core.utils.FileInterpreter;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class MainMenu extends JFrame {
 
@@ -45,11 +49,11 @@ public class MainMenu extends JFrame {
         panel.setLayout(layout);
 
         panel.add(startButton);
-        panel.add(exitButton);
         panel.add(settingsButton);
         panel.add(creditsButton);
         panel.add(highscoreButton);
         panel.add(mapEditorButton);
+        panel.add(exitButton);
 
         this.add(panel);
         this.setSize(500, 500);
@@ -63,9 +67,57 @@ public class MainMenu extends JFrame {
     }
 
     private void openHighscore() {
+        JFrame highscoreFrame = new JFrame();
+        JPanel highscorePanel = new JPanel();
+        JButton backButton = new JButton("Back");
+        JButton resetButton = new JButton("Reset");
+        JTextArea highscoreArea = new JTextArea();
+
+        Box hBox = Box.createHorizontalBox();
+        hBox.add(resetButton);
+        hBox.add(backButton);
+
+        highscoreArea.setEditable(false);
+        highscoreArea.setText(FileInterpreter.loadHighscore(new File("src/highscore/highscore.txt")));
+
+        highscorePanel.setLayout(new BorderLayout());
+        highscorePanel.add(highscoreArea, BorderLayout.CENTER);
+        highscorePanel.add(hBox, BorderLayout.SOUTH);
+
+        highscoreFrame.add(highscorePanel);
+        highscoreFrame.setSize(500, 500);
+        highscoreFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        highscoreFrame.setVisible(true);
+
+        backButton.addActionListener(e -> highscoreFrame.setVisible(false));
+        resetButton.addActionListener(e -> FileInterpreter.clearHighscore(new File("src/highscore/highscore.txt")));
     }
 
     private void openCredits() {
+
+        JFrame creditsFrame = new JFrame();
+        JPanel creditsPanel = new JPanel();
+        JButton backButton = new JButton("Back");
+        JTextArea creditsArea = new JTextArea();
+
+        creditsArea.setEditable(false);
+        creditsArea.setText("Credits:\n\n");
+
+
+
+        creditsArea.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        creditsPanel.setLayout(new BorderLayout());
+        creditsPanel.setBorder(new EmptyBorder(40,40,40,40));
+        creditsPanel.add(creditsArea, BorderLayout.CENTER);
+        creditsPanel.add(backButton, BorderLayout.SOUTH);
+
+        creditsFrame.add(creditsPanel);
+        creditsFrame.setSize(500, 500);
+        creditsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        creditsFrame.setVisible(true);
+
+        backButton.addActionListener(e -> creditsFrame.setVisible(false));
     }
 
     private void openSettings() {
@@ -185,20 +237,6 @@ public class MainMenu extends JFrame {
         if(mainMenu == null)
             mainMenu = new MainMenu();
         return mainMenu;
-    }
-
-    private void applySettings(String name, String fov, String resolution) {
-        try{
-            //Config.FOV = Integer.parseInt(fov);
-            Config.PLAYER_NAME = name;
-            //Config.RESOLUTION = Integer.parseInt(resolution);
-        }catch (NumberFormatException e){
-            System.out.println("Invalid input");
-        }finally {
-            System.out.println("Settings applied");
-            System.out.println("Name: " + Config.PLAYER_NAME);
-            System.out.println("FOV: " + Config.FOV);
-        }
     }
 
     private void exitGame() {

@@ -80,6 +80,7 @@ public class Game implements Runnable{
     public void changeMap(){
         gameEnd = mapIndex == maps.size();
         if(gameEnd) {
+            saveHighsore();
             display.setGameEnd(true);
             return;
         }
@@ -98,6 +99,10 @@ public class Game implements Runnable{
         this.display.addMap(map);
 
         currentMap.setConfig();
+    }
+
+    private void saveHighsore() {
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), player.getHighscore());
     }
 
     /**

@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Objects;
-import javax.swing.DefaultListModel;
+import javax.swing.*;
 
 /**
  *
@@ -52,7 +52,7 @@ public class MapEditor extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(153, 0, 0));
         jPanel1.setForeground(new java.awt.Color(153, 0, 0));

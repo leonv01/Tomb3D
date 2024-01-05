@@ -199,10 +199,12 @@ public class FileInterpreter {
     }
 
     public static void exportHighscore(File file, HighscoreEntry entry) {
+        System.out.println("Exporting highscore");
         BufferedReader reader;
         BufferedWriter writer;
 
         ArrayList<HighscoreEntry> highscoreEntries = new ArrayList<>(MAX_HIGHSCORE_ENTRIES);
+        highscoreEntries.add(entry);
 
         int i = 0;
         try {
@@ -210,45 +212,70 @@ public class FileInterpreter {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                String splitEntry;
-                if ((splitEntry = line.split("Entry")[1]) != null && i++ < MAX_HIGHSCORE_ENTRIES) {
-                    String[] tempEntry = splitEntry.split("\0");
-                    int scoreEntry;
-                    try {
-                        scoreEntry = Integer.parseInt(tempEntry[1]);
-                    } catch (NumberFormatException e) {
-                        scoreEntry = 0;
-                    }
-                    highscoreEntries.add(new HighscoreEntry(tempEntry[0], scoreEntry));
+                if(line.contains("Name:") && line.contains("Score:")){
+                    String[] nameString = line.split("Name:");
+                    String name = nameString[1].trim();
+
+                    String[] scoreString = line.split("Score:");
+                    int score = Integer.parseInt(scoreString[1].trim());
+
+                    highscoreEntries.add(new HighscoreEntry(name, score));
                 }
             }
             reader.close();
-
-            int idx = 0;
-            for (HighscoreEntry e : highscoreEntries) {
-                if (e.getScore() < entry.getScore()) {
-                    highscoreEntries.add(idx, entry);
-                }
-                idx++;
-            }
-
-            writer = new BufferedWriter(new FileWriter(file));
-            writer.write("---\tHighscore\t---");
-            writer.write("Name\tScore");
-
-            idx = 0;
-            for (HighscoreEntry e : highscoreEntries) {
-                if (idx++ >= MAX_HIGHSCORE_ENTRIES) break;
-                writer.write(e.toString());
-            }
-
-            writer.close();
-
         } catch (IOException ignored) {
+        }
+        finally {
+            try{
+                writer = new BufferedWriter(new FileWriter(file));
+                writer.write("-------Highscore-------\n");
+                highscoreEntries.sort((o1, o2) -> o2.getScore() - o1.getScore());
+                highscoreEntries.forEach(highscoreEntry -> {
+                    try {
+                        writer.write("----------------------------------------------------------------------\n");
+                        writer.write(String.format("Name: %s\t|\tScore: %d\n", highscoreEntry.getName(), highscoreEntry.getScore()));
+                        writer.write("----------------------------------------------------------------------\n");
+                    } catch (IOException ignored) {
+                    }
+                });
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
     }
 
-    public static void main(String[] args) {
-        loadMapCollection();
+    public static String loadHighscore(File file) {
+        StringBuilder highscore = new StringBuilder();
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                highscore.append(line).append("\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return highscore.toString();
     }
+
+    public static void clearHighscore(File file) {
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(file));
+            writer.write("-------Highscore-------\n");
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+    }
+
+    public static void main(String[] args) {
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), new HighscoreEntry("Test", 100));
+    }
+
+
 }
