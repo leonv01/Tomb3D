@@ -5,9 +5,11 @@ import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
 import core.utils.FileInterpreter;
+import core.utils.TimeCounter;
 import core.utils.Vector2D;
 import core.entities.Drone;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -41,12 +43,17 @@ public class Game implements Runnable{
     private final InputHandler inputHandler;
 
     private MainMenu mainMenu;
+    private Timer gameTimer;
+    private TimeCounter timeCounter;
     /**
      * Constructor for the Game class. Initializes game components and starts the game loop.
      */
     public Game(){
 
         paused = false;
+
+        timeCounter = new TimeCounter();
+        gameTimer = new Timer(1000, e -> timeCounter.update());
 
         mainMenu = MainMenu.getInstance();
         mainMenu.setVisibility(false);
@@ -78,6 +85,7 @@ public class Game implements Runnable{
     }
 
     public void changeMap(){
+        enemies.forEach(Drone::stopTimer);
         gameEnd = mapIndex == maps.size();
         if(gameEnd) {
             saveHighsore();
@@ -102,7 +110,8 @@ public class Game implements Runnable{
     }
 
     private void saveHighsore() {
-        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), player.getHighscore());
+        gameTimer.stop();
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), player.getHighscore(), timeCounter.getTime());
     }
 
     /**
@@ -143,6 +152,8 @@ public class Game implements Runnable{
         final double ns = 1000000000.0 / 60.0;//60 times per second
         double delta = 0;
         int frames = 0;
+
+        gameTimer.start();
 
         // Game loop.
         while(running) {

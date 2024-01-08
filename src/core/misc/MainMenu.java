@@ -101,7 +101,12 @@ public class MainMenu extends JFrame {
         JTextArea creditsArea = new JTextArea();
 
         creditsArea.setEditable(false);
-        creditsArea.setText("Credits:\n\n");
+        creditsArea.setText("Credits:\n\n" +
+                        "Leon Vogt\n" +
+                        "Nikolai\n" +
+                        "Silas Winter\n" +
+                        "Max \n"+
+                        "Beyza \n");
 
 
 

@@ -73,9 +73,7 @@ public class EntityAttributes {
      * Adds ammo to the entity.
      */
     public void addAmmo(){
-        if(currentAmmo > maxAmmoPack){
-            ammoPack++;
-        }
+        ammoPack++;
     }
 
     /**

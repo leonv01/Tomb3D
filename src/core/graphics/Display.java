@@ -90,7 +90,7 @@ public class Display extends JFrame implements Runnable{
      //   ui.start();
 
         // Load debug texture.
-        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3.png", 64, 5);
+        textureAtlas = new Texture("src/textures/texture_atlas_shadow_3_copy_copy.png", 64, 5);
         crosshair = new Texture("src/textures/ui/crosshair.png");
         deathScreen = new Texture("src/textures/ui/deathScreen.png");
         finishScreen = new Texture("src/textures/ui/finishScreen.png");
