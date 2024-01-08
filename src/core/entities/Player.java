@@ -1,10 +1,12 @@
 package core.entities;
 
+import core.graphics.Texture;
 import core.misc.HighscoreEntry;
 import core.misc.InputHandler;
 import core.misc.Map;
 import core.utils.Config;
 import core.utils.Ray;
+import core.utils.SoundManager;
 import core.utils.Vector2D;
 
 import javax.swing.*;
@@ -23,6 +25,7 @@ public class Player {
 
     private InputHandler inputHandler; // InputHandler to react to user input.
     private Timer timer; // Timer for shooting.
+    private Timer animationTimer;
 
     private Map map;
 
@@ -36,6 +39,11 @@ public class Player {
     private final int shootDelay = 200;
 
     private final double runSpeed = 0.1, playerSpeed = 0.05;
+
+    private Texture weaponIdle = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\player\\gunIdle.png");
+      private Texture weaponShoot = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\player\\gunShoot.png");
+    private Texture currentWeapon;
+
 
 
     public void setPosition(Player player) {
@@ -93,7 +101,18 @@ public class Player {
 
         isShooting = false;
 
+
+        this.currentWeapon = weaponIdle;
+
         timer = new Timer(shootDelay, e -> shoot());
+        animationTimer = new Timer(150, e -> {
+            currentWeapon = weaponIdle;
+            animationTimer.stop();
+        });
+    }
+
+    public Texture getCurrentWeapon() {
+        return currentWeapon;
     }
 
     /**
@@ -433,6 +452,7 @@ public class Player {
 
 
             if(map.getWall(directionX, directionY).equals(Map.WALLS.DOOR)){
+                SoundManager.getInstance().playSound("door");
                 map.setValue(directionX, directionY, Map.WALLS.EMPTY);
             }else if (map.getWall(directionX, directionY).equals(Map.WALLS.GOAL) && attributes.getKey()) {
                 activatedGoal = true;
@@ -452,14 +472,19 @@ public class Player {
         }
 
         if (inputHandler.isShoot()) {
-            if (!isShooting)
+            if (!isShooting) {
                 for (Drone drone : map.getEnemies()) {
                     if (drone.getRenderSprite().getShootable() && canShoot()) {
                         drone.takeDamage(40);
                     }
                 }
+            }
+            System.out.println("SWITCH TEXTURE");
             isShooting = true;
-            timer.start();
+            if(!(attributes.getCurrentAmmo() == 0 && attributes.getAmmoPack() == 0)){
+                currentWeapon = weaponShoot;
+                timer.start();
+            }
         }
 
         // Start the ray casting.
@@ -470,9 +495,11 @@ public class Player {
      * Shoots a bullet.
      */
     private void shoot() {
+        SoundManager.getInstance().playSound("shoot");
         isShooting = false;
         attributes.shoot();
         timer.stop();
+        animationTimer.start();
     }
 
     /**
@@ -496,6 +523,7 @@ public class Player {
      * Adds ammo to the player.
      */
     public void addAmmo() {
+        SoundManager.getInstance().playSound("ammo");
         attributes.addAmmo();
     }
 

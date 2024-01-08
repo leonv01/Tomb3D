@@ -1,5 +1,7 @@
 package core.entities;
 
+import core.utils.SoundManager;
+
 public class EntityAttributes {
     private boolean isAlive;
 
@@ -92,6 +94,7 @@ public class EntityAttributes {
         currentAmmo--;
         if(currentAmmo < 0) {
             if(ammoPack > 0){
+                SoundManager.getInstance().playSound("reload");
                 currentAmmo = maxAmmo;
                 ammoPack--;
             }

@@ -370,6 +370,7 @@ public class Display extends JFrame implements Runnable{
         int ammoPack = player.getAmmoPack();
         boolean hasKey = player.getKey();
 
+        g.drawImage(player.getCurrentWeapon().getImage(), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
         g.drawImage(ui.getCombinedImage(health, ammo, ammoPack, score, hasKey), 0, 0, DIS_WIDTH, DIS_HEIGHT, null);
 
         if(gameEnd){

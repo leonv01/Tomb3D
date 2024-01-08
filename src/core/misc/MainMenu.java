@@ -72,6 +72,7 @@ public class MainMenu extends JFrame {
         JButton backButton = new JButton("Back");
         JButton resetButton = new JButton("Reset");
         JTextArea highscoreArea = new JTextArea();
+        highscoreFrame.setResizable(false);
 
         Box hBox = Box.createHorizontalBox();
         hBox.add(resetButton);
@@ -119,7 +120,7 @@ public class MainMenu extends JFrame {
 
         creditsFrame.add(creditsPanel);
         creditsFrame.setSize(500, 500);
-        creditsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        creditsFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         creditsFrame.setVisible(true);
 
         backButton.addActionListener(e -> creditsFrame.setVisible(false));
@@ -174,6 +175,10 @@ public class MainMenu extends JFrame {
         TextField nameField = new TextField("Enter your name here");
         nameField.setText(Config.PLAYER_NAME);
         nameField.setFont(font);
+        nameField.addActionListener(e -> {
+            Config.PLAYER_NAME = nameField.getText();
+            System.out.println(Config.PLAYER_NAME);
+        });
        // TextField fovField = new TextField("Enter your fov here");
         TextField resolutionField = new TextField("Enter your resolution here");
 
@@ -204,7 +209,10 @@ public class MainMenu extends JFrame {
        // fovField.addActionListener(e -> fovField.setText(""));
         resolutionField.addActionListener(e -> resolutionField.setText(""));
 
-        backButton.addActionListener(e -> settingsFrame.setVisible(false));
+        backButton.addActionListener(e -> {
+            Config.PLAYER_NAME = nameField.getText();
+            settingsFrame.setVisible(false);
+        });
        // applyButton.addActionListener(e -> applySettings(nameField.getText(), fovField.getText(), resolutionField.getText()));
 
         settingsPanel.setLayout(layout);
