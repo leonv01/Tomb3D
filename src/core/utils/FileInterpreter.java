@@ -198,13 +198,13 @@ public class FileInterpreter {
         }
     }
 
-    public static void exportHighscore(File file, HighscoreEntry entry) {
+    public static void exportHighscore(File file, HighscoreEntry entry, String time) {
         System.out.println("Exporting highscore");
         BufferedReader reader;
         BufferedWriter writer;
 
         ArrayList<HighscoreEntry> highscoreEntries = new ArrayList<>(MAX_HIGHSCORE_ENTRIES);
-        highscoreEntries.add(entry);
+        highscoreEntries.add(new HighscoreEntry(entry.getName(), entry.getScore(), time));
 
         int i = 0;
         try {
@@ -217,9 +217,12 @@ public class FileInterpreter {
                     String name = nameString[1].trim();
 
                     String[] scoreString = line.split("Score:");
-                    int score = Integer.parseInt(scoreString[1].trim());
+                    int score = Integer.parseInt(scoreString[1].split("\\|")[0].trim());
 
-                    highscoreEntries.add(new HighscoreEntry(name, score));
+                    String[] timeString = line.split("Time:");
+                    String timeVal = timeString[1].trim();
+
+                    highscoreEntries.add(new HighscoreEntry(name, score, timeVal));
                 }
             }
             reader.close();
@@ -232,9 +235,9 @@ public class FileInterpreter {
                 highscoreEntries.sort((o1, o2) -> o2.getScore() - o1.getScore());
                 highscoreEntries.forEach(highscoreEntry -> {
                     try {
-                        writer.write("----------------------------------------------------------------------\n");
-                        writer.write(String.format("Name: %s\t|\tScore: %d\n", highscoreEntry.getName(), highscoreEntry.getScore()));
-                        writer.write("----------------------------------------------------------------------\n");
+                        writer.write("-------------------------------------------------------------------------------------------------------------\n");
+                        writer.write(String.format("Name: %s\t|\tScore: %d\t|\tTime: %s\n", highscoreEntry.getName(), highscoreEntry.getScore(), highscoreEntry.getTimeVal()));
+                        writer.write("-------------------------------------------------------------------------------------------------------------\n");
                     } catch (IOException ignored) {
                     }
                 });
@@ -274,7 +277,7 @@ public class FileInterpreter {
     }
 
     public static void main(String[] args) {
-        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), new HighscoreEntry("Test", 100));
+        FileInterpreter.exportHighscore(new File("src/highscore/highscore.txt"), new HighscoreEntry("Test", 100), "");
     }
 
 

@@ -62,6 +62,9 @@ public class Drone {
         System.out.println(attributes.getHealth());
     }
 
+    public void stopTimer(){
+        timer.stop();
+    }
 
     public Player getPlayer() {
         return player;
