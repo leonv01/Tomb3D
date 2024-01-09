@@ -2,17 +2,20 @@
 is a pure Java Swing game, using the ray casting technique to simulate a 3D worldspace by only using 2D coordinates. 
 
 ## Roadmap:
-- Enemies + Enemy targeting
-- Shooting mechanic
-- Looting/Point system
-- Level Editor
-- Import/Export custom maps
+- [x] Enemies + Enemy targeting 
+- [x] Shooting mechanic  
+- [x] Looting/Point system 
+- [x] Level Editor
+- [x] Import/Export custom maps
+- [x] Custom sounds and textures
+- [x] Multiple enemy textures
+- [x] Highscore system
+- [x] Settings menu
+- [x] Player sprite
+- [x] Animations
 
 ## Requirements:
 - Java Runtime Environment
-
-## Hardware Acceleration:
-For a better experience and a smoother rendering and framerate add "-Dsun.java2d.opengl=true" to your JVM options to allow hardware acceleration.
 
 ## License:
 Distributed under the MIT License. 
