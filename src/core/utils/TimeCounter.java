@@ -17,7 +17,7 @@ public class TimeCounter {
             seconds++;
             milliseconds = 0;
         }
-        if (seconds == 60) {
+        if (seconds >= 60) {
             minutes++;
             seconds = 0;
         }

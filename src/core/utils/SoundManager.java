@@ -1,11 +1,9 @@
 package core.utils;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -13,17 +11,20 @@ import java.util.Objects;
 public class SoundManager extends Thread {
 
     Thread thread;
+    Thread backgroundMusicThread;
 
     private final Map<String, Clip> soundMap;
     private FloatControl gainControl;
 
     private static SoundManager instance = null;
+    Clip backgroundMusic;
+
 
     public SoundManager() {
         thread = new Thread(this);
         this.soundMap = new HashMap<>();
         loadSound("shoot", "/sfx/Shot.wav");
-         loadSound("door", "/sfx/DoorOpen.wav");
+        loadSound("door", "/sfx/DoorOpen.wav");
         loadSound("reload", "/sfx/Reload.wav");
         loadSound("ammo", "/sfx/Ammopickup.wav");
         loadSound("ambient", "/sfx/DungeonSlayer.wav");
@@ -35,6 +36,34 @@ public class SoundManager extends Thread {
             instance = new SoundManager();
         }
         return instance;
+    }
+
+    public void playBackgroundMusic() {
+       backgroundMusicThread = new Thread(() -> {
+            try {
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
+                        Objects.requireNonNull(SoundManager.class.getResourceAsStream("/sfx/DungeonSlayer.wav"))
+                );
+                backgroundMusic = AudioSystem.getClip();
+                backgroundMusic.open(audioInputStream);
+                backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+                e.printStackTrace();
+            }
+        });
+       backgroundMusicThread.start();
+    }
+
+    public void stopBackgroundMusic() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+
+        try{
+            backgroundMusicThread.join();
+        }catch (InterruptedException e) {
+            System.out.println("threads couldn't join");
+        }
     }
 
     public void loadSound(String name, String filename){
@@ -68,7 +97,7 @@ public class SoundManager extends Thread {
     }
 
     public static void main(String[] args) {
-        SoundManager soundManager = new SoundManager();
-        soundManager.playSound("ambient");
+        SoundManager.getInstance().playBackgroundMusic();
+
     }
 }

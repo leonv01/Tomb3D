@@ -5,6 +5,7 @@ import core.entities.Obstacle;
 import core.entities.Player;
 import core.graphics.Display;
 import core.utils.FileInterpreter;
+import core.utils.SoundManager;
 import core.utils.TimeCounter;
 import core.utils.Vector2D;
 import core.entities.Drone;
@@ -155,6 +156,7 @@ public class Game implements Runnable{
 
         gameTimer.start();
 
+        SoundManager.getInstance().playBackgroundMusic();
         // Game loop.
         while(running) {
 
@@ -209,6 +211,8 @@ public class Game implements Runnable{
                 break;
         }
         System.out.println("END");
+        SoundManager.getInstance().stopBackgroundMusic();
+        SoundManager.getInstance().stopSound("ambient");
         try {
             Thread.sleep(gameEnd ? 5000 : 1000);
         } catch (InterruptedException e) {
