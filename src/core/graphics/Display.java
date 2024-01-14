@@ -118,11 +118,14 @@ public class Display extends JFrame implements Runnable{
         this.addDrones(map.getEnemies());
         this.addObstacle(map.getObstacles());
         this.addPlayer(map.getPlayer());
+        /*
         try{
             Thread.sleep(100);
         } catch (InterruptedException e){
             System.out.println("Thread couldn't sleep");
         }
+
+         */
     }
 
     public void setGameEnd(boolean value){

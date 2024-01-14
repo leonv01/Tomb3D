@@ -40,8 +40,8 @@ public class Player {
 
     private final double runSpeed = 0.1, playerSpeed = 0.05;
 
-    private Texture weaponIdle = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\player\\gunIdle.png");
-      private Texture weaponShoot = new Texture("C:\\Users\\leonv\\Documents\\Tomb3D\\Tomb3D\\src\\textures\\player\\gunShoot.png");
+    private Texture weaponIdle = new Texture("src/textures/player/gunIdle.png");
+      private Texture weaponShoot = new Texture("src/textures/player/gunShoot.png");
     private Texture currentWeapon;
 
 

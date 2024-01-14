@@ -262,9 +262,9 @@ public class Drone {
                 speed = Config.BOSS_ENEMY_SPEED;
                 damage = Config.BOSS_ENEMY_DAMAGE;
                 score = Config.BOSS_ENEMY_SCORE;
-                idlePath = texturePath.concat("medium/mediumIdle.png");
-                attackStartPath = texturePath.concat("medium/mediumAttack.png");
-                attackEndPath = texturePath.concat("medium/mediumAttack.png");
+                idlePath = texturePath.concat("heavy/heavyIdle.png");
+                attackStartPath = texturePath.concat("heavy/heavyAttack.png");
+                attackEndPath = texturePath.concat("heavy/heavyAttacking.png");
             }
         }
         this.transactPoints = true;
