@@ -30,7 +30,14 @@ public class Obstacle {
             case AMMO_PACK -> texture = new Texture("src/textures/collectibles/ammo64.png");
             case OBSTACLE -> texture = new Texture("src/textures/obstacles/ceilingLamp.png");
             case KEY -> texture = new Texture("src/textures/collectibles/key_yellow64.png");
-            case COLLECTIBLE -> texture = new Texture("src/textures/collectibles/score64.png");
+            case COLLECTIBLE -> {
+                if(Math.random() < 0.5) {
+                    System.out.println("Score 2");
+                    texture = new Texture("src/textures/collectibles/score64_2.png");
+                }
+                else
+                    texture = new Texture("src/textures/collectibles/score64.png");
+            }
         }
     }
 

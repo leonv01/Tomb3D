@@ -28,6 +28,11 @@ public class SoundManager extends Thread {
         loadSound("reload", "/sfx/Reload.wav");
         loadSound("ammo", "/sfx/Ammopickup.wav");
         loadSound("ambient", "/sfx/DungeonSlayer.wav");
+        loadSound("coins", "/sfx/coins.wav");
+        loadSound("pickup", "/sfx/pickupSound.wav");
+        loadSound("damage1", "/sfx/damagePlayer1.wav");
+        loadSound("damage2", "/sfx/damagePlayer2.wav");
+        loadSound("damage3", "/sfx/damagePlayer3.wav");
         thread.start();
     }
 
@@ -82,8 +87,8 @@ public class SoundManager extends Thread {
 
     public void playSound(String name){
         Clip clip = soundMap.get(name);
-        gainControl = (FloatControl) soundMap.get(name).getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(-10.0f);
+     //   gainControl = (FloatControl) soundMap.get(name).getControl(FloatControl.Type.MASTER_GAIN);
+      //  gainControl.setValue(-10.0f);
         if(clip == null) return;
         if(clip.isRunning()) clip.stop();
         clip.setFramePosition(0);

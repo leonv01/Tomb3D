@@ -27,6 +27,7 @@ public class Drone {
     private double rotation, radius;
     private Texture idleSprite, attackStart, attackEnd;
     private Obstacle renderSprite;
+    private Texture graveStone;
 
     private boolean transactPoints;
 
@@ -83,7 +84,10 @@ public class Drone {
                 player.addScore(attributes.getScore());
                 transactPoints = false;
             }
+            timer.stop();
+            idleTimer.stop();
             state = State.DEAD;
+            renderSprite.setTexture(graveStone);
         }
         else if(distance < radius)
             state = State.CHASE;
@@ -100,7 +104,7 @@ public class Drone {
      * The drone will die.
      */
     private void dead(){
-        renderSprite.setVisible(false);
+        renderSprite.setVisible(true);
         renderSprite.setActive(false);
         renderSprite.setShootable(false);
     }
@@ -272,6 +276,7 @@ public class Drone {
         this.idleSprite = new Texture(idlePath);
         this.attackEnd = new Texture(attackEndPath);
         this.attackStart = new Texture(attackStartPath);
+        this.graveStone = new Texture(texturePath.concat("graveStone.png"));
 
         this.renderSprite = new Obstacle(idlePath, position, Obstacle.Type.ENEMY, 200);
     }

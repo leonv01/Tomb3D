@@ -141,6 +141,7 @@ public class FileInterpreter {
                             }
                             case "#" -> {
                                 obstacles.add(new Obstacle(
+                                        Math.random() < 0.3 ? "src/textures/collectibles/score64_2.png" :
                                         "src/textures/collectibles/score64.png",
                                         position,
                                         Obstacle.Type.COLLECTIBLE,
@@ -150,7 +151,8 @@ public class FileInterpreter {
                             }
                             case "o" -> {
                                 obstacles.add(new Obstacle(
-                                        "src/textures/obstacles/ceilingLamp.png",
+                                        Math.random() < 0.5 ? "src/textures/obstacles/ceilingLamp.png" :
+                                                "src/textures/obstacles/rock64.png",
                                         position,
                                         Obstacle.Type.OBSTACLE,
                                         0

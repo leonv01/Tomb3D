@@ -532,6 +532,7 @@ public class Player {
      * @param health The amount of health to be added.
      */
     public void addHealth(int health) {
+        SoundManager.getInstance().playSound("pickup");
         attributes.addHealth(health);
     }
 
@@ -540,6 +541,7 @@ public class Player {
      * @param score The amount of score to be added.
      */
     public void addScore(int score) {
+        SoundManager.getInstance().playSound("coins");
         attributes.addScore(score);
         System.out.println(attributes.getScore());
     }
@@ -549,6 +551,7 @@ public class Player {
      * @param damage The damage to be taken.
      */
     public void takeDamage(int damage) {
+        SoundManager.getInstance().playSound("damage" + (int) (Math.random() * 3 + 1));
         attributes.takeDamage(damage);
         if (attributes.getHealth() <= 0)
             state = State.DEAD;
