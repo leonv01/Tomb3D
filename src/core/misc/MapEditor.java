@@ -4,10 +4,7 @@ package core.misc;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Objects;
 import javax.swing.*;
 
@@ -16,6 +13,8 @@ import javax.swing.*;
  * @author panna
  */
 public class MapEditor extends javax.swing.JFrame {
+
+    int selectedIndex = 0;
 
     /**
      * Creates new form MapEditor_v01
@@ -26,6 +25,12 @@ public class MapEditor extends javax.swing.JFrame {
     public MapEditor() {
         initComponents();
         listModel = new DefaultListModel<>();
+        jList1.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                textField.setText(jList1.getSelectedValue());
+                selectedIndex = jList1.getSelectedIndex();
+            }
+        });
         flag =true;
     }
 
@@ -47,7 +52,7 @@ public class MapEditor extends javax.swing.JFrame {
         writeToFileButton = new javax.swing.JButton();
         removeDataFromMapButton = new javax.swing.JButton();
         readDataFromFileButton = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        textField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -96,7 +101,7 @@ public class MapEditor extends javax.swing.JFrame {
         addDataToMapButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         addDataToMapButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addDataToMapEvent(evt);
             }
         });
 
@@ -107,7 +112,7 @@ public class MapEditor extends javax.swing.JFrame {
         writeToFileButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         writeToFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                writeDataToFileEvent(evt);
             }
         });
 
@@ -118,7 +123,7 @@ public class MapEditor extends javax.swing.JFrame {
         removeDataFromMapButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         removeDataFromMapButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                removeDataFromMapEvent(evt);
             }
         });
 
@@ -129,11 +134,11 @@ public class MapEditor extends javax.swing.JFrame {
         readDataFromFileButton.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         readDataFromFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                readDataFromFileEvent(evt);
             }
         });
 
-        jTextField1.setBorder(new javax.swing.border.MatteBorder(null));
+        textField.setBorder(new javax.swing.border.MatteBorder(null));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -149,14 +154,14 @@ public class MapEditor extends javax.swing.JFrame {
                                 .addGap(233, 233, 233))
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGap(20, 20, 20)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
                 jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGap(67, 67, 67)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(52, 52, 52)
                                 .addComponent(addDataToMapButton, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -207,24 +212,29 @@ public class MapEditor extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void readDataFromFileEvent(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // Load data to JList Form Text File
-        if (flag) {
-            BufferedReader br = null;
-            try {
 
-            } catch (Exception e) {
-            }
-        }
+        listModel.clear();
         BufferedReader br= null;
         try {
-            br = new BufferedReader(new FileReader("List.txt"));
-            int val = Integer.parseInt(br.readLine()); // read the first line from i,e integer value
+            String fileName = textField.getText();
+            br = new BufferedReader(new FileReader("src/maps/".concat(fileName).concat(".txt")));
+            //int val = Integer.parseInt(br.readLine()); // read the first line from i,e integer value
             //means number of entries in file
+            String line;
+            listModel.addElement(fileName);
+            while((line = br.readLine()) != null){
+                line = line.replaceAll(" ", "0");
+                listModel.addElement(line); //add data to list model object
+            }
+            /*
             for (int i = 0; i < val; i++) {
                 String ss = br.readLine();  //read data from file
                 listModel.addElement(ss); //add data to list model object
             }
+
+             */
             jList1.setModel(listModel);//store listmodel to jlist object
             //Now Control Multile entry
             flag = false;
@@ -240,44 +250,51 @@ public class MapEditor extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void removeDataFromMapEvent(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        listModel.remove(selectedIndex);
         //Remove data from JList not from file
-        listModel.removeAllElements();
-        jList1.setModel(listModel);
+
+//        listModel.removeAllElements();
+  //      jList1.setModel(listModel);
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void writeDataToFileEvent(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Writing to text file
-        int val = jList1.getModel().getSize(); //get the size of jList and store in variable
-        PrintWriter writer = null;
+       // int val = jList1.getModel().getSize(); //get the size of jList and store in variable
+        String fileName = listModel.get(0);
         try {
-            writer = new PrintWriter("List.txt");
-            writer.println(val);//write size of jList to file first which help us to store number of
-            //entries to file using loop
-            for (int i = 0; i < val; i++) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("src/maps/".concat(fileName).concat(".txt")));
+            for(int i = 0; i < listModel.getSize(); i++){
 
-                writer.println(jList1.getModel().getElementAt(i));//get the element from
-                //jlist model via index value
+                String str = listModel.getElementAt(i);
+                if(i > 0)
+                    str = str.replaceAll("0", " ");
+
+                writer.write(str.concat("\n"));
             }
+            writer.close();
         } catch (Exception e) {
             System.out.println("" + e);
         }finally{
 
-            writer.close();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String str = jTextField1.getText();
+    private void addDataToMapEvent(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String str = textField.getText();
         if (str.equals("")||str.equalsIgnoreCase("Type Here")) {
             //Show message if text field is empty
-            jTextField1.setText("Type Here");
+            textField.setText("Type Here");
         }
         else{
+            listModel.set(selectedIndex, str);
+            /*
             listModel.addElement(str); //add string to listmodel
             jList1.setModel(listModel);//set listmodel to jlist
-            jTextField1.setText("");//clear text field
+            textField.setText("");//clear text field
             flag=true;
+
+             */
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -329,6 +346,6 @@ public class MapEditor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField textField;
     // End of variables declaration//GEN-END:variables
 }

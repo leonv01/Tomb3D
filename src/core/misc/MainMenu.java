@@ -104,10 +104,10 @@ public class MainMenu extends JFrame {
         creditsArea.setEditable(false);
         creditsArea.setText("Credits:\n\n" +
                         "Leon Vogt\n" +
-                        "Nikolai\n" +
+                        "Nikita Kovach\n" +
                         "Silas Winter\n" +
-                        "Max \n"+
-                        "Beyza \n");
+                        "Max Staudenmaier\n"+
+                        "Beyza Altinay\n");
 
 
 

@@ -479,7 +479,7 @@ public class Player {
                     }
                 }
             }
-            System.out.println("SWITCH TEXTURE");
+          //  System.out.println("SWITCH TEXTURE");
             isShooting = true;
             if(!(attributes.getCurrentAmmo() == 0 && attributes.getAmmoPack() == 0)){
                 currentWeapon = weaponShoot;
