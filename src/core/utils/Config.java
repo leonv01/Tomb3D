@@ -41,7 +41,7 @@ public class Config {
     public final static double HEAVY_ENEMY_SPEED = 0.01;
 
     public final static int BOSS_ENEMY_DAMAGE = 17;
-    public final static int BOSS_ENEMY_HEALTH = 600;
+    public final static int BOSS_ENEMY_HEALTH = 1200;
     public final static int BOSS_ENEMY_SCORE = 400;
     public final static double BOSS_ENEMY_SPEED = 0.005;
 

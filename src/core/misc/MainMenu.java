@@ -107,7 +107,7 @@ public class MainMenu extends JFrame {
                         "Nikita Kovach\n" +
                         "Silas Winter\n" +
                         "Max Staudenmaier\n"+
-                        "Beyza Altinay\n");
+                        "Beyzanur Altinay\n");
 
 
 
