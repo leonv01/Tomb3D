@@ -14,19 +14,19 @@ John Doe is a lone adventurer and tomb explorer, always keeping an eye open for 
 - `E` - Open/Close doors
 - `Shift` - Sprint
 
-## Objective:
+## Objective
 - Collect as many treasures as possible
 - Find the key to unlock the exit
 - Kill as many enemies as possible
 - Survive
 
-## Screenshots:
+## Screenshots
 ![Screenshot](img/Tomb3D_Screen1.png) \
 ![Screenshot](img/Tomb3D_Screen2.png) \
 ![Screenshot](img/Tomb3D_Screen3.png) \
 
 ## Requirements
-- Java Runtime Environment
+Java Runtime Environment
 
 ## License
 Distributed under the MIT License.
