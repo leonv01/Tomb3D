@@ -23,7 +23,7 @@ John Doe is a lone adventurer and tomb explorer, always keeping an eye open for 
 ## Screenshots
 ![Screenshot](img/Tomb3D_Screen1.png) \
 ![Screenshot](img/Tomb3D_Screen2.png) \
-![Screenshot](img/Tomb3D_Screen3.png) \
+![Screenshot](img/Tomb3D_Screen3.png) 
 
 ## Requirements
 Java Runtime Environment
